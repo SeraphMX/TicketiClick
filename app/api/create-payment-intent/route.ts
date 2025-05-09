@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       automatic_payment_methods: {
         enabled: true
       },
-      application_fee_amount: Math.round(amount * 0.05), // 5% platform fee
+      application_fee_amount: Math.round(amount * 0.1), // 10% platform fee
       transfer_data: {
         destination: '{{CONNECTED_ACCOUNT_ID}}' // Replace with the organizer's Stripe account ID
       }

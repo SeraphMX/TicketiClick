@@ -39,7 +39,7 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
 
   // Función para ir al checkout
   const handlePurchase = () => {
-    router.push(`/event/${event.id}/checkout`)
+    router.push(`/event/${event.slug}/checkout`)
   }
 
   return (

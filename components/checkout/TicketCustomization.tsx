@@ -2,7 +2,7 @@
 // components/checkout/TicketCustomization.tsx
 // Componente de personalización de boletos
 
-import { ArrowLeft, ChevronRight, Palette, Type } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Type } from 'lucide-react'
 import { useState } from 'react'
 
 interface TicketCustomizationProps {
@@ -61,32 +61,6 @@ export default function TicketCustomization({ formData, onSubmit, onSkip, onBack
             className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
           />
           <p className='mt-1 text-sm text-gray-500'>Este nombre aparecerá impreso en tu boleto</p>
-        </div>
-
-        {/* Color de fondo */}
-        <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            <div className='flex items-center'>
-              <Palette className='h-5 w-5 mr-2' />
-              Color de fondo
-            </div>
-          </label>
-          <div className='grid grid-cols-2 gap-4'>
-            {BACKGROUND_COLORS.map((color) => (
-              <button
-                key={color.value}
-                type='button'
-                onClick={() => setSelectedColor(color.value)}
-                className={`
-                  p-4 rounded-lg border-2 transition-all
-                  ${selectedColor === color.value ? 'border-blue-500 shadow-sm' : 'border-gray-200 hover:border-gray-300'}
-                `}
-                style={{ backgroundColor: color.value }}
-              >
-                <span className='text-sm font-medium text-gray-900'>{color.name}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Vista previa */}

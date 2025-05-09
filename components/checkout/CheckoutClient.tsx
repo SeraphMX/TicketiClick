@@ -78,7 +78,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
       <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Timer */}
         <div className='bg-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between'>
-          <Link href={`/event/${event.id}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
+          <Link href={`/event/${event.slug}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
             <ArrowLeft className='h-5 w-5 mr-1' />
             Volver al evento
           </Link>
