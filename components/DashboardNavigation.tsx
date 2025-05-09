@@ -77,9 +77,9 @@ const DashboardNavigation = () => {
 
   return (
     <div className='bg-white rounded-lg shadow-md overflow-hidden'>
-      <div className='p-4 bg-purple-700 text-white'>
+      <div className='p-4 bg-blue-700 text-white'>
         <h2 className='text-xl font-semibold'>Dashboard</h2>
-        <p className='text-sm text-purple-200'>
+        <p className='text-sm text-blue-200'>
           Rol: {user.role === 'user' ? 'Usuario' : user.role === 'organizer' ? 'Organizador' : 'Administrador'}
         </p>
       </div>
@@ -95,12 +95,12 @@ const DashboardNavigation = () => {
                   href={item.href}
                   className={`
                     flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
-                    ${active ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}
+                    ${active ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}
                   `}
                 >
-                  <span className={`mr-3 ${active ? 'text-purple-600' : 'text-gray-500'}`}>{item.icon}</span>
+                  <span className={`mr-3 ${active ? 'text-blue-600' : 'text-gray-500'}`}>{item.icon}</span>
                   {item.name}
-                  {active && <ChevronRight className='ml-auto h-4 w-4 text-purple-600' />}
+                  {active && <ChevronRight className='ml-auto h-4 w-4 text-blue-600' />}
                 </Link>
               </li>
             )

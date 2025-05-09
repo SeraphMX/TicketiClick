@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className='relative bg-gradient-to-r from-purple-700 to-indigo-900 text-white py-20'>
+      <section className='relative bg-gradient-to-r from-blue-700 to-zinc-900 text-white py-20'>
         <div
           className='absolute inset-0 bg-black opacity-20'
           style={{
@@ -55,20 +55,20 @@ export default function Home() {
         <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='max-w-3xl'>
             <h1 className='text-4xl sm:text-5xl font-extrabold mb-6 animate-fade-in'>Descubre eventos increíbles cerca de ti</h1>
-            <p className='text-lg sm:text-xl mb-8 text-purple-100'>
+            <p className='text-lg sm:text-xl mb-8 text-blue-100'>
               Encuentra y compra boletos para conciertos, eventos deportivos, teatro y mucho más.
             </p>
             <div className='flex flex-col sm:flex-row gap-4'>
               <Link
                 href='/events'
-                className='inline-flex items-center justify-center px-5 py-3 bg-white text-purple-700 font-medium rounded-lg hover:bg-gray-100 transition-colors'
+                className='inline-flex items-center justify-center px-5 py-3 bg-white text-blue-700 font-medium rounded-lg hover:bg-gray-100 transition-colors'
               >
                 <Search className='h-5 w-5 mr-2' />
                 Explorar eventos
               </Link>
               <Link
                 href='/login'
-                className='inline-flex items-center justify-center px-5 py-3 bg-purple-600 text-white font-medium rounded-lg border border-purple-500 hover:bg-purple-700 transition-colors'
+                className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
               >
                 Iniciar sesión
               </Link>
@@ -81,7 +81,7 @@ export default function Home() {
       <section className='py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center mb-8'>
           <h2 className='text-2xl sm:text-3xl font-bold text-gray-800'>Eventos Destacados</h2>
-          <Link href='/events' className='inline-flex items-center text-purple-600 hover:text-purple-800 transition-colors'>
+          <Link href='/events' className='inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors'>
             Ver todos
             <ArrowRight className='h-4 w-4 ml-1' />
           </Link>
@@ -125,7 +125,7 @@ export default function Home() {
         <div className='mt-8 text-center'>
           <Link
             href='/events'
-            className='inline-flex items-center justify-center px-5 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors'
+            className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors'
           >
             <Calendar className='h-5 w-5 mr-2' />
             Ver todos los eventos
@@ -134,21 +134,21 @@ export default function Home() {
       </section>
 
       {/* Información adicional */}
-      <section className='py-12 bg-gradient-to-r from-purple-50 to-indigo-50'>
+      <section className='py-12 bg-gradient-to-r from-blue-50 to-zinc-50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center'>¿Por qué elegir Ticketi?</h2>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {/* Tarjeta 1 */}
             <div className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-              <Search className='h-12 w-12 mb-4 text-purple-600' />
+              <Search className='h-12 w-12 mb-4 text-blue-600' />
               <h3 className='text-xl font-semibold mb-3 text-gray-800'>Encuentra fácilmente</h3>
               <p className='text-gray-600'>Busca eventos por categoría, ubicación o fecha y encuentra exactamente lo que estás buscando.</p>
             </div>
 
             {/* Tarjeta 2 */}
             <div className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-              <CalendarDays className='h-12 w-12 mb-4 text-purple-600' />
+              <CalendarDays className='h-12 w-12 mb-4 text-blue-600' />
               <h3 className='text-xl font-semibold mb-3 text-gray-800'>Eventos para todos</h3>
               <p className='text-gray-600'>
                 Desde conciertos y eventos deportivos hasta conferencias y talleres, tenemos eventos para todos los gustos.
@@ -157,7 +157,7 @@ export default function Home() {
 
             {/* Tarjeta 3 */}
             <div className='bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-              <MapPin className='h-12 w-12 mb-4 text-purple-600' />
+              <MapPin className='h-12 w-12 mb-4 text-blue-600' />
               <h3 className='text-xl font-semibold mb-3 text-gray-800'>Cerca de ti</h3>
               <p className='text-gray-600'>
                 Descubre eventos en tu ciudad o planifica tu próximo viaje con eventos en diferentes ubicaciones.

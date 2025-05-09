@@ -1,59 +1,57 @@
 // components/Footer.tsx
 // Pie de página
 
-import Link from 'next/link';
-import { Ticket, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, Phone, Ticket, Twitter } from 'lucide-react'
+import Link from 'next/link'
 
 const Footer = () => {
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className='bg-gray-900 text-white'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-8'>
           {/* Logo y descripción */}
-          <div className="col-span-1 md:col-span-1">
-            <div className="flex items-center mb-4">
-              <Ticket className="h-8 w-8 mr-2 text-purple-400" />
-              <span className="font-bold text-xl">Ticketi</span>
+          <div className='col-span-1 md:col-span-1'>
+            <div className='flex items-center mb-4'>
+              <Ticket className='h-8 w-8 mr-2 text-blue-400' />
+              <span className='font-bold text-xl'>Ticketi</span>
             </div>
-            <p className="text-gray-400 mb-4">
-              Los mejores eventos en un solo click
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Facebook className="h-5 w-5" />
+            <p className='text-gray-400 mb-4'>Los mejores eventos en un solo click</p>
+            <div className='flex space-x-4'>
+              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Facebook className='h-5 w-5' />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Twitter className="h-5 w-5" />
+              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Twitter className='h-5 w-5' />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Instagram className='h-5 w-5' />
               </a>
             </div>
           </div>
 
           {/* Enlaces rápidos */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">Enlaces Rápidos</h3>
-            <ul className="space-y-2">
+            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Enlaces Rápidos</h3>
+            <ul className='space-y-2'>
               <li>
-                <Link href="/" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='/' className='text-gray-400 hover:text-white transition-colors'>
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link href="/events" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='/events' className='text-gray-400 hover:text-white transition-colors'>
                   Eventos
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='/dashboard' className='text-gray-400 hover:text-white transition-colors'>
                   Mi cuenta
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Preguntas frecuentes
                 </Link>
               </li>
@@ -62,30 +60,30 @@ const Footer = () => {
 
           {/* Categorías de eventos */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">Categorías</h3>
-            <ul className="space-y-2">
+            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Categorías</h3>
+            <ul className='space-y-2'>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Conciertos
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Deportes
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Teatro
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Conferencias
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-gray-400 hover:text-white transition-colors">
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Festivales
                 </Link>
               </li>
@@ -94,31 +92,31 @@ const Footer = () => {
 
           {/* Contacto */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 border-b border-gray-700 pb-2">Contacto</h3>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <MapPin className="h-5 w-5 mr-2 text-purple-400 mt-0.5" />
-                <span className="text-gray-400">Calle Principal 123, México</span>
+            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Contacto</h3>
+            <ul className='space-y-3'>
+              <li className='flex items-start'>
+                <MapPin className='h-5 w-5 mr-2 text-blue-400 mt-0.5' />
+                <span className='text-gray-400'>Calle Principal 123, México</span>
               </li>
-              <li className="flex items-center">
-                <Phone className="h-5 w-5 mr-2 text-purple-400" />
-                <span className="text-gray-400">+34 912 345 678</span>
+              <li className='flex items-center'>
+                <Phone className='h-5 w-5 mr-2 text-blue-400' />
+                <span className='text-gray-400'>+34 912 345 678</span>
               </li>
-              <li className="flex items-center">
-                <Mail className="h-5 w-5 mr-2 text-purple-400" />
-                <span className="text-gray-400">info@ticketi.click</span>
+              <li className='flex items-center'>
+                <Mail className='h-5 w-5 mr-2 text-blue-400' />
+                <span className='text-gray-400'>info@ticketi.click</span>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Derechos de autor */}
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <div className='border-t border-gray-800 mt-8 pt-8 text-center text-gray-400'>
           <p>© {currentYear} Ticketi Click. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
