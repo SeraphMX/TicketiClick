@@ -42,6 +42,11 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
     setError(null)
 
     try {
+      // Calculate total amount including 5% service fee
+      const baseAmount = selectedEvent.price * 100 // Convert to cents
+      const serviceFee = Math.round(baseAmount * 0.1) // 10% service fee
+      const totalAmount = baseAmount + serviceFee
+
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
@@ -49,7 +54,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          amount: selectedEvent.price * 100, // Convert to cents
+          amount: totalAmount, // Total amount including service fee
           currency: selectedEvent.currency.toLowerCase(),
           stripe_id: selectedEvent.stripe_id
         })
@@ -130,16 +135,21 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
                   <div className='mt-4 pl-7'>
                     <CardElement
                       options={{
+                        hidePostalCode: true,
                         style: {
                           base: {
                             fontSize: '16px',
                             color: '#424770',
+                            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                            fontSmoothing: 'antialiased',
                             '::placeholder': {
                               color: '#aab7c4'
-                            }
+                            },
+                            padding: '10px 12px'
                           },
                           invalid: {
-                            color: '#9e2146'
+                            color: '#9e2146',
+                            iconColor: '#9e2146'
                           }
                         }
                       }}
