@@ -1,8 +1,7 @@
 'use client'
-// components/EventDetailClient.tsx
-// Componente cliente para la página de detalle de evento
-
+import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
+import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { CalendarDays, ChevronLeft, Clock, MapPin, Tag, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -29,16 +28,14 @@ const translateCategory = (category: string) => {
   return translations[category] || 'Otro'
 }
 
-interface EventDetailClientProps {
-  event: Event
-}
-
-export default function EventDetailClient({ event }: EventDetailClientProps) {
+export default function EventDetailClient({ event }: { event: Event }) {
   const router = useRouter()
+  const dispatch = useDispatch()
   const [quantity, setQuantity] = useState(1)
 
   // Función para ir al checkout
   const handlePurchase = () => {
+    dispatch(setSelectedEvent(event)) // Store the selected event in Redux
     router.push(`/event/${event.slug}/checkout`)
   }
 

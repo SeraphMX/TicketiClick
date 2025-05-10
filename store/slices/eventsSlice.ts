@@ -1,6 +1,3 @@
-// store/slices/eventsSlice.ts
-// Slice para manejar los eventos
-
 import { Event, mockEvents } from '@/data/events'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 

@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency } = await request.json()
+    const { amount, currency, stripe_id } = await request.json()
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       },
       application_fee_amount: Math.round(amount * 0.1), // 10% platform fee
       transfer_data: {
-        destination: '{{CONNECTED_ACCOUNT_ID}}' // Replace with the organizer's Stripe account ID
+        destination: stripe_id // Use the event's stripe_id
       }
     })
 

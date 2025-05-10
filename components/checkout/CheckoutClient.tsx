@@ -59,9 +59,9 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   useEffect(() => {
     if (expired) {
       alert('El tiempo para completar la compra ha expirado')
-      router.push(`/event/${event.id}`)
+      router.push(`/event/${event.slug}`)
     }
-  }, [expired, event.id, router])
+  }, [expired, event.slug, router])
 
   // Formatear tiempo restante
   const formatTimeLeft = () => {

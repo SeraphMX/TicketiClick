@@ -16,6 +16,7 @@ export interface Event {
   organizerId: number
   availableTickets: number
   featured: boolean
+  stripe_id: string
 }
 
 export type EventCategory = 'music' | 'sports' | 'theater' | 'conference' | 'festival' | 'workshop' | 'other'
@@ -37,7 +38,8 @@ export const mockEvents: Event[] = [
     category: 'music',
     organizerId: 2,
     availableTickets: 250,
-    featured: true
+    featured: true,
+    stripe_id: 'acct_1RMhq2LhYrNjtk3X'
   }
 ]
 

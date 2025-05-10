@@ -1,7 +1,6 @@
 'use client'
-// components/checkout/PaymentMethod.tsx
-// Componente de selección de método de pago
-
+import { useSelector } from '@/hooks/useReduxHooks'
+import { RootState } from '@/store/store'
 import { loadStripe } from '@stripe/stripe-js'
 import { ArrowLeft, ChevronRight, CreditCard } from 'lucide-react'
 import { useState } from 'react'
@@ -27,13 +26,14 @@ const PAYMENT_METHODS = [
 ]
 
 export default function PaymentMethod({ formData, onSubmit, onBack }: PaymentMethodProps) {
+  const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const [selectedMethod, setSelectedMethod] = useState(formData.paymentMethod || '')
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedMethod) return
+    if (!selectedMethod || !selectedEvent) return
 
     setIsProcessing(true)
     setError(null)
@@ -42,15 +42,16 @@ export default function PaymentMethod({ formData, onSubmit, onBack }: PaymentMet
       const stripe = await stripePromise
       if (!stripe) throw new Error('Stripe failed to initialize')
 
-      // Create payment intent
+      // Create payment intent with the event's stripe_id
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          amount: 1000, // Amount in cents
-          currency: 'mxn'
+          amount: selectedEvent.price * 100, // Convert to cents
+          currency: selectedEvent.currency.toLowerCase(),
+          stripe_id: selectedEvent.stripe_id
         })
       })
 
