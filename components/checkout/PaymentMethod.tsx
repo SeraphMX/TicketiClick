@@ -7,7 +7,7 @@ import { ArrowLeft, ChevronRight, CreditCard } from 'lucide-react'
 import { useState } from 'react'
 
 // Initialize Stripe
-const stripePromise = loadStripe(process.env.VITE_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 interface PaymentMethodProps {
   formData: {
