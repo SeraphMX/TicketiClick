@@ -60,6 +60,8 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
         })
       })
 
+      console.log(response)
+
       if (!response.ok) throw new Error('Failed to create payment intent')
 
       const { clientSecret } = await response.json()
@@ -82,6 +84,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       onSubmit(selectedMethod)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
+      console.error('Payment error:', err)
     } finally {
       setIsProcessing(false)
     }
