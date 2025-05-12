@@ -3,7 +3,8 @@
 // Barra de navegación principal
 
 import { useAuth } from '@/hooks/useAuth'
-import { LogOut, Menu, Ticket, User, X } from 'lucide-react'
+import { LogOut, Menu, User, X } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -16,14 +17,14 @@ const Navbar = () => {
   }
 
   return (
-    <nav className='bg-gradient-to-r from-blue-700 to-blue-900 text-white shadow-md'>
+    <nav className='bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-16'>
           {/* Logo y Nombre */}
           <div className='flex-shrink-0'>
             <Link href='/' className='flex items-center'>
-              <Ticket className='h-8 w-8 mr-2' />
-              <span className='font-bold text-xl'>Ticketi</span>
+              <Image src='/branding/logo-ticketi.webp' alt='Logo' className='h-8 w-8 mr-2' width={50} height={50} />
+              <span className='font-bold text-xl'>Ticketi Click</span>
             </Link>
           </div>
 

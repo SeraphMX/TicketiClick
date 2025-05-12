@@ -1,7 +1,8 @@
 // components/Footer.tsx
 // Pie de página
 
-import { Facebook, Instagram, Mail, MapPin, Phone, Ticket, Twitter } from 'lucide-react'
+import { Facebook, Instagram, Mail, MapPin, Phone, Twitter } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const Footer = () => {
@@ -14,10 +15,10 @@ const Footer = () => {
           {/* Logo y descripción */}
           <div className='col-span-1 md:col-span-1'>
             <div className='flex items-center mb-4'>
-              <Ticket className='h-8 w-8 mr-2 text-blue-400' />
-              <span className='font-bold text-xl'>Ticketi</span>
+              <Image src='/branding/logo-ticketi.webp' alt='Logo' className='h-8 w-8 mr-2' width={50} height={50} />
+              <span className='font-bold text-xl'>Ticketi Click</span>
             </div>
-            <p className='text-gray-400 mb-4'>Los mejores eventos en un solo click</p>
+            <p className='text-gray-400 mb-4'>Tu acceso a los mejores eventos en un solo click</p>
             <div className='flex space-x-4'>
               <a href='#' className='text-gray-400 hover:text-white transition-colors'>
                 <Facebook className='h-5 w-5' />

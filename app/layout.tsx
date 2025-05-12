@@ -10,7 +10,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Ticketi Click - Plataforma de Venta de Boletos',
-  description: 'Encuentra y compra boletos para los mejores eventos'
+  description: 'Encuentra y compra boletos para los mejores eventos',
+  icons: {
+    icon: '/branding/favicon.png'
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
