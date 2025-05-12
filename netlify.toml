@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build && cp -R .next/static .next/standalone/.next/static && cp -R .next/server .next/standalone/.next/server"
-  publish = ".next/standalone"
+  command = "npm run build"
+  publish = ".next/server"
   functions = "netlify/functions"
 
 [[plugins]]

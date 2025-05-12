@@ -1,18 +1,15 @@
-const path = require('path')
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
-  experimental: {
-    appDir: true,
-    serverComponentsExternalPackages: ['stripe'],
-    outputFileTracingRoot: path.join(__dirname, '../../')
-  },
+  output: 'standalone', // Esta línea es crucial
   eslint: {
     ignoreDuringBuilds: true
   },
   images: {
     unoptimized: true
+  },
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ['stripe']
   }
 }
 
