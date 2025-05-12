@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "netlify build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -77,7 +77,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@netlify/next": "^1.4.9",
     "@types/qrcode": "^1.5.5"
   }
 }
