@@ -2,14 +2,7 @@
   command = "npm run build"
   publish = ".next"
   functions = "netlify/functions"
-
-  [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-[functions]
-  included_files = ["!**/*"]
+ 
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
