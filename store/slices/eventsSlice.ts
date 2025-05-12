@@ -5,7 +5,7 @@ interface EventsState {
   items: Event[]
   loading: boolean
   error: string | null
-  selectedEvent: Event | null
+  selectedEvent: Event & { quantity?: number; ticketHolder?: string } | null
 }
 
 const initialState: EventsState = {
@@ -28,6 +28,14 @@ const eventsSlice = createSlice({
   reducers: {
     setSelectedEvent: (state, action: PayloadAction<Event | null>) => {
       state.selectedEvent = action.payload
+    },
+    updateSelectedEventDetails: (state, action: PayloadAction<{ quantity: number; ticketHolder?: string }>) => {
+      if (state.selectedEvent) {
+        state.selectedEvent = {
+          ...state.selectedEvent,
+          ...action.payload
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -47,5 +55,5 @@ const eventsSlice = createSlice({
   }
 })
 
-export const { setSelectedEvent } = eventsSlice.actions
+export const { setSelectedEvent, updateSelectedEventDetails } = eventsSlice.actions
 export default eventsSlice.reducer

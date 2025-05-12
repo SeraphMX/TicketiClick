@@ -121,7 +121,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
 
           {currentStep === 2 && (
             <OtpVerification
-              email={formData.email}
+              phone={formData.phone}
               onVerified={() => {
                 setFormData((prev) => ({ ...prev, otpVerified: true }))
                 setCurrentStep(3)

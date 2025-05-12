@@ -2,16 +2,16 @@
 // components/checkout/OtpVerification.tsx
 // Componente de verificación OTP
 
-import { ArrowLeft, Check } from 'lucide-react'
+import { ArrowLeft, Check, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 interface OtpVerificationProps {
-  email: string
+  phone: string
   onVerified: () => void
   onBack: () => void
 }
 
-export default function OtpVerification({ email, onVerified, onBack }: OtpVerificationProps) {
+export default function OtpVerification({ phone, onVerified, onBack }: OtpVerificationProps) {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [timeLeft, setTimeLeft] = useState(30)
   const [canResend, setCanResend] = useState(false)
@@ -64,7 +64,12 @@ export default function OtpVerification({ email, onVerified, onBack }: OtpVerifi
   const handleResend = () => {
     setTimeLeft(30)
     setCanResend(false)
-    alert('Se ha enviado un nuevo código a tu correo')
+    alert('Se ha enviado un nuevo código a tu teléfono')
+  }
+
+  // Formatear número de teléfono
+  const formatPhone = (phone: string) => {
+    return phone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3')
   }
 
   return (
@@ -77,10 +82,13 @@ export default function OtpVerification({ email, onVerified, onBack }: OtpVerifi
       </div>
 
       <div className='text-center'>
+        <div className='flex items-center justify-center mb-4'>
+          <Phone className='h-12 w-12 text-blue-600' />
+        </div>
         <p className='text-sm text-gray-600 mb-4'>
-          Hemos enviado un código de verificación a
+          Hemos enviado un código de verificación al número
           <br />
-          <span className='font-medium text-gray-900'>{email}</span>
+          <span className='font-medium text-gray-900'>{formatPhone(phone)}</span>
         </p>
 
         {/* Inputs OTP */}

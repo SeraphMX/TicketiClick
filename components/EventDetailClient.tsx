@@ -1,8 +1,9 @@
 'use client'
+
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
-import { setSelectedEvent } from '@/store/slices/eventsSlice'
-import { CalendarDays, ChevronLeft, Clock, MapPin, Tag, Users } from 'lucide-react'
+import { setSelectedEvent, updateSelectedEventDetails } from '@/store/slices/eventsSlice'
+import { CalendarDays, ChevronDown, ChevronLeft, ChevronUp, Clock, Info, MapPin, Tag, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -32,10 +33,18 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const router = useRouter()
   const dispatch = useDispatch()
   const [quantity, setQuantity] = useState(1)
+  const [showFeeDetails, setShowFeeDetails] = useState(false)
+
+  // Calcular costos
+  const subtotal = event.price * quantity
+  const serviceFee = subtotal * 0.10 // 10% cargo por servicio
+  const paymentFee = subtotal * 0.05 // 5% comisión bancaria
+  const ticketFee = 10 * quantity // $10 por boleto
+  const total = subtotal + serviceFee + paymentFee + ticketFee
 
   // Función para ir al checkout
   const handlePurchase = () => {
-    dispatch(setSelectedEvent(event)) // Store the selected event in Redux
+    dispatch(setSelectedEvent({ ...event, quantity }))
     router.push(`/event/${event.slug}/checkout`)
   }
 
@@ -78,7 +87,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
           <div className='md:col-span-2 space-y-6'>
             <div>
               <h2 className='text-2xl font-bold text-gray-800 mb-4'>Acerca del evento</h2>
-              <p className='text-gray-600 whitespace-pre-line'>{event.description}</p>
+              <div className='text-gray-600 whitespace-pre-line' dangerouslySetInnerHTML={{ __html: event.description }}/>
             </div>
 
             <div className='border-t border-gray-200 pt-6'>
@@ -156,24 +165,60 @@ export default function EventDetailClient({ event }: { event: Event }) {
               </select>
             </div>
 
-            <div className='mb-6'>
+            <div className='mb-6 space-y-3'>
               <p className='text-gray-600 flex justify-between'>
                 <span>Subtotal:</span>
                 <span>
-                  {(event.price * quantity).toFixed(2)} {event.currency}
+                  {subtotal.toFixed(2)} {event.currency}
                 </span>
               </p>
-              <p className='text-gray-600 flex justify-between'>
-                <span>Comisión de servicio:</span>
-                <span>
-                  {(event.price * quantity * 0.05).toFixed(2)} {event.currency}
-                </span>
-              </p>
-              <div className='border-t border-gray-200 my-2 pt-2'>
+
+              <div className='border-t border-gray-200 pt-3'>
+                <div className='flex justify-between items-center mb-2'>
+                  <button
+                    onClick={() => setShowFeeDetails(!showFeeDetails)}
+                    className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
+                  >
+                    <span className='flex items-center'>
+                      Cargos y comisiones
+                      <Info className='h-4 w-4 ml-1 text-gray-400' />
+                    </span>
+                    {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
+                  </button>
+                  <span className='text-gray-600'>
+                    {(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
+                  </span>
+                </div>
+
+                {showFeeDetails && (
+                  <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
+                    <p className='flex justify-between text-gray-600'>
+                      <span>Cargo por servicio (10%):</span>
+                      <span>
+                        {serviceFee.toFixed(2)} {event.currency}
+                      </span>
+                    </p>
+                    <p className='flex justify-between text-gray-600'>
+                      <span>Comisión bancaria (5%):</span>
+                      <span>
+                        {paymentFee.toFixed(2)} {event.currency}
+                      </span>
+                    </p>
+                    <p className='flex justify-between text-gray-600'>
+                      <span>Emisión de boleto:</span>
+                      <span>
+                        {ticketFee.toFixed(2)} {event.currency}
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className='border-t border-gray-200 pt-3'>
                 <p className='text-lg font-bold flex justify-between'>
                   <span>Total:</span>
                   <span>
-                    {(event.price * quantity * 1.05).toFixed(2)} {event.currency}
+                    {total.toFixed(2)} {event.currency}
                   </span>
                 </p>
               </div>

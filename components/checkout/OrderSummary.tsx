@@ -1,10 +1,11 @@
 'use client'
-// components/checkout/OrderSummary.tsx
-// Componente de resumen de la orden
-
 import { Event } from '@/lib/types'
-import { ArrowLeft, Calendar, Check, CreditCard, MapPin, Phone, Ticket, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Check, ChevronDown, ChevronUp, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
+import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
+import { RootState } from '@/store/store'
 
 interface OrderSummaryProps {
   event: Event
@@ -36,12 +37,36 @@ const translatePaymentMethod = (method: string) => {
 
 export default function OrderSummary({ event, formData, onConfirm, onBack }: OrderSummaryProps) {
   const [isProcessing, setIsProcessing] = useState(false)
+  const [showFeeDetails, setShowFeeDetails] = useState(false)
+  const router = useRouter()
+  const dispatch = useDispatch()
+  const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
+  const quantity = selectedEvent?.quantity || 1
+
+  // Calcular costos
+  const subtotal = event.price * quantity
+  const serviceFee = subtotal * 0.10 // 10% cargo por servicio
+  const paymentFee = subtotal * 0.05 // 5% comisión método de pago
+  const ticketFee = 10 * quantity // $10 por boleto
+  const total = subtotal + serviceFee + paymentFee + ticketFee
 
   const handleConfirm = async () => {
     setIsProcessing(true)
-    // Simular proceso de pago
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    onConfirm()
+    try {
+      // Actualizar detalles del evento seleccionado
+      dispatch(updateSelectedEventDetails({
+        quantity,
+        ticketHolder: formData.ticketName || formData.email
+      }))
+
+      // Simular proceso de pago
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Redirigir a la página de confirmación
+      router.push(`/event/${event.slug}/confirmation`)
+    } catch (error) {
+      setIsProcessing(false)
+      console.error('Error en el proceso de pago:', error)
+    }
   }
 
   return (
@@ -64,6 +89,10 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
           <div className='flex items-center text-sm text-gray-600'>
             <MapPin className='h-4 w-4 mr-2' />
             {event.location}
+          </div>
+          <div className='flex items-center text-sm text-gray-600'>
+            <Ticket className='h-4 w-4 mr-2' />
+            Cantidad: {quantity} {quantity === 1 ? 'boleto' : 'boletos'}
           </div>
         </div>
       </div>
@@ -102,24 +131,62 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
 
       {/* Resumen de costos */}
       <div className='border-t border-gray-200 pt-4'>
-        <div className='space-y-2'>
+        <div className='space-y-3'>
           <div className='flex justify-between text-sm'>
             <span className='text-gray-600'>Subtotal</span>
             <span>
-              {event.price.toFixed(2)} {event.currency}
+              {subtotal.toFixed(2)} {event.currency}
             </span>
           </div>
-          <div className='flex justify-between text-sm'>
-            <span className='text-gray-600'>Cargo por servicio</span>
-            <span>
-              {(event.price * 0.05).toFixed(2)} {event.currency}
-            </span>
+
+          <div className='border-t border-gray-200 pt-3'>
+            <div className='flex justify-between items-center mb-2'>
+              <button
+                onClick={() => setShowFeeDetails(!showFeeDetails)}
+                className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
+              >
+                <span className='flex items-center'>
+                  Cargos y comisiones
+                  <Info className='h-4 w-4 ml-1 text-gray-400' />
+                </span>
+                {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
+              </button>
+              <span className='text-gray-600'>
+                {(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
+              </span>
+            </div>
+
+            {showFeeDetails && (
+              <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
+                <p className='flex justify-between text-gray-600'>
+                  <span>Cargo por servicio (10%):</span>
+                  <span>
+                    {serviceFee.toFixed(2)} {event.currency}
+                  </span>
+                </p>
+                <p className='flex justify-between text-gray-600'>
+                  <span>Comisión bancaria (5%):</span>
+                  <span>
+                    {paymentFee.toFixed(2)} {event.currency}
+                  </span>
+                </p>
+                <p className='flex justify-between text-gray-600'>
+                  <span>Emisión de boleto:</span>
+                  <span>
+                    {ticketFee.toFixed(2)} {event.currency}
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
-          <div className='flex justify-between text-base font-medium pt-2 border-t border-gray-200'>
-            <span>Total</span>
-            <span>
-              {(event.price * 1.05).toFixed(2)} {event.currency}
-            </span>
+
+          <div className='border-t border-gray-200 pt-3'>
+            <div className='flex justify-between text-base font-medium'>
+              <span>Total</span>
+              <span>
+                {total.toFixed(2)} {event.currency}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -133,7 +200,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
             inline-flex items-center justify-center px-6 py-3 border border-transparent
             text-base font-medium rounded-md shadow-sm text-white bg-blue-600
             hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
-            focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed
+            focus:ring-blue-500 transition-colors duration-200 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}
             min-w-[200px]
           `}
         >

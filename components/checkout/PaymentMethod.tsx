@@ -4,7 +4,7 @@ import { RootState } from '@/store/store'
 import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { ArrowLeft, ChevronRight, CreditCard } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -33,19 +33,40 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   const [selectedMethod, setSelectedMethod] = useState(formData.paymentMethod || '')
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [cardComplete, setCardComplete] = useState(false)
+
+  useEffect(() => {
+    if (selectedMethod !== 'card') {
+      setCardComplete(false)
+    }
+  }, [selectedMethod])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!stripe || !elements || !selectedMethod || !selectedEvent) return
+    if (!stripe || !elements || !selectedMethod || !selectedEvent) {
+      setError('Please ensure all payment details are complete')
+      return
+    }
+
+    if (selectedMethod === 'card' && !cardComplete) {
+      setError('Please complete your card details')
+      return
+    }
 
     setIsProcessing(true)
     setError(null)
 
     try {
-      // Calculate total amount including 5% service fee
-      const baseAmount = selectedEvent.price * 100 // Convert to cents
-      const serviceFee = Math.round(baseAmount * 0.1) // 10% service fee
-      const totalAmount = baseAmount + serviceFee
+      const quantity = selectedEvent.quantity || 1
+      const baseAmount = selectedEvent.price * quantity * 100 // Precio base en centavos por cantidad de boletos
+      
+      // Comisiones por boleto:
+      const serviceFee = Math.round(baseAmount * 0.1) // 10% comisión de servicio
+      const paymentFee = Math.round(baseAmount * 0.05) // 5% comisión método de pago
+      const ticketFee = 1000 * quantity // $10 MXN en centavos por boleto
+
+      // Total a cobrar:
+      const totalAmount = baseAmount + serviceFee + paymentFee + ticketFee
 
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
@@ -54,21 +75,24 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          amount: totalAmount, // Total amount including service fee
+          amount: totalAmount,
           currency: selectedEvent.currency.toLowerCase(),
-          stripe_id: selectedEvent.stripe_id
+          stripe_id: selectedEvent.stripe_id,
+          quantity
         })
       })
 
-      console.log(response)
-
-      if (!response.ok) throw new Error('Failed to create payment intent')
+      if (!response.ok) {
+        throw new Error('Failed to create payment intent')
+      }
 
       const { clientSecret } = await response.json()
 
       // Get card element
       const cardElement = elements.getElement(CardElement)
-      if (!cardElement) throw new Error('Card element not found')
+      if (!cardElement) {
+        throw new Error('Please ensure your card details are entered correctly')
+      }
 
       // Confirm the payment
       const { error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
@@ -87,6 +111,15 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       console.error('Payment error:', err)
     } finally {
       setIsProcessing(false)
+    }
+  }
+
+  const handleCardChange = (event: any) => {
+    setCardComplete(event.complete)
+    if (event.error) {
+      setError(event.error.message)
+    } else {
+      setError(null)
     }
   }
 
@@ -134,7 +167,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
                   </div>
                 </div>
 
-                {method.id === 'card' && selectedMethod === 'card' && (
+                {selectedMethod === 'card' && method.id === 'card' && (
                   <div className='mt-4 pl-7'>
                     <CardElement
                       options={{
@@ -156,6 +189,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
                           }
                         }
                       }}
+                      onChange={handleCardChange}
                     />
                   </div>
                 )}
@@ -167,7 +201,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
         <div className='flex justify-end'>
           <button
             type='submit'
-            disabled={!stripe || !elements || !selectedMethod || isProcessing}
+            disabled={!stripe || !elements || !selectedMethod || isProcessing || (selectedMethod === 'card' && !cardComplete)}
             className={`
               inline-flex items-center justify-center px-4 py-2 border border-transparent 
               text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 
