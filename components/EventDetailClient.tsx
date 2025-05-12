@@ -44,6 +44,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const serviceFee = subtotal * 0.1 // 10% cargo por servicio
   const paymentFee = subtotal * 0.05 // 5% comisión bancaria
   const ticketFee = 10 * quantity // $10 por boleto
+  const total = subtotal + serviceFee + paymentFee + ticketFee
   dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
 
   // Función para ir al checkout
