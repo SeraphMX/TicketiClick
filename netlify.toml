@@ -1,11 +1,20 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = ".next/server/app"  # Cambio crucial para App Router
   functions = "netlify/functions"
- 
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Configuración de redirecciones
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Variables de entorno (opcional pero recomendado)
+[context.production.environment]
+  NEXT_PUBLIC_NETLIFY = "true"
 
 
 

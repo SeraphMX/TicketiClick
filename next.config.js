@@ -1,14 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Elimina 'output: export' para habilitar funciones serverless
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
-  images: { unoptimized: true },
-  webpack: (config) => {
-    config.cache = false;
-    return config;
+  images: {
+    unoptimized: true
   },
-};
+  // Configuración para API routes
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ['stripe']
+  }
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig
