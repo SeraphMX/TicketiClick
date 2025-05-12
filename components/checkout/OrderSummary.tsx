@@ -1,11 +1,11 @@
 'use client'
+import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
+import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
+import { RootState } from '@/store/store'
 import { ArrowLeft, Calendar, Check, ChevronDown, ChevronUp, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
-import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
-import { RootState } from '@/store/store'
 
 interface OrderSummaryProps {
   event: Event
@@ -45,7 +45,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
 
   // Calcular costos
   const subtotal = event.price * quantity
-  const serviceFee = subtotal * 0.10 // 10% cargo por servicio
+  const serviceFee = subtotal * 0.1 // 10% cargo por servicio
   const paymentFee = subtotal * 0.05 // 5% comisión método de pago
   const ticketFee = 10 * quantity // $10 por boleto
   const total = subtotal + serviceFee + paymentFee + ticketFee
@@ -54,10 +54,12 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
     setIsProcessing(true)
     try {
       // Actualizar detalles del evento seleccionado
-      dispatch(updateSelectedEventDetails({
-        quantity,
-        ticketHolder: formData.ticketName || formData.email
-      }))
+      dispatch(
+        updateSelectedEventDetails({
+          quantity,
+          ticketHolder: formData.ticketName || formData.email
+        })
+      )
 
       // Simular proceso de pago
       await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -112,7 +114,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
           {formData.ticketName && (
             <div className='flex items-center text-sm'>
               <Ticket className='h-4 w-4 mr-2 text-gray-400' />
-              <span>Nombre en boleto: {formData.ticketName}</span>
+              <span>Nombre en los boletos: {formData.ticketName}</span>
             </div>
           )}
         </div>
@@ -132,10 +134,10 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
       {/* Resumen de costos */}
       <div className='border-t border-gray-200 pt-4'>
         <div className='space-y-3'>
-          <div className='flex justify-between text-sm'>
+          <div className='flex justify-between '>
             <span className='text-gray-600'>Subtotal</span>
             <span>
-              {subtotal.toFixed(2)} {event.currency}
+              ${subtotal.toFixed(2)} {event.currency}
             </span>
           </div>
 
@@ -152,7 +154,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
                 {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
               </button>
               <span className='text-gray-600'>
-                {(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
+                ${(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
               </span>
             </div>
 
@@ -184,7 +186,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
             <div className='flex justify-between text-base font-medium'>
               <span>Total</span>
               <span>
-                {total.toFixed(2)} {event.currency}
+                ${total.toFixed(2)} {event.currency}
               </span>
             </div>
           </div>

@@ -2,7 +2,7 @@
 // components/checkout/TicketCustomization.tsx
 // Componente de personalización de boletos
 
-import { ArrowLeft, ChevronRight, Type } from 'lucide-react'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 
 interface TicketCustomizationProps {
@@ -47,11 +47,8 @@ export default function TicketCustomization({ formData, onSubmit, onSkip, onBack
       <form onSubmit={handleSubmit} className='space-y-6'>
         {/* Nombre en el boleto */}
         <div>
-          <label className='block text-sm font-medium text-gray-700 mb-2'>
-            <div className='flex items-center'>
-              <Type className='h-5 w-5 mr-2' />
-              Nombre en el boleto
-            </div>
+          <label className='block text-md font-medium text-gray-700 mb-2'>
+            <div className='flex items-center'>Nombre en el boleto</div>
           </label>
           <input
             type='text'
@@ -60,15 +57,9 @@ export default function TicketCustomization({ formData, onSubmit, onSkip, onBack
             placeholder='Ej: Juan Pérez'
             className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
           />
-          <p className='mt-1 text-sm text-gray-500'>Este nombre aparecerá impreso en tu boleto</p>
-        </div>
-
-        {/* Vista previa */}
-        <div className='border rounded-lg p-4'>
-          <h3 className='text-sm font-medium text-gray-700 mb-2'>Vista previa</h3>
-          <div className='border rounded-lg p-4 transition-colors' style={{ backgroundColor: selectedColor }}>
-            <p className='text-gray-900 font-medium'>{ticketName || 'Nombre del asistente'}</p>
-          </div>
+          <p className='mt-1 text-sm text-gray-500'>
+            Este nombre aparecerá impreso en tu boleto, al personalizarlo solicitaremos la identificación del titular para hacerlo válido.
+          </p>
         </div>
 
         {/* Botones */}

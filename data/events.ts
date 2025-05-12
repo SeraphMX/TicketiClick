@@ -28,7 +28,7 @@ export const mockEvents: Event[] = [
     title: 'Chapul Big Band',
     slug: 'chapul-big-band',
     description:
-      '<p>Prep&aacute;rate para una noche inolvidable con la <strong data-start="192" data-end="211" id="isPasted">Chapul Big Band</strong>, una orquesta que rinde homenaje a la &eacute;poca dorada del jazz, fusionando ese esp&iacute;ritu cl&aacute;sico con la energ&iacute;a vibrante de los ritmos actuales.	<br/>D&eacute;jate llevar por una explosiva mezcla de <strong >jazz, swing, funk, bossa nova y salsa</strong>, en un espect&aacute;culo que te har&aacute; vibrar desde la primera nota.</p>',
+      '<p>Prep&aacute;rate para una noche inolvidable con la <strong>Chapul Big Band</strong>, una orquesta que rinde homenaje a la &eacute;poca dorada del jazz, fusionando ese esp&iacute;ritu cl&aacute;sico con la energ&iacute;a vibrante de los ritmos actuales.	<br/>D&eacute;jate llevar por una explosiva mezcla de <strong >jazz, swing, funk, bossa nova y salsa</strong>, en un espect&aacute;culo que te har&aacute; vibrar desde la primera nota.</p>',
     date: '2025-07-17',
     time: '20:00',
     location: 'Palacio de los Deportes, CDMX',
