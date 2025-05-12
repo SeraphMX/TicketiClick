@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build && npx @netlify/plugin-nextjs"
-  publish = ".next/server/pages"  # Directorio que Next.js realmente usa
+  command = "npm run build"
+  publish = ".next/serverless"  # Directorio clave para Next.js en Netlify
   functions = "netlify/functions"
 
 [[plugins]]

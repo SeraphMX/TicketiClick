@@ -1,19 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Elimina completamente 'output: export' - incompatible con API routes
+  // Elimina 'output: export' completamente
   eslint: {
     ignoreDuringBuilds: true
   },
   images: {
     unoptimized: true
   },
-  // Configuración esencial para API routes
+  // Habilita el modo serverless para Netlify
+  output: 'standalone', // ¡Esta línea es crucial!
   experimental: {
     appDir: true,
     serverComponentsExternalPackages: ['stripe']
-  },
-  // Añade esta configuración crucial
-  output: 'standalone' // o "export" si no necesitas API routes
+  }
 }
 
 module.exports = nextConfig
