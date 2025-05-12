@@ -2,11 +2,15 @@
 
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
-import { setSelectedEvent, updateSelectedEventDetails } from '@/store/slices/eventsSlice'
+import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronUp, Clock, Info, MapPin, Tag, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+
+interface EventWithQuantity extends Event {
+  quantity: number
+}
 
 // Función para formatear fechas a formato español
 const formatDate = (dateString: string) => {
@@ -37,14 +41,14 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
   // Calcular costos
   const subtotal = event.price * quantity
-  const serviceFee = subtotal * 0.10 // 10% cargo por servicio
+  const serviceFee = subtotal * 0.1 // 10% cargo por servicio
   const paymentFee = subtotal * 0.05 // 5% comisión bancaria
   const ticketFee = 10 * quantity // $10 por boleto
-  const total = subtotal + serviceFee + paymentFee + ticketFee
+  dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
 
   // Función para ir al checkout
   const handlePurchase = () => {
-    dispatch(setSelectedEvent({ ...event, quantity }))
+    dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
     router.push(`/event/${event.slug}/checkout`)
   }
 
@@ -87,7 +91,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
           <div className='md:col-span-2 space-y-6'>
             <div>
               <h2 className='text-2xl font-bold text-gray-800 mb-4'>Acerca del evento</h2>
-              <div className='text-gray-600 whitespace-pre-line' dangerouslySetInnerHTML={{ __html: event.description }}/>
+              <div className='text-gray-600 whitespace-pre-line' dangerouslySetInnerHTML={{ __html: event.description }} />
             </div>
 
             <div className='border-t border-gray-200 pt-6'>

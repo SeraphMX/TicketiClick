@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useSelector } from '@/hooks/useReduxHooks'
 import { RootState } from '@/store/store'
-import { Download, Mail, QrCode } from 'lucide-react'
-import QRCode from 'qrcode'
 import { jsPDF } from 'jspdf'
+import { Download, Mail, QrCode } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import QRCode from 'qrcode'
+import { useEffect, useState } from 'react'
 
 interface TicketData {
   id: string
@@ -34,7 +34,7 @@ export default function ConfirmationClient() {
       const ticketsData: TicketData[] = []
 
       // Generar un ticket por cada cantidad comprada
-      for (let i = 0; i < selectedEvent.quantity; i++) {
+      for (let i = 0; i < (selectedEvent.quantity ?? 0); i++) {
         const ticketId = `${selectedEvent.id}-${Date.now()}-${i}`
         const ticketInfo = {
           eventId: selectedEvent.id,
@@ -83,7 +83,7 @@ export default function ConfirmationClient() {
     // Añadir información del evento
     doc.setFontSize(20)
     doc.text(ticket.eventName, 10, 20)
-    
+
     doc.setFontSize(12)
     doc.text(`Fecha: ${ticket.eventDate}`, 10, 35)
     doc.text(`Hora: ${ticket.eventTime}`, 10, 45)
