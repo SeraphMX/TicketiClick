@@ -3,7 +3,7 @@
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronUp, Clock, Info, MapPin, Tag, Users } from 'lucide-react'
+import { CalendarDays, ChevronDown, ChevronUp, Clock, Info, MapPin, Minus, Plus, Tag, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -38,14 +38,43 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const dispatch = useDispatch()
   const [quantity, setQuantity] = useState(1)
   const [showFeeDetails, setShowFeeDetails] = useState(false)
+  const [showCouponInput, setShowCouponInput] = useState(false)
+  const [couponCode, setCouponCode] = useState('')
+  const [couponError, setCouponError] = useState('')
+  const [couponDiscount, setCouponDiscount] = useState(0)
 
   // Calcular costos
   const subtotal = event.price * quantity
   const serviceFee = subtotal * 0.1 // 10% cargo por servicio
   const paymentFee = subtotal * 0.05 // 5% comisión bancaria
   const ticketFee = 10 * quantity // $10 por boleto
-  const total = subtotal + serviceFee + paymentFee + ticketFee
-  dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
+  const total = subtotal + serviceFee + paymentFee + ticketFee - couponDiscount
+
+  // Función para verificar cupón
+  const validateCoupon = () => {
+    // Simulación de validación de cupón
+    if (couponCode.toLowerCase() === 'first10') {
+      setCouponDiscount(total * 0.1) // 10% de descuento
+      setCouponError('')
+    } else {
+      setCouponError('Cupón inválido')
+      setCouponDiscount(0)
+    }
+  }
+
+  // Función para incrementar cantidad
+  const incrementQuantity = () => {
+    if (quantity < event.availableTickets) {
+      setQuantity(quantity + 1)
+    }
+  }
+
+  // Función para decrementar cantidad
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1)
+    }
+  }
 
   // Función para ir al checkout
   const handlePurchase = () => {
@@ -58,7 +87,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
       {/* Botón para volver */}
       <div className='mb-6'>
         <Link href='/events' className='inline-flex items-center text-blue-600 hover:text-blue-800'>
-          <ChevronLeft className='h-5 w-5 mr-1' />
+          <ChevronUp className='h-5 w-5 mr-1' />
           Volver a eventos
         </Link>
       </div>
@@ -97,7 +126,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
             <div className='border-t border-gray-200 pt-6'>
               <h2 className='text-xl font-bold text-gray-800 mb-4'>Detalles</h2>
-              <div className='space-y-3'>
+              <div className='space-y-3 grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className='flex items-start'>
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
@@ -153,21 +182,24 @@ export default function EventDetailClient({ event }: { event: Event }) {
             </div>
 
             <div className='mb-6'>
-              <label htmlFor='quantity' className='block text-sm font-medium text-gray-700 mb-1'>
-                Cantidad de boletos
-              </label>
-              <select
-                id='quantity'
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                className='mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md'
-              >
-                {[...Array(10)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
-                ))}
-              </select>
+              <label className='block text-sm font-medium text-gray-700 mb-2'>Cantidad de boletos</label>
+              <div className='flex items-center space-x-4'>
+                <button
+                  onClick={decrementQuantity}
+                  disabled={quantity <= 1}
+                  className='p-2 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  <Minus className='h-4 w-4' />
+                </button>
+                <span className='text-lg font-medium'>{quantity}</span>
+                <button
+                  onClick={incrementQuantity}
+                  disabled={quantity >= event.availableTickets}
+                  className='p-2 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
+                >
+                  <Plus className='h-4 w-4' />
+                </button>
+              </div>
             </div>
 
             <div className='mb-6 space-y-3'>
@@ -219,6 +251,36 @@ export default function EventDetailClient({ event }: { event: Event }) {
                 )}
               </div>
 
+              {/* Cupón de descuento */}
+              <div className='border-t border-gray-200 pt-3'>
+                {!showCouponInput ? (
+                  <button onClick={() => setShowCouponInput(true)} className='text-sm text-blue-600 hover:text-blue-800'>
+                    ¿Tienes un cupón?
+                  </button>
+                ) : (
+                  <div className='space-y-2'>
+                    <div className='flex gap-2'>
+                      <input
+                        type='text'
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        placeholder='Ingresa tu código'
+                        className='flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm'
+                      />
+                      <button onClick={validateCoupon} className='px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700'>
+                        Aplicar
+                      </button>
+                    </div>
+                    {couponError && <p className='text-sm text-red-600'>{couponError}</p>}
+                    {couponDiscount > 0 && (
+                      <p className='text-sm text-green-600'>
+                        Descuento aplicado: -{couponDiscount.toFixed(2)} {event.currency}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className='border-t border-gray-200 pt-3'>
                 <p className='text-lg font-bold flex justify-between'>
                   <span>Total:</span>
@@ -238,7 +300,11 @@ export default function EventDetailClient({ event }: { event: Event }) {
                 ${event.availableTickets < quantity ? 'opacity-70 cursor-not-allowed' : ''}
               `}
             >
-              {event.availableTickets < quantity ? 'No hay suficientes boletos' : 'Comprar boletos'}
+              {event.availableTickets < quantity
+                ? 'No hay suficientes boletos'
+                : quantity === 1
+                ? 'Comprar boleto'
+                : `Comprar ${quantity} boletos`}
             </button>
           </div>
         </div>
