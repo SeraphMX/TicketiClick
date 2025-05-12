@@ -1,14 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Elimina 'output: export' completamente
+  // Configuración esencial para Netlify
+  output: 'standalone', // ¡Esta es la clave!
+
+  // Configuraciones adicionales
   eslint: {
     ignoreDuringBuilds: true
   },
   images: {
     unoptimized: true
   },
-  // Habilita el modo serverless para Netlify
-  output: 'standalone', // ¡Esta línea es crucial!
   experimental: {
     appDir: true,
     serverComponentsExternalPackages: ['stripe']

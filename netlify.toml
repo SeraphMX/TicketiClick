@@ -1,6 +1,6 @@
 [build]
   command = "npm run build"
-  publish = ".next/serverless"  # Directorio clave para Next.js en Netlify
+  publish = ".next/standalone" # Directorio correcto para 'output: standalone'
   functions = "netlify/functions"
 
 [[plugins]]
