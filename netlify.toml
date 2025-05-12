@@ -1,18 +1,12 @@
 [build]
   command = "npm run build"
-  publish = "out"  # Directorio estándar para Next.js en Netlify
+  publish = "out"
   functions = "netlify/functions"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    buildCommand = "next build"
-    publishDir = "out"
 
 [context.production.environment]
   NEXT_PUBLIC_NETLIFY = "true"
-
-
-
 
 
