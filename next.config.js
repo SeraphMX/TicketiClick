@@ -1,18 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configuración esencial para Netlify
-  output: 'standalone', // ¡Esta es la clave!
+  output: 'standalone',
 
-  // Configuraciones adicionales
+  // Configuración para API Routes
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ['stripe'],
+    outputFileTracingRoot: path.join(__dirname, '../../')
+  },
+
+  // Otras configuraciones
   eslint: {
     ignoreDuringBuilds: true
   },
   images: {
     unoptimized: true
-  },
-  experimental: {
-    appDir: true,
-    serverComponentsExternalPackages: ['stripe']
   }
 }
 
