@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
-    "@netlify/plugin-nextjs": "^5.11.1",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -78,6 +77,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@netlify/next": "^1.4.9",
     "@types/qrcode": "^1.5.5"
   }
 }
