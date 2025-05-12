@@ -1,12 +1,10 @@
 [build]
-  command = "npm run build && cp -R .next/static .next/standalone/.next/static"
-  publish = ".next/standalone/.next/server/pages"
+  command = "npm run build && cp -R .next/static .next/standalone/.next/static && cp -R .next/server .next/standalone/.next/server"
+  publish = ".next/standalone"
   functions = "netlify/functions"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    skip_plugin = false
 
 [context.production.environment]
   NEXT_PUBLIC_NETLIFY = "true"
