@@ -1,7 +1,9 @@
 'use client'
 
+import { useCategories } from '@/hooks/useCategories'
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
+import { formatDate, formatTime } from '@/lib/utils'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { CalendarDays, ChevronDown, ChevronUp, Clock, Info, MapPin, Minus, Plus, Tag, Users } from 'lucide-react'
 import Link from 'next/link'
@@ -10,27 +12,6 @@ import { useState } from 'react'
 
 interface EventWithQuantity extends Event {
   quantity: number
-}
-
-// Función para formatear fechas a formato español
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('es-ES', options)
-}
-
-// Traductor de categorías
-const translateCategory = (category: string) => {
-  const translations: Record<string, string> = {
-    music: 'Música',
-    sports: 'Deportes',
-    theater: 'Teatro',
-    conference: 'Conferencia',
-    festival: 'Festival',
-    workshop: 'Taller',
-    other: 'Otros'
-  }
-
-  return translations[category] || 'Otro'
 }
 
 export default function EventDetailClient({ event }: { event: Event }) {
@@ -49,6 +30,9 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const paymentFee = subtotal * 0.05 // 5% comisión bancaria
   const ticketFee = 10 * quantity // $10 por boleto
   const total = subtotal + serviceFee + paymentFee + ticketFee - couponDiscount
+
+  const { categories } = useCategories()
+  const category = categories.find((cat) => cat.slug === event.category)
 
   // Función para verificar cupón
   const validateCoupon = () => {
@@ -100,16 +84,14 @@ export default function EventDetailClient({ event }: { event: Event }) {
           <div className='absolute bottom-0 left-0 p-6 text-white'>
             <h1 className='text-3xl md:text-4xl font-bold mb-2'>{event.title}</h1>
             <div className='flex flex-wrap items-center gap-3'>
-              <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>
-                {translateCategory(event.category)}
-              </span>
+              <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>{category?.name}</span>
               <span className='inline-flex items-center'>
                 <CalendarDays className='h-4 w-4 mr-1' />
-                {formatDate(event.date)}
+                {formatDate(event.event_date)}
               </span>
               <span className='inline-flex items-center'>
                 <Clock className='h-4 w-4 mr-1' />
-                {event.time}
+                {formatTime(event.event_time)}
               </span>
             </div>
           </div>
@@ -126,7 +108,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
             <div className='border-t border-gray-200 pt-6'>
               <h2 className='text-xl font-bold text-gray-800 mb-4'>Detalles</h2>
-              <div className='space-y-3 grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
                 <div className='flex items-start'>
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
@@ -139,7 +121,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Hora</p>
-                    <p className='text-gray-600'>{event.event_time}</p>
+                    <p className='text-gray-600'>{formatTime(event.event_time)}</p>
                   </div>
                 </div>
 
@@ -155,7 +137,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <Tag className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Categoría</p>
-                    <p className='text-gray-600'>{translateCategory(event.category)}</p>
+                    <p className='text-gray-600'>{category?.name} </p>
                   </div>
                 </div>
 

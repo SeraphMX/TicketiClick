@@ -5,42 +5,17 @@ import EventDetailClient from '@/components/EventDetailClient'
 import { supabase } from '@/lib/supabase'
 import { Event } from '@/lib/types'
 
-// Función para formatear fechas a formato español
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('es-ES', options)
-}
-
-// Traductor de categorías
-const translateCategory = (category: string) => {
-  const translations: Record<string, string> = {
-    music: 'Música',
-    sports: 'Deportes',
-    theater: 'Teatro',
-    conference: 'Conferencia',
-    festival: 'Festival',
-    workshop: 'Taller',
-    other: 'Otros'
-  }
-
-  return translations[category] || 'Otro'
-}
-
 // Generar parámetros estáticos para pre-renderizado
 export const generateStaticParams = async () => {
   const { data: events = [] } = await supabase.from('event_details_view').select('slug')
-  return events.map((event) => ({
+  return (events ?? []).map((event) => ({
     slug: event.slug.toString()
   }))
 }
 
 export default async function EventDetailPage({ params }: { params: { slug: string } }) {
   const slug = String(params.slug)
-  const { data: event } = await supabase
-    .from('event_details_view')
-    .select('*')
-    .eq('slug', slug)
-    .single()
+  const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', slug).single()
 
   if (!event) {
     return (

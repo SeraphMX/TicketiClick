@@ -1,27 +1,22 @@
 // components/EventCard.tsx
 // Tarjeta para mostrar información resumida de un evento
 
+import { useCategories } from '@/hooks/useCategories'
 import { Event } from '@/lib/types'
+import { formatDate } from '@/lib/utils'
 import { CalendarDays, Clock, MapPin } from 'lucide-react'
 import Link from 'next/link'
-import { useCategories } from '@/hooks/useCategories'
-
-// Función para formatear fechas a formato español
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('es-ES', options)
-}
 
 // Función para obtener color según categoría
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
-    'musica': 'bg-pink-100 text-pink-800',
-    'deportes': 'bg-blue-100 text-blue-800',
-    'teatro': 'bg-blue-100 text-blue-800',
-    'conferencias': 'bg-amber-100 text-amber-800',
-    'festivales': 'bg-green-100 text-green-800',
-    'talleres': 'bg-zinc-100 text-zinc-800',
-    'otros': 'bg-gray-100 text-gray-800'
+    musica: 'bg-pink-100 text-pink-800',
+    deportes: 'bg-blue-100 text-blue-800',
+    teatro: 'bg-blue-100 text-blue-800',
+    conferencias: 'bg-amber-100 text-amber-800',
+    festivales: 'bg-green-100 text-green-800',
+    talleres: 'bg-zinc-100 text-zinc-800',
+    otros: 'bg-gray-100 text-gray-800'
   }
 
   return colors[category] || colors.otros
@@ -34,7 +29,7 @@ interface EventCardProps {
 
 const EventCard = ({ event, featured = false }: EventCardProps) => {
   const { categories } = useCategories()
-  const category = categories.find(cat => cat.slug === event.category)
+  const category = categories.find((cat) => cat.slug === event.category)
 
   return (
     <div
