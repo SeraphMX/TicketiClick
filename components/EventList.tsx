@@ -2,10 +2,11 @@
 // components/EventList.tsx
 // Componente para mostrar una lista de eventos
 
-import { Event, EventCategory } from '@/lib/types'
+import { Event } from '@/lib/types'
 import { ChevronDown, Search, X } from 'lucide-react'
 import { useState } from 'react'
 import EventCard from './EventCard'
+import { useCategories } from '@/hooks/useCategories'
 
 interface EventListProps {
   events: Event[]
@@ -13,29 +14,12 @@ interface EventListProps {
   showFilters?: boolean
 }
 
-// Traductor de categorías
-const translateCategory = (category: string) => {
-  const translations: Record<string, string> = {
-    music: 'Música',
-    sports: 'Deportes',
-    theater: 'Teatro',
-    conference: 'Conferencia',
-    festival: 'Festival',
-    workshop: 'Taller',
-    other: 'Otros'
-  }
-
-  return translations[category] || 'Otro'
-}
-
 const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListProps) => {
-  const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'all'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [priceRange, setPriceRange] = useState<{ min: number; max: number | null }>({ min: 0, max: null })
   const [showAllCategories, setShowAllCategories] = useState(false)
-
-  // Obtener todas las categorías únicas
-  const categories = Array.from(new Set(events.map((event) => event.category)))
+  const { categories, loading: loadingCategories } = useCategories()
 
   // Aplicar filtros
   const filteredEvents = events.filter((event) => {
@@ -150,17 +134,18 @@ const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListP
             </button>
 
             {/* Mostrar algunas categorías o todas */}
-            {(showAllCategories ? categories : categories.slice(0, 5)).map((category) => (
-              <button
-                key={category}
-                onClick={() => setCategoryFilter(category)}
-                className={`text-sm px-3 py-1 rounded-full ${
-                  categoryFilter === category ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {translateCategory(category)}
-              </button>
-            ))}
+            {!loadingCategories &&
+              (showAllCategories ? categories : categories.slice(0, 5)).map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setCategoryFilter(category.slug)}
+                  className={`text-sm px-3 py-1 rounded-full ${
+                    categoryFilter === category.slug ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
 
             {/* Botón para ver más/menos categorías */}
             {categories.length > 5 && (

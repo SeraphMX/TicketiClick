@@ -131,7 +131,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Fecha</p>
-                    <p className='text-gray-600'>{formatDate(event.date)}</p>
+                    <p className='text-gray-600'>{formatDate(event.event_date)}</p>
                   </div>
                 </div>
 
@@ -139,7 +139,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Hora</p>
-                    <p className='text-gray-600'>{event.time}</p>
+                    <p className='text-gray-600'>{event.event_time}</p>
                   </div>
                 </div>
 

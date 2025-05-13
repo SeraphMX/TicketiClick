@@ -2,9 +2,9 @@
 // hooks/useEvents.tsx
 // Hook para gestionar eventos
 
-import { getEventById, getEventsByOrganizerId, mockEvents } from '@/data/events'
 import { Event, EventFormData } from '@/lib/types'
 import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 // Hook para obtener y manipular eventos
 export const useEvents = (organizerId?: number) => {
@@ -16,17 +16,23 @@ export const useEvents = (organizerId?: number) => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Simulando retraso de red
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        setLoading(true)
+        let query = supabase.from('event_details_view').select('*')
 
-        // Si hay un organizerId, filtramos por ese organizador
         if (organizerId) {
-          setEvents(getEventsByOrganizerId(organizerId))
-        } else {
-          setEvents(mockEvents)
+          query = query.eq('organizerId', organizerId)
         }
+
+        const { data, error: supabaseError } = await query
+
+        if (supabaseError) {
+          throw supabaseError
+        }
+
+        setEvents(data || [])
         setLoading(false)
       } catch (err) {
+        console.error('Error fetching events:', err)
         setError('Error al cargar los eventos')
         setLoading(false)
       }
@@ -39,43 +45,54 @@ export const useEvents = (organizerId?: number) => {
   const getEvent = async (id: number): Promise<Event | undefined> => {
     setLoading(true)
     try {
-      // Simulando retraso de red
-      await new Promise((resolve) => setTimeout(resolve, 300))
+      const { data, error: supabaseError } = await supabase
+        .from('events_view')
+        .select('*')
+        .eq('id', id)
+        .single()
 
-      const event = getEventById(id)
+      if (supabaseError) {
+        throw supabaseError
+      }
+
       setLoading(false)
-      return event
+      return data
     } catch (err) {
+      console.error('Error fetching event:', err)
       setError('Error al obtener el evento')
       setLoading(false)
       return undefined
     }
   }
 
-  // Función para crear un nuevo evento (simulada)
+  // Función para crear un nuevo evento
   const createEvent = async (eventData: EventFormData, organizerId: number): Promise<Event | null> => {
     setLoading(true)
     try {
-      // Simulando retraso de red
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      const { data, error: supabaseError } = await supabase
+        .from('events')
+        .insert([
+          {
+            ...eventData,
+            organizerId,
+            currency: 'EUR',
+            featured: eventData.featured || false,
+            image: eventData.image || 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg',
+            slug: eventData.title.toLowerCase().replace(/\s+/g, '-')
+          }
+        ])
+        .select()
+        .single()
 
-      // Crear nuevo evento con ID único
-      const newEvent: Event = {
-        id: Math.max(...mockEvents.map((e) => e.id)) + 1,
-        ...eventData,
-        organizerId,
-        currency: 'EUR',
-        featured: eventData.featured || false,
-        image: eventData.image || 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg',
-        slug: eventData.title.toLowerCase().replace(/\s+/g, '-'),
-        stripe_id: 'acct_1RMhq2LhYrNjtk3X' //TODO: Cambiar por el ID de Stripe real
+      if (supabaseError) {
+        throw supabaseError
       }
 
-      // Actualizar estado (en una implementación real esto modificaría la base de datos)
-      setEvents((prev) => [...prev, newEvent])
+      setEvents((prev) => [...prev, data])
       setLoading(false)
-      return newEvent
+      return data
     } catch (err) {
+      console.error('Error creating event:', err)
       setError('Error al crear el evento')
       setLoading(false)
       return null

@@ -1,5 +1,6 @@
-import { Event, mockEvents } from '@/data/events'
+import { Event } from '@/lib/types'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { supabase } from '@/lib/supabase'
 
 interface EventsState {
   items: Event[]
@@ -9,17 +10,17 @@ interface EventsState {
 }
 
 const initialState: EventsState = {
-  items: mockEvents,
+  items: [],
   loading: false,
   error: null,
   selectedEvent: null
 }
 
-// Thunk para cargar eventos (preparado para futura integración con Supabase)
+// Thunk para cargar eventos desde Supabase
 export const fetchEvents = createAsyncThunk('events/fetchEvents', async () => {
-  // Simular llamada a API
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  return mockEvents
+  const { data, error } = await supabase.from('event_details_view').select('*')
+  if (error) throw error
+  return data
 })
 
 const eventsSlice = createSlice({

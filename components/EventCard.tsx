@@ -4,6 +4,7 @@
 import { Event } from '@/lib/types'
 import { CalendarDays, Clock, MapPin } from 'lucide-react'
 import Link from 'next/link'
+import { useCategories } from '@/hooks/useCategories'
 
 // Función para formatear fechas a formato español
 const formatDate = (dateString: string) => {
@@ -14,31 +15,16 @@ const formatDate = (dateString: string) => {
 // Función para obtener color según categoría
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
-    music: 'bg-pink-100 text-pink-800',
-    sports: 'bg-blue-100 text-blue-800',
-    theater: 'bg-blue-100 text-blue-800',
-    conference: 'bg-amber-100 text-amber-800',
-    festival: 'bg-green-100 text-green-800',
-    workshop: 'bg-zinc-100 text-zinc-800',
-    other: 'bg-gray-100 text-gray-800'
+    'musica': 'bg-pink-100 text-pink-800',
+    'deportes': 'bg-blue-100 text-blue-800',
+    'teatro': 'bg-blue-100 text-blue-800',
+    'conferencias': 'bg-amber-100 text-amber-800',
+    'festivales': 'bg-green-100 text-green-800',
+    'talleres': 'bg-zinc-100 text-zinc-800',
+    'otros': 'bg-gray-100 text-gray-800'
   }
 
-  return colors[category] || colors.other
-}
-
-// Traductor de categorías
-const translateCategory = (category: string) => {
-  const translations: Record<string, string> = {
-    music: 'Música',
-    sports: 'Deportes',
-    theater: 'Teatro',
-    conference: 'Conferencia',
-    festival: 'Festival',
-    workshop: 'Taller',
-    other: 'Otros'
-  }
-
-  return translations[category] || 'Otro'
+  return colors[category] || colors.otros
 }
 
 interface EventCardProps {
@@ -47,6 +33,9 @@ interface EventCardProps {
 }
 
 const EventCard = ({ event, featured = false }: EventCardProps) => {
+  const { categories } = useCategories()
+  const category = categories.find(cat => cat.slug === event.category)
+
   return (
     <div
       className={`bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full
@@ -57,7 +46,7 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
         <img src={event.image} alt={event.title} className='w-full h-full object-cover transition-transform duration-300 hover:scale-105' />
         {featured && <div className='absolute top-0 left-0 bg-blue-600 text-white px-3 py-1 text-sm font-semibold'>Destacado</div>}
         <div className={`absolute top-0 right-0 ${getCategoryColor(event.category)} m-2 px-2 py-1 rounded-full text-xs font-medium`}>
-          {translateCategory(event.category)}
+          {category?.name}
         </div>
       </div>
 
@@ -68,12 +57,12 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
         <div className='space-y-2 mb-4 flex-grow'>
           <div className='flex items-center text-gray-600'>
             <CalendarDays className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{formatDate(event.date)}</span>
+            <span>{formatDate(event.event_date)}</span>
           </div>
 
           <div className='flex items-center text-gray-600'>
             <Clock className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{event.time} hrs</span>
+            <span>{event.event_time} hrs</span>
           </div>
 
           <div className='flex items-center text-gray-600'>

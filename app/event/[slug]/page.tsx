@@ -1,8 +1,9 @@
-// app/event/[id]/page.tsx
+// app/event/[slug]/page.tsx
 // Página de detalle de evento
 
 import EventDetailClient from '@/components/EventDetailClient'
-import { getEventBySlug, mockEvents } from '@/data/events'
+import { supabase } from '@/lib/supabase'
+import { Event } from '@/lib/types'
 
 // Función para formatear fechas a formato español
 const formatDate = (dateString: string) => {
@@ -27,14 +28,19 @@ const translateCategory = (category: string) => {
 
 // Generar parámetros estáticos para pre-renderizado
 export const generateStaticParams = async () => {
-  return mockEvents.map((event) => ({
+  const { data: events = [] } = await supabase.from('event_details_view').select('slug')
+  return events.map((event) => ({
     slug: event.slug.toString()
   }))
 }
 
-export default function EventDetailPage({ params }: { params: { slug: string } }) {
+export default async function EventDetailPage({ params }: { params: { slug: string } }) {
   const slug = String(params.slug)
-  const event = getEventBySlug(slug)
+  const { data: event } = await supabase
+    .from('event_details_view')
+    .select('*')
+    .eq('slug', slug)
+    .single()
 
   if (!event) {
     return (
@@ -51,5 +57,5 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
     )
   }
 
-  return <EventDetailClient event={event} />
+  return <EventDetailClient event={event as Event} />
 }

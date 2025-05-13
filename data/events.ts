@@ -25,7 +25,7 @@ export const mockEvents: Event[] = [
   {
     id: 1,
 
-    title: 'Chapul Big Band',
+    title: 'Chapul Big Band Hard',
     slug: 'chapul-big-band',
     description:
       '<p>Prep&aacute;rate para una noche inolvidable con la <strong>Chapul Big Band</strong>, una orquesta que rinde homenaje a la &eacute;poca dorada del jazz, fusionando ese esp&iacute;ritu cl&aacute;sico con la energ&iacute;a vibrante de los ritmos actuales.	<br/>D&eacute;jate llevar por una explosiva mezcla de <strong >jazz, swing, funk, bossa nova y salsa</strong>, en un espect&aacute;culo que te har&aacute; vibrar desde la primera nota.</p>',

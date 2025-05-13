@@ -2,16 +2,26 @@
 // Página principal
 
 import EventList from '@/components/EventList'
-import { getFeaturedEvents, mockEvents } from '@/data/events'
+import { supabase } from '@/lib/supabase'
 import { ArrowRight, Calendar, CalendarDays, MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
 
-export default function Home() {
-  // Obtener eventos destacados
-  const featuredEvents = getFeaturedEvents()
+// Función para obtener eventos destacados
+const getFeaturedEvents = async () => {
+  const { data } = await supabase
+    .from('event_details_view')
+    .select('*')
+    .eq('featured', true)
+  return data || []
+}
 
-  // Obtener categorías únicas para el showcase
-  const categories = Array.from(new Set(mockEvents.map((event) => event.category)))
+export default async function Home() {
+  // Obtener eventos destacados
+  const featuredEvents = await getFeaturedEvents()
+
+  // Obtener categorías únicas
+  const { data: events = [] } = await supabase.from('event_details_view').select('*')
+  const categories = Array.from(new Set(events.map((event) => event.category)))
 
   // Traductor de categorías
   const translateCategory = (category: string) => {
@@ -120,7 +130,7 @@ export default function Home() {
         <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8'>Próximos Eventos</h2>
 
         {/* Mostrar primeros 4 eventos */}
-        <EventList events={mockEvents.slice(0, 4)} showFilters={false} title='' />
+        <EventList events={events.slice(0, 4)} showFilters={false} title='' />
 
         <div className='mt-8 text-center'>
           <Link
