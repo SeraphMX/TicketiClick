@@ -52,12 +52,12 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
         <div className='space-y-2 mb-4 flex-grow'>
           <div className='flex items-center text-gray-600'>
             <CalendarDays className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{formatDate(event.event_date)}</span>
+            <span>{formatDate(event.date)}</span>
           </div>
 
           <div className='flex items-center text-gray-600'>
             <Clock className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{event.event_time} hrs</span>
+            <span>{event.time} hrs</span>
           </div>
 
           <div className='flex items-center text-gray-600'>

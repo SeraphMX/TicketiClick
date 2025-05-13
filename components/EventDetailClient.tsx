@@ -87,11 +87,11 @@ export default function EventDetailClient({ event }: { event: Event }) {
               <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>{category?.name}</span>
               <span className='inline-flex items-center'>
                 <CalendarDays className='h-4 w-4 mr-1' />
-                {formatDate(event.event_date)}
+                {formatDate(event.date)}
               </span>
               <span className='inline-flex items-center'>
                 <Clock className='h-4 w-4 mr-1' />
-                {formatTime(event.event_time)}
+                {formatTime(event.time)}
               </span>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Fecha</p>
-                    <p className='text-gray-600'>{formatDate(event.event_date)}</p>
+                    <p className='text-gray-600'>{formatDate(event.date)}</p>
                   </div>
                 </div>
 
@@ -121,7 +121,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Hora</p>
-                    <p className='text-gray-600'>{formatTime(event.event_time)}</p>
+                    <p className='text-gray-600'>{formatTime(event.time)}</p>
                   </div>
                 </div>
 
