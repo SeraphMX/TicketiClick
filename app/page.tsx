@@ -8,10 +8,7 @@ import Link from 'next/link'
 
 // Función para obtener eventos destacados
 const getFeaturedEvents = async () => {
-  const { data } = await supabase
-    .from('event_details_view')
-    .select('*')
-    .eq('featured', true)
+  const { data } = await supabase.from('event_details_view').select('*').eq('featured', true)
   return data || []
 }
 
@@ -21,7 +18,7 @@ export default async function Home() {
 
   // Obtener categorías únicas
   const { data: events = [] } = await supabase.from('event_details_view').select('*')
-  const categories = Array.from(new Set(events.map((event) => event.category)))
+  const categories = Array.from(new Set((events || []).map((event) => event.category)))
 
   // Traductor de categorías
   const translateCategory = (category: string) => {
