@@ -40,8 +40,8 @@ export default function ConfirmationClient() {
           eventId: selectedEvent.id,
           ticketId,
           eventName: selectedEvent.title,
-          eventDate: selectedEvent.date,
-          eventTime: selectedEvent.time,
+          eventDate: selectedEvent.event_date,
+          eventTime: selectedEvent.event_time,
           ticketHolder: selectedEvent.ticketHolder || 'General Admission'
         }
 
@@ -51,8 +51,8 @@ export default function ConfirmationClient() {
         ticketsData.push({
           id: ticketId,
           eventName: selectedEvent.title,
-          eventDate: selectedEvent.date,
-          eventTime: selectedEvent.time,
+          eventDate: selectedEvent.event_date,
+          eventTime: selectedEvent.event_time,
           eventLocation: selectedEvent.location,
           ticketHolder: selectedEvent.ticketHolder || 'General Admission',
           qrCode
