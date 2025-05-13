@@ -1,22 +1,22 @@
 // store/slices/checkoutSlice.ts
 // Slice para manejar el flujo de checkout
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface CheckoutState {
-  step: number;
+  step: number
   contactInfo: {
-    email: string;
-    phone: string;
-    createAccount: boolean;
-  };
-  otpVerified: boolean;
+    email: string
+    phone: string
+    createAccount: boolean
+  }
+  otpVerified: boolean
   ticketCustomization: {
-    name: string;
-    color: string;
-  };
-  paymentMethod: 'card' | 'transfer' | 'deposit' | null;
-  timer: number; // Tiempo restante en segundos
+    name: string
+    color: string
+  }
+  paymentMethod: 'card' | 'transfer' | 'deposit' | null
+  timer: number // Tiempo restante en segundos
 }
 
 const initialState: CheckoutState = {
@@ -33,7 +33,7 @@ const initialState: CheckoutState = {
   },
   paymentMethod: null,
   timer: 15 * 60 // 15 minutos
-};
+}
 
 const checkoutSlice = createSlice({
   name: 'checkout',
@@ -41,41 +41,41 @@ const checkoutSlice = createSlice({
   reducers: {
     // Navegación entre pasos
     goToNextStep: (state) => {
-      if (state.step < 5) state.step += 1;
+      if (state.step < 5) state.step += 1
     },
     goToPrevStep: (state) => {
-      if (state.step > 1) state.step -= 1;
+      if (state.step > 1) state.step -= 1
     },
-    
+
     // Actualizar datos de contacto
     setContactInfo: (state, action: PayloadAction<typeof initialState.contactInfo>) => {
-      state.contactInfo = action.payload;
+      state.contactInfo = action.payload
     },
-    
+
     // Verificar OTP
     setOtpVerified: (state, action: PayloadAction<boolean>) => {
-      state.otpVerified = action.payload;
+      state.otpVerified = action.payload
     },
-    
+
     // Actualizar personalización
     setTicketCustomization: (state, action: PayloadAction<typeof initialState.ticketCustomization>) => {
-      state.ticketCustomization = action.payload;
+      state.ticketCustomization = action.payload
     },
-    
+
     // Establecer método de pago
     setPaymentMethod: (state, action: PayloadAction<typeof initialState.paymentMethod>) => {
-      state.paymentMethod = action.payload;
+      state.paymentMethod = action.payload
     },
-    
+
     // Actualizar timer
     updateTimer: (state) => {
-      if (state.timer > 0) state.timer -= 1;
+      if (state.timer > 0) state.timer -= 1
     },
-    
+
     // Reiniciar checkout
     resetCheckout: () => initialState
   }
-});
+})
 
 export const {
   goToNextStep,
@@ -86,6 +86,6 @@ export const {
   setPaymentMethod,
   updateTimer,
   resetCheckout
-} = checkoutSlice.actions;
+} = checkoutSlice.actions
 
-export default checkoutSlice.reducer;
+export default checkoutSlice.reducer
