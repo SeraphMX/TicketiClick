@@ -10,10 +10,12 @@ import TicketCustomization from '@/components/checkout/TicketCustomization'
 import { useAuth } from '@/hooks/useAuth'
 import { useCheckoutTimer } from '@/hooks/useCheckoutTimer'
 import { Event } from '@/lib/types'
+import { RootState } from '@/store/store'
 import { ArrowLeft, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 // Pasos del checkout
 const CHECKOUT_STEPS = [
@@ -29,6 +31,7 @@ interface CheckoutClientProps {
 }
 
 export default function CheckoutClient({ event }: CheckoutClientProps) {
+  const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const router = useRouter()
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
@@ -46,6 +49,12 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   const { timeLeft, expired } = useCheckoutTimer(15 * 60) // 15 minutos
 
   useEffect(() => {
+    // Redirigir al evento si no hay evento seleccionado en el estado de Redux
+    if (!selectedEvent) {
+      router.push(`/event/${event.slug}`)
+      return
+    }
+
     // Si el usuario está autenticado, prellenar datos
     if (user) {
       setFormData((prev) => ({
@@ -53,7 +62,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
         email: user.email
       }))
     }
-  }, [user])
+  }, [user, event.slug, router, selectedEvent])
 
   // Manejar expiración del timer
   useEffect(() => {
