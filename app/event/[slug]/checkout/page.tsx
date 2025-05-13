@@ -1,19 +1,21 @@
-// app/event/[id]/checkout/page.tsx
+// app/event/[slug]/checkout/page.tsx
 // Página de checkout (Server Component)
 
 import CheckoutClient from '@/components/checkout/CheckoutClient'
-import { getEventBySlug, mockEvents } from '@/data/events'
+import { supabase } from '@/lib/supabase'
+import { Event } from '@/lib/types'
 
 // Generar parámetros estáticos para pre-renderizado
-export function generateStaticParams() {
-  return mockEvents.map((event) => ({
+export async function generateStaticParams() {
+  const { data: events = [] } = await supabase.from('event_details_view').select('slug')
+  return (events ?? []).map((event) => ({
     slug: event.slug.toString()
   }))
 }
 
-export default function CheckoutPage({ params }: { params: { slug: string } }) {
+export default async function CheckoutPage({ params }: { params: { slug: string } }) {
   const eventSlug = String(params.slug)
-  const event = getEventBySlug(eventSlug)
+  const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', eventSlug).single()
 
   if (!event) {
     return (
@@ -27,5 +29,5 @@ export default function CheckoutPage({ params }: { params: { slug: string } }) {
     )
   }
 
-  return <CheckoutClient event={event} />
+  return <CheckoutClient event={event as Event} />
 }
