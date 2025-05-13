@@ -1,6 +1,7 @@
 'use client'
 import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
+import { formatDate, formatTime } from '@/lib/utils'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
 import { ArrowLeft, Calendar, Check, ChevronDown, ChevronUp, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
@@ -17,12 +18,6 @@ interface OrderSummaryProps {
   }
   onConfirm: () => void
   onBack: () => void
-}
-
-// Función para formatear fechas a formato español
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('es-ES', options)
 }
 
 // Traductor de métodos de pago
@@ -86,7 +81,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
         <div className='space-y-2'>
           <div className='flex items-center text-sm text-gray-600'>
             <Calendar className='h-4 w-4 mr-2' />
-            {formatDate(event.date)} - {event.time}
+            {formatDate(event.event_date)} - {formatTime(event.event_time)}
           </div>
           <div className='flex items-center text-sm text-gray-600'>
             <MapPin className='h-4 w-4 mr-2' />

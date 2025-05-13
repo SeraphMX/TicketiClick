@@ -17,10 +17,10 @@ import { useEffect, useState } from 'react'
 
 // Pasos del checkout
 const CHECKOUT_STEPS = [
-  { id: 1, title: 'Datos de contacto' },
+  { id: 1, title: 'Contacto' },
   { id: 2, title: 'Verificación' },
   { id: 3, title: 'Personalización' },
-  { id: 4, title: 'Método de pago' },
+  { id: 4, title: 'Pago' },
   { id: 5, title: 'Confirmación' }
 ]
 
