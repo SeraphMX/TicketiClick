@@ -3,16 +3,11 @@
 
 import { getEventById } from '@/data/events'
 import { Ticket } from '@/lib/types'
+import { formatDate } from '@/lib/utils'
 import { Calendar, Clock, MapPin, QrCode, Ticket as TicketIcon } from 'lucide-react'
 
 interface TicketCardProps {
   ticket: Ticket
-}
-
-// Función para formatear fechas a formato español
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-  return new Date(dateString).toLocaleDateString('es-ES', options)
 }
 
 // Función para determinar el color según el estado del boleto
