@@ -44,12 +44,12 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!stripe || !elements || !selectedMethod || !selectedEvent) {
-      setError('Please ensure all payment details are complete')
+      setError('Revisa que todos los campos estén completos')
       return
     }
 
     if (selectedMethod === 'card' && !cardComplete) {
-      setError('Please complete your card details')
+      setError('Completa los datos de la tarjeta')
       return
     }
 
@@ -59,7 +59,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
     try {
       const quantity = selectedEvent.quantity || 1
       const baseAmount = selectedEvent.price * quantity * 100 // Precio base en centavos por cantidad de boletos
-      
+
       // Comisiones por boleto:
       const serviceFee = Math.round(baseAmount * 0.1) // 10% comisión de servicio
       const paymentFee = Math.round(baseAmount * 0.05) // 5% comisión método de pago
@@ -83,7 +83,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create payment intent')
+        throw new Error('Hubo un error al procesar el pago')
       }
 
       const { clientSecret } = await response.json()
@@ -91,7 +91,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       // Get card element
       const cardElement = elements.getElement(CardElement)
       if (!cardElement) {
-        throw new Error('Please ensure your card details are entered correctly')
+        throw new Error('Asegurate que los detalles de tu tarjeta son correctos')
       }
 
       // Confirm the payment
@@ -107,7 +107,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
 
       onSubmit(selectedMethod)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'Ups... hubo un error al procesar el pago')
       console.error('Payment error:', err)
     } finally {
       setIsProcessing(false)
