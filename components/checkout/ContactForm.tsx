@@ -1,7 +1,5 @@
-'use client'
-// components/checkout/ContactForm.tsx
-// Formulario de datos de contacto
-
+import { useDispatch } from '@/hooks/useReduxHooks'
+import { setContactInfo } from '@/store/slices/checkoutSlice'
 import { Mail, Phone } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 
@@ -17,6 +15,7 @@ interface ContactFormProps {
 }
 
 export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
+  const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
@@ -29,8 +28,70 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
     }
   })
 
+  const handleFormSubmit = async (data: ContactFormData) => {
+    try {
+      // Formatear número de teléfono
+      const formattedPhone = data.phone.startsWith('+') ? data.phone : `+52${data.phone}`
+
+      // Validar el teléfono primero
+      const validateResponse = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate-phone`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          phone: formattedPhone
+        })
+      })
+
+      const validateResult = await validateResponse.json()
+
+      if (!validateResult.isValid || !validateResult.isMobile) {
+        throw new Error('Por favor, ingresa un número de teléfono móvil válido')
+      }
+
+      const formattedData = { ...data, phone: formattedPhone }
+
+      // Actualizar el estado en Redux
+      dispatch(setContactInfo(formattedData))
+
+      // Enviar OTP
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          phone: formattedPhone
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el código de verificación')
+      }
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Continuar con el siguiente paso
+        onSubmit(formattedData)
+      } else {
+        throw new Error(result.message || 'Error al enviar el código de verificación')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      if (error instanceof Error) {
+        alert(error.message || 'Error al procesar la solicitud. Por favor, intenta de nuevo.')
+      } else {
+        alert('Error al procesar la solicitud. Por favor, intenta de nuevo.')
+      }
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className='space-y-6'>
       <div>
         <h2 className='text-xl font-bold text-gray-900 mb-6'>Datos de contacto</h2>
 
@@ -50,14 +111,15 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
                 {...register('phone', {
                   required: 'El teléfono es obligatorio',
                   pattern: {
-                    value: /^\d{10}$/,
-                    message: 'El teléfono debe tener 10 dígitos'
+                    value: /^\+?[1-9]\d{1,14}$/,
+                    message: 'Ingresa un número de teléfono válido'
                   }
                 })}
                 className={`block w-full pl-10 pr-3 py-2 border ${
                   errors.phone ? 'border-red-300' : 'border-gray-300'
                 } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
-                placeholder='10 dígitos'
+                placeholder='10 dígitos (sin espacios ni guiones)'
+                maxLength={10}
               />
             </div>
             {errors.phone && <p className='mt-1 text-sm text-red-600'>{errors.phone.message}</p>}
