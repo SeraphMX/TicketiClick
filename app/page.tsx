@@ -127,7 +127,7 @@ export default async function Home() {
         <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8'>Próximos Eventos</h2>
 
         {/* Mostrar primeros 4 eventos */}
-        <EventList events={events.slice(0, 4)} showFilters={false} title='' />
+        <EventList events={(events || []).slice(0, 4)} showFilters={false} title='' />
 
         <div className='mt-8 text-center'>
           <Link
