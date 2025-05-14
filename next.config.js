@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone', // Esta línea es crucial
+  output: 'standalone',
   eslint: {
     ignoreDuringBuilds: true
   },
@@ -8,8 +8,19 @@ const nextConfig = {
     unoptimized: true
   },
   experimental: {
-    appDir: true,
-    serverComponentsExternalPackages: ['stripe']
+    serverComponentsExternalPackages: ['stripe'],
+    outputFileTracingExcludes: {
+      '**/*': ['./supabase/functions/**/*']
+    }
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.ts$/,
+      include: /supabase[\\/]functions/,
+      use: 'null-loader'
+    })
+
+    return config
   }
 }
 

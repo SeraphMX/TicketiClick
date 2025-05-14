@@ -79,6 +79,7 @@
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.11.1",
-    "@types/qrcode": "^1.5.5"
+    "@types/qrcode": "^1.5.5",
+    "null-loader": "^4.0.1"
   }
 }
