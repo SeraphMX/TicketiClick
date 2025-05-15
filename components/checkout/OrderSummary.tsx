@@ -4,7 +4,7 @@ import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
-import { ArrowLeft, Calendar, Check, ChevronDown, ChevronUp, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
+import { ArrowLeft, Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -57,7 +57,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
       )
 
       // Simular proceso de pago
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      //await new Promise((resolve) => setTimeout(resolve, 2000))
       // Redirigir a la página de confirmación
       router.push(`/event/${event.slug}/confirmation`)
     } catch (error) {
@@ -204,12 +204,12 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
           {isProcessing ? (
             <>
               <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3'></div>
-              Procesando...
+              Generando entradas...
             </>
           ) : (
             <>
-              <Check className='mr-2 h-5 w-5' />
-              Confirmar compra
+              <CloudDownload className='mr-2 h-5 w-5' />
+              Descargar boletos
             </>
           )}
         </button>

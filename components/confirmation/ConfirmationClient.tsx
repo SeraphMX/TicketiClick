@@ -1,6 +1,8 @@
 'use client'
 
 import { useSelector } from '@/hooks/useReduxHooks'
+import { supabase } from '@/lib/supabase'
+import { formatDate, formatTime } from '@/lib/utils'
 import { RootState } from '@/store/store'
 import { jsPDF } from 'jspdf'
 import { Download, Mail, QrCode } from 'lucide-react'
@@ -14,7 +16,8 @@ interface TicketData {
   eventDate: string
   eventTime: string
   eventLocation: string
-  ticketHolder: string
+  ticketHolder?: string
+  ticketType: string
   qrCode: string
 }
 
@@ -23,48 +26,49 @@ export default function ConfirmationClient() {
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const [tickets, setTickets] = useState<TicketData[]>([])
   const [loading, setLoading] = useState(true)
+  const paymentIntentId = useSelector((state: RootState) => state.checkout.paymentIntentId)
 
   useEffect(() => {
-    if (!selectedEvent) {
-      router.push('/events')
-      return
-    }
-
-    const generateTickets = async () => {
-      const ticketsData: TicketData[] = []
-
-      // Generar un ticket por cada cantidad comprada
-      for (let i = 0; i < (selectedEvent.quantity ?? 0); i++) {
-        const ticketId = `${selectedEvent.id}-${Date.now()}-${i}`
-        const ticketInfo = {
-          eventId: selectedEvent.id,
-          ticketId,
-          eventName: selectedEvent.title,
-          eventDate: selectedEvent.date,
-          eventTime: selectedEvent.time,
-          ticketHolder: selectedEvent.ticketHolder || 'General Admission'
-        }
-
-        // Generar QR code
-        const qrCode = await QRCode.toDataURL(JSON.stringify(ticketInfo))
-
-        ticketsData.push({
-          id: ticketId,
-          eventName: selectedEvent.title,
-          eventDate: selectedEvent.date,
-          eventTime: selectedEvent.time,
-          eventLocation: selectedEvent.location,
-          ticketHolder: selectedEvent.ticketHolder || 'General Admission',
-          qrCode
-        })
+    const fetchTickets = async () => {
+      if (!paymentIntentId) {
+        router.push('/events')
+        return
       }
 
-      setTickets(ticketsData)
+      setLoading(true)
+
+      const { data, error } = await supabase.rpc('get_tickets_by_payment_intent', {
+        payment_intent_id: paymentIntentId
+      })
+
+      if (error || !data) {
+        console.error('Error al obtener tickets:', error)
+        router.push('/events')
+        return
+      }
+
+      const ticketsWithQR: TicketData[] = await Promise.all(
+        data.map(async (ticket: any) => {
+          const qrCode = await QRCode.toDataURL(ticket.code)
+          return {
+            id: ticket.ticket_id,
+            eventName: ticket.title,
+            eventDate: ticket.date,
+            eventTime: ticket.time,
+            eventLocation: ticket.location,
+            ticketType: ticket.ticket_type,
+            ticketHolder: ticket.ticket_holder ? ticket.ticket_holder : null,
+            qrCode
+          }
+        })
+      )
+
+      setTickets(ticketsWithQR)
       setLoading(false)
     }
 
-    generateTickets()
-  }, [selectedEvent, router])
+    fetchTickets()
+  }, [paymentIntentId, router, supabase])
 
   const generatePDF = (ticket: TicketData) => {
     const doc = new jsPDF({
@@ -124,12 +128,12 @@ export default function ConfirmationClient() {
       <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
           <div className='flex items-center justify-between mb-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>¡Compra exitosa!</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>¡Descarga tus boletos!</h1>
             <QrCode className='h-8 w-8 text-blue-600' />
           </div>
           <p className='text-gray-600 mb-4'>
-            Tu compra se ha completado correctamente. A continuación, encontrarás tus boletos para descargar o enviar por correo
-            electrónico.
+            A continuación, encontrarás tus boletos para descargar o enviar por correo electrónico con un click. Adicionalmente te hemos
+            enviado un correo de confirmación a tu email con un link para descargar tus boletos mas tarde.
           </p>
         </div>
 
@@ -140,10 +144,10 @@ export default function ConfirmationClient() {
                 <div className='flex-1'>
                   <h2 className='text-xl font-semibold text-gray-900 mb-4'>{ticket.eventName}</h2>
                   <div className='space-y-2 text-gray-600'>
-                    <p>Fecha: {ticket.eventDate}</p>
-                    <p>Hora: {ticket.eventTime}</p>
+                    <p>Fecha: {formatDate(ticket.eventDate)}</p>
+                    <p>Hora: {formatTime(ticket.eventTime)}</p>
                     <p>Lugar: {ticket.eventLocation}</p>
-                    <p>Titular: {ticket.ticketHolder}</p>
+                    <p>Tipo: {ticket.ticketType}</p>
                     <p className='font-mono text-sm'>ID: {ticket.id}</p>
                   </div>
                 </div>
