@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency, stripe_id, quantity = 1 } = await request.json()
+    const { buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity = 1 } = await request.json()
 
     // Comisiones por boleto
     const desiredFixedFee = 1000 * quantity // $10 MXN en centavos por boleto
@@ -31,11 +31,17 @@ export async function POST(request: Request) {
         destination: stripe_id // El resto va a la cuenta conectada
       },
       metadata: {
-        quantity // Guardamos la cantidad de boletos para referencia
+        quantity, // Guardamos la cantidad de boletos para referencia
+        event_id,
+        buyer_email,
+        buyer_phone
       }
     })
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret })
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
+    })
   } catch (err) {
     console.error('Error creating payment intent:', err)
     return NextResponse.json({ error: 'Error creating payment intent' }, { status: 500 })
