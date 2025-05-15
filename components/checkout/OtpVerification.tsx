@@ -55,6 +55,17 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
     if (completeOtp.length === 6) {
       try {
         setIsVerifying(true)
+
+        // Verificar si estamos en modo desarrollo y el código es 123456
+        const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
+        if (isDevMode && completeOtp === '123456') {
+          console.log('Modo desarrollo: Aceptando código OTP 123456 como válido')
+          setIsVerified(true)
+          dispatch(setOtpVerified(true))
+          setTimeout(onVerified, 1500)
+          return
+        }
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/verify-otp`, {
           method: 'POST',
           headers: {
@@ -99,6 +110,16 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
   // Reenviar código
   const handleResend = async () => {
     try {
+      const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
+
+      if (isDevMode) {
+        console.log('Modo desarrollo: Omitiendo envío real de OTP')
+        setTimeLeft(30)
+        setCanResend(false)
+        setError(null)
+        return
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-otp`, {
         method: 'POST',
         headers: {
@@ -146,6 +167,15 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
           <br />
           <span className='font-medium text-gray-900'>{formatPhone(phone)}</span>
         </p>
+
+        {/* Mensaje de modo desarrollo */}
+        {process.env.NEXT_PUBLIC_DEVMODE === 'true' && (
+          <div className='bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4'>
+            <p className='text-yellow-700 text-sm'>
+              <strong>Modo desarrollo activo:</strong> Usa el código <strong>123456</strong> para continuar
+            </p>
+          </div>
+        )}
 
         {/* Inputs OTP */}
         <div className='flex justify-center gap-2 mb-6'>

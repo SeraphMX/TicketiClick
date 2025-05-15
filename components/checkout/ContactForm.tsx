@@ -56,6 +56,18 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
       // Actualizar el estado en Redux
       dispatch(setContactInfo(formattedData))
 
+      // Verificar si estamos en modo desarrollo
+      const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
+
+      console.log('Modo desarrollo:', isDevMode)
+
+      if (isDevMode) {
+        console.log('Modo desarrollo: Omitiendo envío de OTP')
+        // Continuar directamente con el siguiente paso
+        onSubmit(formattedData)
+        return
+      }
+
       // Enviar OTP
       const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-otp`, {
         method: 'POST',
