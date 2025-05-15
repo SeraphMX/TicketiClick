@@ -1,5 +1,6 @@
 'use client'
-import { useSelector } from '@/hooks/useReduxHooks'
+import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
+import { setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { RootState } from '@/store/store'
 import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
@@ -30,10 +31,12 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   const stripe = useStripe()
   const elements = useElements()
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
+  const checkoutData = useSelector((state: RootState) => state.checkout.contactInfo)
   const [selectedMethod, setSelectedMethod] = useState(formData.paymentMethod || '')
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (selectedMethod !== 'card') {
@@ -75,6 +78,9 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          buyer_email: checkoutData.email,
+          buyer_phone: checkoutData.phone,
+          event_id: selectedEvent.id,
           amount: totalAmount,
           currency: selectedEvent.currency.toLowerCase(),
           stripe_id: selectedEvent.stripe_id,
@@ -86,7 +92,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
         throw new Error('Hubo un error al procesar el pago')
       }
 
-      const { clientSecret } = await response.json()
+      const { clientSecret, paymentIntentId } = await response.json()
 
       // Get card element
       const cardElement = elements.getElement(CardElement)
@@ -104,6 +110,9 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       if (stripeError) {
         throw new Error(stripeError.message)
       }
+
+      // Set paymentIntentId in redux state
+      dispatch(setPaymentIntentId(paymentIntentId))
 
       onSubmit(selectedMethod)
     } catch (err) {
