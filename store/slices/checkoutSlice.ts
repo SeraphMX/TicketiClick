@@ -17,6 +17,7 @@ interface CheckoutState {
   }
   paymentMethod: 'card' | 'transfer' | 'deposit' | null
   timer: number // Tiempo restante en segundos
+  paymentIntentId?: string
 }
 
 const initialState: CheckoutState = {
@@ -67,6 +68,11 @@ const checkoutSlice = createSlice({
       state.paymentMethod = action.payload
     },
 
+    // Establecer ID de PaymentIntent
+    setPaymentIntentId: (state, action: PayloadAction<string | undefined>) => {
+      state.paymentIntentId = action.payload
+    },
+
     // Actualizar timer
     updateTimer: (state) => {
       if (state.timer > 0) state.timer -= 1
@@ -84,6 +90,7 @@ export const {
   setOtpVerified,
   setTicketCustomization,
   setPaymentMethod,
+  setPaymentIntentId,
   updateTimer,
   resetCheckout
 } = checkoutSlice.actions
