@@ -12,8 +12,7 @@ interface CheckoutState {
   }
   otpVerified: boolean
   ticketCustomization: {
-    name: string
-    color: string
+    names: string[]
   }
   paymentMethod: 'card' | 'transfer' | 'deposit' | null
   timer: number // Tiempo restante en segundos
@@ -29,8 +28,7 @@ const initialState: CheckoutState = {
   },
   otpVerified: false,
   ticketCustomization: {
-    name: '',
-    color: '#FFFFFF'
+    names: []
   },
   paymentMethod: null,
   timer: 15 * 60 // 15 minutos
@@ -58,9 +56,9 @@ const checkoutSlice = createSlice({
       state.otpVerified = action.payload
     },
 
-    // Actualizar personalización
-    setTicketCustomization: (state, action: PayloadAction<typeof initialState.ticketCustomization>) => {
-      state.ticketCustomization = action.payload
+    // Actualizar nombres de boletos
+    setTicketNames: (state, action: PayloadAction<string[]>) => {
+      state.ticketCustomization.names = action.payload
     },
 
     // Establecer método de pago
@@ -88,7 +86,7 @@ export const {
   goToPrevStep,
   setContactInfo,
   setOtpVerified,
-  setTicketCustomization,
+  setTicketNames,
   setPaymentMethod,
   setPaymentIntentId,
   updateTimer,
