@@ -35,6 +35,7 @@ export default function TicketCustomization({ onSubmit, onSkip, onBack }: Ticket
       return
     }
 
+    console.log('Nombres de boletos:', ticketNames)
     dispatch(setTicketNames(ticketNames))
     onSubmit({
       names: ticketNames,

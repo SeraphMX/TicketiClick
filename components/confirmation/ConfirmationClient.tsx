@@ -115,7 +115,7 @@ export default function ConfirmationClient() {
 
     // Imagen principal del evento
     const eventImg = await getImageBase64(selectedEvent?.image || '/branding/genericEvent.webp') // Ruta pública en Next.js
-    doc.addImage(eventImg.data, eventImg.format, 14, 145, 60, 34)
+    doc.addImage(eventImg.data, eventImg.format, 14, 150, 60, 34)
 
     // QR
     const qrImg = await getImageBase64(ticket.qrCode)
@@ -136,10 +136,11 @@ export default function ConfirmationClient() {
     doc.text(`Fecha: ${ticket.eventDate}`, 90, 150)
     doc.text(`Hora: ${ticket.eventTime}`, 90, 157)
     doc.text(`Lugar: ${ticket.eventLocation}`, 90, 164)
-    doc.text(`Tipo: ${ticket.ticketType}`, 90, 180)
     if (ticket.ticketHolder) {
-      doc.text(`Titular: ${ticket.ticketHolder}`, 90, 187)
+      doc.text(`Titular: ${ticket.ticketHolder}`, 90, 175)
     }
+    doc.text(`Tipo: ${ticket.ticketType}`, 90, 182)
+
     doc.setFontSize(10)
     doc.text(`ID: ${ticket.id}`, 90, 190)
 
@@ -192,6 +193,7 @@ export default function ConfirmationClient() {
                 <div className='flex-1'>
                   <h2 className='text-xl font-semibold text-gray-900 mb-4'>{ticket.eventName}</h2>
                   <div className='space-y-2 text-gray-600'>
+                    {ticket.ticketHolder && <p className='font-semibold text-lg'>Titular: {ticket.ticketHolder}</p>}
                     <p>Tipo: {ticket.ticketType}</p>
                     <p className='font-mono text-sm'>ID: {ticket.id}</p>
                   </div>
