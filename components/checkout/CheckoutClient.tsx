@@ -66,11 +66,11 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
 
   // Manejar expiración del timer
   useEffect(() => {
-    if (expired) {
+    if (expired && currentStep !== 5) {
       alert('El tiempo para completar la compra ha expirado')
       router.push(`/event/${event.slug}`)
     }
-  }, [expired, event.slug, router])
+  }, [expired, event.slug, router, currentStep])
 
   // Formatear tiempo restante
   const formatTimeLeft = () => {
@@ -86,16 +86,18 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
     <div className='min-h-screen bg-gray-50 py-12'>
       <div className='max-w-2xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Timer */}
-        <div className='bg-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between'>
-          <Link href={`/event/${event.slug}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
-            <ArrowLeft className='h-5 w-5 mr-1' />
-            Volver al evento
-          </Link>
-          <div className='flex items-center text-gray-600'>
-            <Clock className='h-5 w-5 mr-2' />
-            Tiempo restante: <span className='font-mono ml-2'>{formatTimeLeft()}</span>
+        {currentStep !== 5 && (
+          <div className='bg-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between'>
+            <Link href={`/event/${event.slug}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
+              <ArrowLeft className='h-5 w-5 mr-1' />
+              Volver al evento
+            </Link>
+            <div className='flex items-center text-gray-600'>
+              <Clock className='h-5 w-5 mr-2' />
+              Tiempo restante: <span className='font-mono ml-2'>{formatTimeLeft()}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Barra de progreso */}
         <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
@@ -141,7 +143,6 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
 
           {currentStep === 3 && (
             <TicketCustomization
-              formData={formData}
               onSubmit={(data) => {
                 setFormData((prev) => ({ ...prev, ...data }))
                 setCurrentStep(4)
