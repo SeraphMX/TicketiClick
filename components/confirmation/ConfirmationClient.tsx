@@ -2,16 +2,16 @@
 
 import { useSelector } from '@/hooks/useReduxHooks'
 import { supabase } from '@/lib/supabase'
-import { formatDate, formatTime } from '@/lib/utils'
 import { RootState } from '@/store/store'
 import { jsPDF } from 'jspdf'
-import { Download, Mail, QrCode } from 'lucide-react'
+import { Download, QrCode } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
 
 interface TicketData {
   id: string
+  eventImage: string
   eventName: string
   eventDate: string
   eventTime: string
@@ -70,30 +70,82 @@ export default function ConfirmationClient() {
     fetchTickets()
   }, [paymentIntentId, router, supabase])
 
-  const generatePDF = (ticket: TicketData) => {
+  const loadWebPAsPngBase64 = async (src: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.src = src
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+
+        const ctx = canvas.getContext('2d')
+        ctx?.drawImage(img, 0, 0)
+
+        const pngBase64 = canvas.toDataURL('image/png')
+        resolve(pngBase64)
+      }
+
+      img.onerror = reject
+    })
+  }
+
+  const getImageBase64 = async (src: string): Promise<{ data: string; format: 'PNG' | 'JPEG' }> => {
+    const format = src.endsWith('.webp') ? 'PNG' : src.endsWith('.jpg') || src.endsWith('.jpeg') ? 'JPEG' : 'PNG'
+    if (format === 'PNG' && src.endsWith('.webp')) {
+      const converted = await loadWebPAsPngBase64(src)
+      return { data: converted, format: 'PNG' }
+    } else {
+      return { data: src, format }
+    }
+  }
+
+  const generatePDF = async (ticket: TicketData) => {
     const doc = new jsPDF({
-      orientation: 'landscape',
+      orientation: 'portrait',
       unit: 'mm',
-      format: [210, 99] // Tamaño de ticket estándar
+      format: [210, 250] // Tamaño personalizado
     })
 
-    // Añadir fondo
-    doc.setFillColor(245, 245, 245)
-    doc.rect(0, 0, 210, 99, 'F')
+    // Fondo blanco
+    doc.setFillColor(255, 255, 255)
+    doc.rect(0, 0, 210, 250, 'F')
 
-    // Añadir QR
-    doc.addImage(ticket.qrCode, 'PNG', 150, 20, 50, 50)
+    // Imagen principal del evento
+    const eventImg = await getImageBase64(selectedEvent?.image || '/branding/genericEvent.webp') // Ruta pública en Next.js
+    doc.addImage(eventImg.data, eventImg.format, 14, 145, 60, 34)
 
-    // Añadir información del evento
-    doc.setFontSize(20)
-    doc.text(ticket.eventName, 10, 20)
+    // QR
+    const qrImg = await getImageBase64(ticket.qrCode)
+    doc.addImage(qrImg.data, qrImg.format, 55, 10, 100, 100)
 
+    // Logo
+    const logoImg = await getImageBase64('/branding/logo-ticketi.webp') // Ruta pública en Next.js
+    doc.addImage(logoImg.data, logoImg.format, 80, 220, 20, 20)
+
+    // Texto
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(0, 0, 0)
+    doc.setFontSize(14)
+    doc.text(ticket.eventName, 90, 142)
+
+    doc.setFont('helvetica', 'normal')
     doc.setFontSize(12)
-    doc.text(`Fecha: ${ticket.eventDate}`, 10, 35)
-    doc.text(`Hora: ${ticket.eventTime}`, 10, 45)
-    doc.text(`Lugar: ${ticket.eventLocation}`, 10, 55)
-    doc.text(`Titular: ${ticket.ticketHolder}`, 10, 65)
-    doc.text(`ID: ${ticket.id}`, 10, 75)
+    doc.text(`Fecha: ${ticket.eventDate}`, 90, 150)
+    doc.text(`Hora: ${ticket.eventTime}`, 90, 157)
+    doc.text(`Lugar: ${ticket.eventLocation}`, 90, 164)
+    doc.text(`Tipo: ${ticket.ticketType}`, 90, 180)
+    if (ticket.ticketHolder) {
+      doc.text(`Titular: ${ticket.ticketHolder}`, 90, 187)
+    }
+    doc.setFontSize(10)
+    doc.text(`ID: ${ticket.id}`, 90, 190)
+
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Ticketi', 111, 232, { align: 'center' })
 
     // Guardar PDF
     doc.save(`ticket-${ticket.id}.pdf`)
@@ -128,13 +180,9 @@ export default function ConfirmationClient() {
       <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
           <div className='flex items-center justify-between mb-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>¡Descarga tus boletos!</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>¡Descarga tus boletos con un click!</h1>
             <QrCode className='h-8 w-8 text-blue-600' />
           </div>
-          <p className='text-gray-600 mb-4'>
-            A continuación, encontrarás tus boletos para descargar o enviar por correo electrónico con un click. Adicionalmente te hemos
-            enviado un correo de confirmación a tu email con un link para descargar tus boletos mas tarde.
-          </p>
         </div>
 
         <div className='space-y-6'>
@@ -144,14 +192,11 @@ export default function ConfirmationClient() {
                 <div className='flex-1'>
                   <h2 className='text-xl font-semibold text-gray-900 mb-4'>{ticket.eventName}</h2>
                   <div className='space-y-2 text-gray-600'>
-                    <p>Fecha: {formatDate(ticket.eventDate)}</p>
-                    <p>Hora: {formatTime(ticket.eventTime)}</p>
-                    <p>Lugar: {ticket.eventLocation}</p>
                     <p>Tipo: {ticket.ticketType}</p>
                     <p className='font-mono text-sm'>ID: {ticket.id}</p>
                   </div>
                 </div>
-                <img src={ticket.qrCode} alt='QR Code' className='w-32 h-32' />
+                {/* <img src={ticket.qrCode} alt='QR Code' className='w-32 h-32' /> */}
               </div>
 
               <div className='mt-6 flex gap-4'>
@@ -162,13 +207,13 @@ export default function ConfirmationClient() {
                   <Download className='h-5 w-5 mr-2' />
                   Descargar PDF
                 </button>
-                <button
+                {/* <button
                   onClick={() => sendByEmail(ticket)}
                   className='flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700'
                 >
                   <Mail className='h-5 w-5 mr-2' />
                   Enviar por email
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
