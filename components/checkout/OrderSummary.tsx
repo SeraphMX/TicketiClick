@@ -4,7 +4,7 @@ import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
-import { ArrowLeft, Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
+import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -56,10 +56,10 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
         })
       )
 
-      // Simular proceso de pago
-      //await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Simular generacion de boletos
+      await new Promise((resolve) => setTimeout(resolve, 1000))
       // Redirigir a la página de confirmación
-      router.push(`/event/${event.slug}/confirmation`)
+      router.push(`/event/${event.slug}/tickets`)
     } catch (error) {
       setIsProcessing(false)
       console.error('Error en el proceso de pago:', error)
@@ -69,11 +69,14 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
   return (
     <div className='space-y-6'>
       <div className='flex items-center'>
-        <button onClick={onBack} className='mr-4 text-gray-500 hover:text-gray-700'>
-          <ArrowLeft className='h-5 w-5' />
-        </button>
         <h2 className='text-xl font-bold text-gray-900'>Resumen de compra</h2>
       </div>
+
+      <p className='text-sm text-gray-600'>
+        La compra se ha realizado correctamente. Ahora puedes ver los detalles de tu pedido y descargar tus boletos. También te hemos
+        enviado un correo electrónico con esta información por si necesitas acceder a ellos más tarde. ¡Gracias por tu compra y disfruta el
+        evento!
+      </p>
 
       {/* Detalles del evento */}
       <div className='bg-gray-50 rounded-lg p-4'>
