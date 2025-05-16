@@ -34,38 +34,13 @@ export async function POST(req: Request) {
 
     const event_id = metadata.event_id
     const quantity = parseInt(metadata.quantity || '1', 10)
+    const holder_names = metadata.holder_names ? JSON.parse(metadata.holder_names) : []
     const ticket_type = metadata.ticket_type || 'general'
     const buyer_email = metadata.buyer_email
     const buyer_phone = metadata.buyer_phone
     const unit_price = Number(paymentIntent.amount) / quantity / 100
     const subtotal = unit_price * quantity
     const total_amount = paymentIntent.amount / 100
-
-    // const { data: userExists, error: userError } = await supabase.from('users').select('id').eq('email', buyer_email).maybeSingle()
-
-    // if (userError) {
-    //   console.error('User lookup error:', userError)
-    //   return NextResponse.json({ error: 'User DB error' }, { status: 500 })
-    // }
-
-    // if (!userExists) {
-    //   const randomPassword = nanoid(12)
-
-    //   const { error: signupError } = await supabase.auth.admin.createUser({
-    //     email: buyer_email,
-    //     phone: buyer_phone,
-    //     password: randomPassword,
-    //     email_confirm: true,
-    //     user_metadata: {
-    //       origin: 'stripe_webhook'
-    //     }
-    //   })
-
-    //   if (signupError) {
-    //     console.error('User creation error:', signupError)
-    //     return NextResponse.json({ error: 'Signup error' }, { status: 500 })
-    //   }
-    // }
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -101,15 +76,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Order items error' }, { status: 500 })
     }
 
-    const tickets = Array.from({ length: quantity }).map(() => ({
+    // Crear los tickets con los nombres de los titulares si están disponibles
+    const tickets = Array.from({ length: quantity }).map((_, index) => ({
       order_id: order.id,
       event_id,
       status: 'valid',
       ticket_type,
       code: nanoid(),
-      issued_at: new Date().toISOString()
+      issued_at: new Date().toISOString(),
+      ticket_holder: holder_names[index] || null // Asigna el nombre si existe, sino null
     }))
-
     const { error: ticketError } = await supabase.from('tickets').insert(tickets)
 
     if (ticketError) {

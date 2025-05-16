@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity = 1 } = await request.json()
+    const { buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity = 1, holder_names } = await request.json()
 
     // Comisiones por boleto
     const desiredFixedFee = 1000 * quantity // $10 MXN en centavos por boleto
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
       },
       metadata: {
         quantity, // Guardamos la cantidad de boletos para referencia
+        holder_names: JSON.stringify(holder_names), // Guardamos los nombres de los titulares de los boletos
         event_id,
         buyer_email,
         buyer_phone

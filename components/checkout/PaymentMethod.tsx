@@ -31,7 +31,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   const stripe = useStripe()
   const elements = useElements()
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
-  const checkoutData = useSelector((state: RootState) => state.checkout.contactInfo)
+  const checkoutData = useSelector((state: RootState) => state.checkout)
   const [selectedMethod, setSelectedMethod] = useState(formData.paymentMethod || '')
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -78,13 +78,14 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          buyer_email: checkoutData.email,
-          buyer_phone: checkoutData.phone,
+          buyer_email: checkoutData.contactInfo.email,
+          buyer_phone: checkoutData.contactInfo.phone,
           event_id: selectedEvent.id,
           amount: totalAmount,
           currency: selectedEvent.currency.toLowerCase(),
           stripe_id: selectedEvent.stripe_id,
-          quantity
+          quantity,
+          holder_names: checkoutData.ticketCustomization.names
         })
       })
 
