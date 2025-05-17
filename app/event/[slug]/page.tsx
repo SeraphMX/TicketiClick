@@ -1,20 +1,43 @@
 // app/event/[slug]/page.tsx
-// Página de detalle de evento
 
 import EventDetailClient from '@/components/EventDetailClient'
 import { supabase } from '@/lib/supabase'
 import { Event } from '@/lib/types'
 
-// Generar parámetros estáticos para pre-renderizado
-export const generateStaticParams = async () => {
-  const { data: events = [] } = await supabase.from('event_details_view').select('slug')
-  return (events ?? []).map((event) => ({
-    slug: event.slug.toString()
-  }))
+export const dynamic = 'force-dynamic'
+
+// Metadata dinámica para SEO
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const { slug } = await params
+
+  const { data: event } = await supabase.from('event_details_view').select('title, description, image').eq('slug', slug).single()
+
+  if (!event) {
+    return {
+      title: 'Evento no encontrado',
+      description: 'No pudimos encontrar información sobre este evento.'
+    }
+  }
+
+  return {
+    title: event.title,
+    description: event.description,
+    openGraph: {
+      title: event.title,
+      description: event.description,
+      images: event.image ? [{ url: event.image, width: 1200, height: 630 }] : undefined
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: event.title,
+      description: event.description,
+      images: event.image ? [event.image] : undefined
+    }
+  }
 }
 
 export default async function EventDetailPage({ params }: { params: { slug: string } }) {
-  const slug = String(params.slug)
+  const { slug } = await params
   const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', slug).single()
 
   if (!event) {

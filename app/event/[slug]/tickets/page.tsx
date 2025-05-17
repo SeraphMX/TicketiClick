@@ -1,6 +1,5 @@
+import DownloadTickets from '@/components/tickets/DownloadTickets'
 import { Metadata } from 'next'
-import ConfirmationClient from '@/components/confirmation/ConfirmationClient'
-import { mockEvents } from '@/data/events'
 
 export const metadata: Metadata = {
   title: 'Confirmación de Compra',
@@ -8,11 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function ConfirmationPage() {
-  return <ConfirmationClient />
-}
-
-export async function generateStaticParams() {
-  return mockEvents.map((event) => ({
-    slug: event.slug,
-  }))
+  return <DownloadTickets />
 }
