@@ -7,19 +7,20 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  experimental: {
-    serverComponentsExternalPackages: ['stripe'],
-    outputFileTracingExcludes: {
-      '**/*': ['./supabase/functions/**/*']
-    }
+  // Configuración para paquetes externos
+  serverExternalPackages: ['stripe'],
+
+  // Configuración correcta para excluir archivos del tracing
+  outputFileTracingExcludes: {
+    '**/*': ['node_modules/**/@supabase/functions/**/*']
   },
+
   webpack: (config) => {
     config.module.rules.push({
       test: /\.ts$/,
       include: /supabase[\\/]functions/,
       use: 'null-loader'
     })
-
     return config
   }
 }
