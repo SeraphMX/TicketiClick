@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { generateOrderToken } from '@/lib/tokens'
 import { nanoid } from 'nanoid'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -14,7 +15,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    const stripeSignature = headers().get('stripe-signature')
+    const stripeSignature = (await headers()).get('stripe-signature')
     const rawBody = await req.text()
 
     if (!stripeSignature) {
@@ -93,8 +94,42 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Ticket insert error' }, { status: 500 })
     }
 
-    return NextResponse.json({ ok: true })
+    const { data: eventData, error: eventError } = await supabase
+      .from('event_details_view')
+      .select('date, slug') // Obtén la fecha y el slug
+      .eq('id', event_id)
+      .single()
+
+    if (eventError || !eventData) {
+      console.error('Error fetching event date:', eventError)
+      return NextResponse.json({ error: 'Failed to fetch event info' }, { status: 500 })
+    }
+
+    const token = generateOrderToken(order.id, new Date(eventData.date))
+    const downloadUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${eventData.slug}/tickets/${token}`
+
+    //Llamar internamente al endpoint de correo
+    const mailResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, // Usa la URL absoluta
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: buyer_email,
+          subject: 'Confirmación de compra en Ticketi',
+          template: 'purchaseConfirmation',
+          templateProps: {
+            downloadLink: downloadUrl
+          }
+        })
+      }
+    )
+
+    if (!mailResponse.ok) {
+      const mailResponseText = await mailResponse.text()
+      console.error('Error al enviar correo. Response text:', mailResponseText)
+    }
   }
 
-  return NextResponse.json({ message: 'Received' }, { status: 200 })
+  return NextResponse.json({ ok: true })
 }
