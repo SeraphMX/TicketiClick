@@ -21,12 +21,20 @@ interface TicketData {
   qrCode: string
 }
 
-export default function ConfirmationClient() {
+interface DownloadTicketsProps {
+  paymentIntentId?: string | null
+}
+
+export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProps) {
   const router = useRouter()
-  const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const [tickets, setTickets] = useState<TicketData[]>([])
   const [loading, setLoading] = useState(true)
-  const paymentIntentId = useSelector((state: RootState) => state.checkout.paymentIntentId)
+  const reduxPaymentIntent = useSelector((state: RootState) => state.checkout.paymentIntentId)
+
+  if (!paymentIntentId) {
+    //Si no se manda como parametro se asume que viene de la compra
+    paymentIntentId = reduxPaymentIntent ?? null
+  }
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -114,7 +122,7 @@ export default function ConfirmationClient() {
     doc.rect(0, 0, 210, 250, 'F')
 
     // Imagen principal del evento
-    const eventImg = await getImageBase64(selectedEvent?.image || '/branding/genericEvent.webp') // Ruta pública en Next.js
+    const eventImg = await getImageBase64(ticket.eventImage || '/branding/genericEvent.webp') // Ruta pública en Next.js
     doc.addImage(eventImg.data, eventImg.format, 14, 150, 60, 34)
 
     // QR
@@ -177,7 +185,7 @@ export default function ConfirmationClient() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 py-12'>
+    <div className=' bg-gray-50 py-12'>
       <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
           <div className='flex items-center justify-between mb-6'>
