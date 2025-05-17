@@ -5,12 +5,7 @@ import { verifyOrderToken } from '@/lib/tokens'
 import { formatDate } from '@/lib/utils'
 import { notFound } from 'next/navigation'
 
-interface PageProps {
-  params: {
-    slug: string
-    token: string
-  }
-}
+type Props = Promise<{ slug: string; token: string }>
 
 interface OrderData {
   id: string
@@ -39,8 +34,8 @@ interface TicketData {
   qrCode: string
 }
 
-export default async function TicketPage({ params }: PageProps) {
-  const { token, slug } = params
+export default async function TicketPage(props: { params: Props }) {
+  const { token, slug } = await props.params
 
   let orderId: string
 

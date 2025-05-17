@@ -5,17 +5,11 @@ import CheckoutClient from '@/components/checkout/CheckoutClient'
 import { supabase } from '@/lib/supabase'
 import { Event } from '@/lib/types'
 
-// Generar parámetros estáticos para pre-renderizado
-export async function generateStaticParams() {
-  const { data: events = [] } = await supabase.from('event_details_view').select('slug')
-  return (events ?? []).map((event) => ({
-    slug: event.slug.toString()
-  }))
-}
+type Props = Promise<{ slug: string }>
 
-export default async function CheckoutPage({ params }: { params: { slug: string } }) {
-  const eventSlug = String(params.slug)
-  const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', eventSlug).single()
+export default async function CheckoutPage(props: { params: Props }) {
+  const { slug } = await props.params
+  const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', slug).single()
 
   if (!event) {
     return (

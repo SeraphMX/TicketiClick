@@ -6,9 +6,11 @@ import { Event } from '@/lib/types'
 
 export const dynamic = 'force-dynamic'
 
+type Props = Promise<{ slug: string }>
+
 // Metadata dinámica para SEO
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const { slug } = await params
+export async function generateMetadata(props: { params: Props }) {
+  const { slug } = await props.params
 
   const { data: event } = await supabase.from('event_details_view').select('title, description, image').eq('slug', slug).single()
 
@@ -36,8 +38,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function EventDetailPage({ params }: { params: { slug: string } }) {
-  const { slug } = await params
+export default async function EventDetailPage(props: { params: Props }) {
+  const { slug } = await props.params
   const { data: event } = await supabase.from('event_details_view').select('*').eq('slug', slug).single()
 
   if (!event) {
