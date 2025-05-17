@@ -1,15 +1,16 @@
-// app/api/send/route.ts
-import { RenderMail } from '@/lib/emails/RenderMail'
+// app/api/send-email/route.ts
+
+import { renderMail } from '@/lib/emails/renderMail.server'
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
 export async function POST(request: Request) {
-  const { to, template, templateProps } = await request.json()
+  const { to, subject, template, templateProps } = await request.json()
 
   const transporter = nodemailer.createTransport({
     host: 'mail.ticketi.click',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD
@@ -17,12 +18,12 @@ export async function POST(request: Request) {
   })
 
   try {
-    const html = RenderMail(template, templateProps)
+    const html = await renderMail(template, templateProps)
 
     await transporter.sendMail({
-      from: '"Ticketi" <no-reply@ticketi.click>',
+      from: '"Ticketi" <notificaciones@ticketi.click>',
       to,
-      subject: getSubjectByTemplate(template), // Ej: "Bienvenido a Ticketi"
+      subject: subject, // Ej: "Bienvenido a Ticketi"
       html
     })
 
@@ -31,14 +32,4 @@ export async function POST(request: Request) {
     console.error(error)
     return NextResponse.json({ error: 'Error al enviar' }, { status: 500 })
   }
-}
-
-// Helper para subjects
-function getSubjectByTemplate(template: keyof typeof subjects): string {
-  const subjects = {
-    welcome: 'Activa tu cuenta en Ticketi',
-    ticket: 'Descarga tu ticket',
-    notification: 'Tienes una notificación'
-  }
-  return subjects[template] || 'Mensaje de Ticketi'
 }
