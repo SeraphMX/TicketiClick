@@ -5,13 +5,16 @@ import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
-import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Tag, Twitter, Users } from 'lucide-react'
+import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Twitter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
+import { version } from 'react'
 interface EventWithQuantity extends Event {
   quantity: number
 }
+
+console.log(version)
 
 export default function EventDetailClient({ event }: { event: Event }) {
   const router = useRouter()
@@ -62,7 +65,14 @@ export default function EventDetailClient({ event }: { event: Event }) {
   // Función para ir al checkout
   const handlePurchase = () => {
     dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
-    router.push(`/event/${event.slug}/checkout`)
+
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        router.push(`/event/${event.slug}/checkout`)
+      })
+    } else {
+      router.push(`/event/${event.slug}/checkout`)
+    }
   }
 
   // URLs para compartir
@@ -95,13 +105,18 @@ export default function EventDetailClient({ event }: { event: Event }) {
     <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10'>
       <div className='bg-white rounded-lg shadow-sm overflow-hidden'>
         {/* Imagen principal */}
-        <div className='relative h-80 md:h-1/2'>
-          <img src={event.image} alt={event.title} className='w-full h-full object-cover' />
+        <div className='relative '>
+          <img
+            src={event.image}
+            alt={event.title}
+            className='w-full h-96 object-cover '
+            style={{ viewTransitionName: `event-image-${event.slug}` }}
+          />
           <div className='absolute inset-0 bg-gradient-to-t from-black opacity-90'></div>
           <div className='absolute bottom-0 p-4 text-white w-full'>
             <div className='md:flex justify-between items-end space-y-3'>
               <div>
-                <h1 className='text-3xl md:text-4xl font-bold mb-2'>{event.title}</h1>
+                <h1 className='text-3xl md:text-4xl font-bold mb-2 '>{event.title}</h1>
                 <div className='flex flex-wrap items-center gap-3'>
                   <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>
                     {category?.name}
@@ -145,7 +160,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
         </div>
 
         {/* Contenido principal */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 p-6'>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 p-2 mdd:p-6'>
           {/* Información del evento */}
           <div className='md:col-span-2 space-y-6'>
             <div>
@@ -155,7 +170,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
             <div className='border-t border-gray-200 pt-6'>
               <h2 className='text-xl font-bold text-gray-800 mb-4'>Detalles</h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-8'>
                 <div className='flex items-start'>
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
@@ -179,35 +194,20 @@ export default function EventDetailClient({ event }: { event: Event }) {
                     <p className='text-gray-600'>{event.location}</p>
                   </div>
                 </div>
-
-                <div className='flex items-start'>
-                  <Tag className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Categoría</p>
-                    <p className='text-gray-600'>{category?.name} </p>
-                  </div>
-                </div>
-
-                <div className='flex items-start'>
-                  <Users className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Boletos disponibles</p>
-                    <p className='text-gray-600'>{event.availableTickets}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
           {/* Comprar boletos */}
-          <div className='bg-blue-50 p-6 rounded-lg shadow-sm'>
+          <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm'>
             <h2 className='text-xl font-bold text-gray-800 mb-4'>Comprar boletos</h2>
 
-            <div className='mb-6'>
-              <p className='text-lg font-bold text-blue-700 mb-1'>
+            <div className='mb-6 gap-2'>
+              <span className='text-lg font-bold text-blue-700 mb-1'>
                 {event.price.toFixed(2)} {event.currency}
-              </p>
-              <p className='text-sm text-gray-500'>por boleto</p>
+              </span>
+              <span className='text-sm text-gray-500 ml-2 '>por boleto</span>
+              <p className='text-sm text-gray-400'>Quedan {event.availableTickets} entradas.</p>
             </div>
 
             <div className='mb-6'>

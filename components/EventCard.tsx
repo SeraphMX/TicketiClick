@@ -5,7 +5,7 @@ import { useCategories } from '@/hooks/useCategories'
 import { Event } from '@/lib/types'
 import { formatDate } from '@/lib/utils'
 import { CalendarDays, Clock, MapPin } from 'lucide-react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 // Función para obtener color según categoría
 const getCategoryColor = (category: string) => {
@@ -30,6 +30,21 @@ interface EventCardProps {
 const EventCard = ({ event, featured = false }: EventCardProps) => {
   const { categories } = useCategories()
   const category = categories.find((cat) => cat.slug === event.category)
+  const router = useRouter()
+
+  const handleNavigate = (e: React.MouseEvent) => {
+    e.preventDefault()
+
+    const url = `/event/${event.slug}`
+
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        router.push(url)
+      })
+    } else {
+      router.push(url)
+    }
+  }
 
   return (
     <div
@@ -38,7 +53,12 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
     >
       {/* Imagen */}
       <div className='relative h-48 overflow-hidden'>
-        <img src={event.image} alt={event.title} className='w-full h-full object-cover transition-transform duration-300 hover:scale-105' />
+        <img
+          src={event.image}
+          alt={event.title}
+          className='w-full h-full object-cover transition-transform duration-300 hover:scale-105'
+          style={{ viewTransitionName: `event-image-${event.slug}` }}
+        />
         {featured && <div className='absolute top-0 left-0 bg-blue-600 text-white px-3 py-1 text-sm font-semibold'>Destacado</div>}
         <div className={`absolute top-0 right-0 ${getCategoryColor(event.category)} m-2 px-2 py-1 rounded-full text-xs font-medium`}>
           {category?.name}
@@ -47,7 +67,9 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
 
       {/* Contenido */}
       <div className='p-5 flex-grow flex flex-col'>
-        <h3 className='text-xl font-bold mb-2 text-gray-800 line-clamp-2'>{event.title}</h3>
+        <h3 className='text-xl font-bold mb-2 text-gray-800 line-clamp-2' style={{ viewTransitionName: `${event.title}` }}>
+          {event.title}
+        </h3>
 
         <div className='space-y-2 mb-4 flex-grow'>
           <div className='flex items-center text-gray-600'>
@@ -72,12 +94,12 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
             {event.price.toFixed(2)} {event.currency}
           </div>
 
-          <Link
-            href={`/event/${event.slug}`}
-            className='inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors'
+          <div
+            onClick={handleNavigate}
+            className='inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors cursor-pointer'
           >
             Ver detalles
-          </Link>
+          </div>
         </div>
       </div>
     </div>
