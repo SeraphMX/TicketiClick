@@ -14,6 +14,9 @@ const nextConfig = {
   outputFileTracingExcludes: {
     '**/*': ['node_modules/**/@supabase/functions/**/*']
   },
+  experimental: {
+    viewTransition: true
+  },
 
   webpack: (config) => {
     config.module.rules.push({
