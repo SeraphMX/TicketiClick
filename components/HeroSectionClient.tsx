@@ -45,7 +45,7 @@ const HeroSectionClient = () => {
       <div
         className='absolute inset-0 '
         style={{
-          backgroundImage: "url('events/1745434434PQzWhASDd4.webp')",
+          backgroundImage: "url('/events/1745434434PQzWhASDd4.webp')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

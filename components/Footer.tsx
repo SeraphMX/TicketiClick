@@ -38,12 +38,12 @@ const Footer = () => {
             <ul className='space-y-2'>
               <li>
                 <Link href='/' className='text-gray-400 hover:text-white transition-colors'>
-                  Inicio
+                  Conoce Ticketi
                 </Link>
               </li>
               <li>
                 <Link href='/events' className='text-gray-400 hover:text-white transition-colors'>
-                  Eventos
+                  Eres organizador?
                 </Link>
               </li>
               <li>
@@ -51,45 +51,29 @@ const Footer = () => {
                   Mi cuenta
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Páginas útiles</h3>
+            <ul className='space-y-2'>
               <li>
                 <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
                   Preguntas frecuentes
                 </Link>
               </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
+                  Aviso de privacidad
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
+                  Términos y condiciones
+                </Link>
+              </li>
             </ul>
           </div>
-
-          {/* Categorías de eventos */}
-          {/* <div>
-            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Categorías</h3>
-            <ul className='space-y-2'>
-              <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
-                  Conciertos
-                </Link>
-              </li>
-              <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
-                  Deportes
-                </Link>
-              </li>
-              <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
-                  Teatro
-                </Link>
-              </li>
-              <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
-                  Conferencias
-                </Link>
-              </li>
-              <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
-                  Festivales
-                </Link>
-              </li>
-            </ul>
-          </div> */}
 
           {/* Contacto */}
           <div>
@@ -97,7 +81,7 @@ const Footer = () => {
             <ul className='space-y-3'>
               <li className='flex items-start'>
                 <MapPin className='h-5 w-5 mr-2 text-blue-400 mt-0.5' />
-                <span className='text-gray-400'>Calle Principal 123, México</span>
+                <span className='text-gray-400'>Donceles 22, CDMX</span>
               </li>
               <li className='flex items-center'>
                 <Phone className='h-5 w-5 mr-2 text-blue-400' />
@@ -105,7 +89,7 @@ const Footer = () => {
               </li>
               <li className='flex items-center'>
                 <Mail className='h-5 w-5 mr-2 text-blue-400' />
-                <span className='text-gray-400'>info@ticketi.click</span>
+                <span className='text-gray-400'>hola@ticketi.click</span>
               </li>
             </ul>
           </div>
