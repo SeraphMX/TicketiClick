@@ -19,12 +19,12 @@ const Navbar = () => {
   return (
     <nav className='bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='flex items-center justify-between h-16'>
+        <div className='flex items-center justify-between h-14'>
           {/* Logo y Nombre */}
           <div className='flex-shrink-0'>
             <Link href='/' className='flex items-center'>
-              <Image src='/branding/logo-ticketi.webp' alt='Logo' className='h-8 w-8 mr-2' width={50} height={50} />
-              <span className='font-bold text-xl'>Ticketi Click</span>
+              <Image src='/branding/logo-ticketi.webp' alt='Logo' className='h-6 w-6 mr-2' width={50} height={50} />
+              <span className='font-bold text-xl'>Ticketi </span>
             </Link>
           </div>
 
@@ -63,13 +63,15 @@ const Navbar = () => {
                   </button>
                 </div>
               ) : (
-                <Link
-                  href='/login'
-                  className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 transition-colors'
-                >
-                  <User className='h-4 w-4 mr-1' />
-                  Iniciar Sesión
-                </Link>
+                <>
+                  <Link
+                    href='/login'
+                    className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-900 hover:bg-gray-800 transition-colors'
+                  >
+                    <User className='h-4 w-4 mr-1' />
+                    Crear evento
+                  </Link>
+                </>
               )}
             </div>
           </div>

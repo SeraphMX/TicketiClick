@@ -19,11 +19,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='es'>
-      <body className={`${inter.className} bg-gray-50 min-h-screen flex flex-col`}>
+      <body className={`${inter.className} bg-gray-100 min-h-screen flex flex-col`}>
         <Providers>
           <AuthProvider>
             <Navbar />
-            <main className='flex-grow pb-12'>{children}</main>
+            <main className='flex-grow '>{children}</main>
             <Footer />
           </AuthProvider>
         </Providers>

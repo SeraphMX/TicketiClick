@@ -2,8 +2,9 @@
 // Página principal
 
 import EventList from '@/components/EventList'
+import HeroSectionClient from '@/components/HeroSectionClient'
 import { supabase } from '@/lib/supabase'
-import { ArrowRight, Calendar, CalendarDays, MapPin, Search } from 'lucide-react'
+import { ArrowRight, CalendarDays, MapPin, Search } from 'lucide-react'
 import Link from 'next/link'
 
 // Función para obtener eventos destacados
@@ -20,69 +21,10 @@ export default async function Home() {
   const { data: events = [] } = await supabase.from('event_details_view').select('*')
   const categories = Array.from(new Set((events || []).map((event) => event.category)))
 
-  // Traductor de categorías
-  const translateCategory = (category: string) => {
-    const translations: Record<string, string> = {
-      music: 'Música',
-      sports: 'Deportes',
-      theater: 'Teatro',
-      conference: 'Conferencia',
-      festival: 'Festival',
-      workshop: 'Taller',
-      other: 'Otros'
-    }
-
-    return translations[category] || 'Otro'
-  }
-
-  // Imágenes para las categorías
-  const categoryImages: Record<string, string> = {
-    music: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg',
-    sports: 'https://images.pexels.com/photos/46798/the-ball-stadion-football-the-pitch-46798.jpeg',
-    theater: 'https://images.pexels.com/photos/11523493/pexels-photo-11523493.jpeg',
-    conference: 'https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg',
-    festival: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg',
-    workshop: 'https://images.pexels.com/photos/3183183/pexels-photo-3183183.jpeg',
-    other: 'https://images.pexels.com/photos/2263436/pexels-photo-2263436.jpeg'
-  }
-
   return (
     <div>
       {/* Hero Section */}
-      <section className='relative bg-gradient-to-r from-blue-700 to-zinc-900 text-white py-20'>
-        <div
-          className='absolute inset-0 bg-black opacity-20'
-          style={{
-            backgroundImage: "url('https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            mixBlendMode: 'overlay'
-          }}
-        ></div>
-        <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='max-w-3xl'>
-            <h1 className='text-4xl sm:text-5xl font-extrabold mb-6 animate-fade-in'>Descubre eventos increíbles cerca de ti</h1>
-            <p className='text-lg sm:text-xl mb-8 text-blue-100'>
-              Encuentra y compra boletos para conciertos, eventos deportivos, teatro y mucho más.
-            </p>
-            <div className='flex flex-col sm:flex-row gap-4'>
-              <Link
-                href='/events'
-                className='inline-flex items-center justify-center px-5 py-3 bg-white text-blue-700 font-medium rounded-lg hover:bg-gray-100 transition-colors'
-              >
-                <Search className='h-5 w-5 mr-2' />
-                Explorar eventos
-              </Link>
-              <Link
-                href='/login'
-                className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
-              >
-                Iniciar sesión
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSectionClient />
 
       {/* Eventos Destacados */}
       <section className='py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -94,11 +36,11 @@ export default async function Home() {
           </Link>
         </div>
 
-        <EventList events={featuredEvents} showFilters={false} title='' />
+        <EventList events={featuredEvents} showFilters={false} />
       </section>
 
       {/* Categorías */}
-      <section className='py-12 bg-gray-100'>
+      {/* <section className='py-12 bg-gray-100'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center'>Explora por Categoría</h2>
 
@@ -120,14 +62,14 @@ export default async function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Próximos eventos */}
-      <section className='py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      {/* <section className='py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8'>Próximos Eventos</h2>
 
-        {/* Mostrar primeros 4 eventos */}
-        <EventList events={(events || []).slice(0, 4)} showFilters={false} title='' />
+        
+        <EventList events={(events || []).slice(0, 4)} showFilters={false} />
 
         <div className='mt-8 text-center'>
           <Link
@@ -138,12 +80,12 @@ export default async function Home() {
             Ver todos los eventos
           </Link>
         </div>
-      </section>
+      </section> */}
 
       {/* Información adicional */}
-      <section className='py-12 bg-gradient-to-r from-blue-50 to-zinc-50'>
+      <section className='py-12 bg-blue-50'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-8 text-center'>¿Por qué elegir Ticketi?</h2>
+          <h2 className='text-2xl sm:text-3xl font-bold text-black mb-8 text-center'>¿Por qué elegir Ticketi?</h2>
 
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             {/* Tarjeta 1 */}
