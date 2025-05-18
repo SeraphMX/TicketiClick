@@ -5,6 +5,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface CheckoutState {
   step: number
+  selectedQuantity: number
+  coupon: {
+    code: string
+    discount: number
+    isApplied: boolean
+  }
   contactInfo: {
     email: string
     phone: string
@@ -21,6 +27,13 @@ interface CheckoutState {
 
 const initialState: CheckoutState = {
   step: 1,
+  selectedQuantity: 1,
+  coupon: {
+    code: '',
+    discount: 0,
+    isApplied: false
+  },
+
   contactInfo: {
     email: '',
     phone: '',
@@ -44,6 +57,40 @@ const checkoutSlice = createSlice({
     },
     goToPrevStep: (state) => {
       if (state.step > 1) state.step -= 1
+    },
+
+    setSelectedQuantity: (state, action: PayloadAction<number>) => {
+      state.selectedQuantity = action.payload
+    },
+
+    applyCoupon: (state, action: PayloadAction<string>) => {
+      if (state.coupon.isApplied) return
+
+      const code = action.payload.toLowerCase()
+      if (code === 'admin90') {
+        state.coupon = {
+          code: 'admin90',
+          discount: 0, // se calcula en el componente según el total
+          isApplied: true
+        }
+      } else {
+        state.coupon = {
+          code,
+          discount: 0,
+          isApplied: false
+        }
+      }
+    },
+
+    setCouponDiscount: (state, action: PayloadAction<number>) => {
+      state.coupon.discount = action.payload
+    },
+    removeCoupon: (state) => {
+      state.coupon = {
+        code: '',
+        discount: 0,
+        isApplied: false
+      }
     },
 
     // Actualizar datos de contacto
@@ -90,7 +137,11 @@ export const {
   setPaymentMethod,
   setPaymentIntentId,
   updateTimer,
-  resetCheckout
+  resetCheckout,
+  setSelectedQuantity,
+  applyCoupon,
+  setCouponDiscount,
+  removeCoupon
 } = checkoutSlice.actions
 
 export default checkoutSlice.reducer

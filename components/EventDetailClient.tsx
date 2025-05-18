@@ -4,12 +4,15 @@ import { useCategories } from '@/hooks/useCategories'
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
+import { applyCoupon, removeCoupon, setCouponDiscount as setPromoDiscount, setSelectedQuantity } from '@/store/slices/checkoutSlice'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
+import { RootState } from '@/store/store'
 import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Twitter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { version } from 'react'
+import { useSelector } from 'react-redux'
 interface EventWithQuantity extends Event {
   quantity: number
 }
@@ -21,50 +24,77 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const dispatch = useDispatch()
   const [quantity, setQuantity] = useState(1)
   const [showFeeDetails, setShowFeeDetails] = useState(false)
-  const [showCouponInput, setShowCouponInput] = useState(false)
   const [couponCode, setCouponCode] = useState('')
   const [couponError, setCouponError] = useState('')
-  const [couponDiscount, setCouponDiscount] = useState(0)
-
-  // Calcular costos
-  const subtotal = event.price * quantity
-  const serviceFee = subtotal * 0.1 // 10% cargo por servicio
-  const paymentFee = subtotal * 0.05 // 5% comisión bancaria
-  const ticketFee = 10 * quantity // $10 por boleto
-  const total = subtotal + serviceFee + paymentFee + ticketFee - couponDiscount
-
+  const [showCouponInput, setShowCouponInput] = useState(false)
   const { categories } = useCategories()
   const category = categories.find((cat) => cat.slug === event.category)
 
-  // Función para verificar cupón
+  const coupon = useSelector((state: RootState) => state.checkout.coupon)
+  const couponDiscount = useSelector((state: RootState) => state.checkout.coupon.discount)
+
+  // Función para calcular costos (sin cupón)
+  const calculateSubtotal = () => event.price * quantity
+  const calculateServiceFee = (subtotal: number) => subtotal * 0.1
+  const calculatePaymentFee = (subtotal: number) => subtotal * 0.05
+  const calculateTicketFee = () => 10 * quantity
+
+  // Costos base
+  const subtotal = calculateSubtotal()
+  const serviceFee = calculateServiceFee(subtotal)
+  const paymentFee = calculatePaymentFee(subtotal)
+  const ticketFee = calculateTicketFee()
+
+  // Total con descuento si aplica
+  const discount = coupon.isApplied ? coupon.discount : 0
+  const total = subtotal + serviceFee + paymentFee + ticketFee - discount
+
+  // Manejo del cupón
   const validateCoupon = () => {
-    // Simulación de validación de cupón
-    if (couponCode.toLowerCase() === 'first10') {
-      setCouponDiscount(total * 0.1) // 10% de descuento
+    if (coupon.isApplied) return // ya aplicado
+
+    if (couponCode.toLowerCase() === 'admin90') {
+      // Calcula el descuento 90% sobre todos los cargos
+      const basePrice = subtotal
+      const extras = serviceFee + paymentFee + ticketFee
+      const discountAmount = (basePrice + extras) * 0.9
+
+      dispatch(applyCoupon('admin90'))
+      dispatch(setPromoDiscount(discountAmount))
       setCouponError('')
     } else {
+      dispatch(removeCoupon())
       setCouponError('Cupón inválido')
-      setCouponDiscount(0)
     }
   }
 
-  // Función para incrementar cantidad
+  // Cuando cambia la cantidad, también actualizar el descuento para mantener coherencia
+  useEffect(() => {
+    if (coupon.isApplied) {
+      // Recalcula el descuento con la nueva cantidad
+      const basePrice = subtotal
+      const extras = serviceFee + paymentFee + ticketFee
+      const discountAmount = (basePrice + extras) * 0.9
+      dispatch(setPromoDiscount(discountAmount))
+    }
+    setCouponError('') // limpia error al cambiar cantidad
+  }, [quantity])
+
   const incrementQuantity = () => {
     if (quantity < event.availableTickets) {
       setQuantity(quantity + 1)
     }
   }
 
-  // Función para decrementar cantidad
   const decrementQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1)
     }
   }
 
-  // Función para ir al checkout
   const handlePurchase = () => {
     dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
+    dispatch(setSelectedQuantity(quantity))
 
     if (document.startViewTransition) {
       document.startViewTransition(() => {
@@ -81,7 +111,6 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const encodedShareText = encodeURIComponent(shareText)
   const encodedUrl = encodeURIComponent(shareUrl)
 
-  // Funciones para compartir
   const handleShare = async (platform: string) => {
     switch (platform) {
       case 'facebook':
@@ -296,15 +325,22 @@ export default function EventDetailClient({ event }: { event: Event }) {
                         placeholder='Ingresa tu código'
                         className='flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm'
                       />
-                      <button onClick={validateCoupon} className='px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700'>
+                      <button
+                        disabled={couponDiscount > 0}
+                        onClick={validateCoupon}
+                        className='px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                      >
                         Aplicar
                       </button>
                     </div>
                     {couponError && <p className='text-sm text-red-600'>{couponError}</p>}
                     {couponDiscount > 0 && (
-                      <p className='text-sm text-green-600'>
-                        Descuento aplicado: -{couponDiscount.toFixed(2)} {event.currency}
-                      </p>
+                      <div className='flex justify-between items-center bg-green-100 p-3 rounded-md'>
+                        <p className='text-sm text-green-600'>Descuento aplicado:</p>
+                        <p className='text-sm text-green-600'>
+                          -{couponDiscount.toFixed(2)} {event.currency}
+                        </p>
+                      </div>
                     )}
                   </div>
                 )}
