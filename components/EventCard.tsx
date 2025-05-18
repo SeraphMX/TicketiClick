@@ -3,7 +3,7 @@
 
 import { useCategories } from '@/hooks/useCategories'
 import { Event } from '@/lib/types'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatTime } from '@/lib/utils'
 import { CalendarDays, Clock, MapPin } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -79,7 +79,7 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
 
           <div className='flex items-center text-gray-600'>
             <Clock className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{event.time} hrs</span>
+            <span>{formatTime(event.time)} hrs</span>
           </div>
 
           <div className='flex items-center text-gray-600'>
