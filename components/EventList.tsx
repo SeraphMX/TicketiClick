@@ -2,19 +2,19 @@
 // components/EventList.tsx
 // Componente para mostrar una lista de eventos
 
+import { useCategories } from '@/hooks/useCategories'
 import { Event } from '@/lib/types'
-import { ChevronDown, Search, X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { useState } from 'react'
 import EventCard from './EventCard'
-import { useCategories } from '@/hooks/useCategories'
 
 interface EventListProps {
   events: Event[]
-  title?: string
+
   showFilters?: boolean
 }
 
-const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListProps) => {
+const EventList = ({ events, showFilters = true }: EventListProps) => {
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [priceRange, setPriceRange] = useState<{ min: number; max: number | null }>({ min: 0, max: null })
@@ -63,12 +63,10 @@ const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListP
 
   return (
     <div>
-      {title && <h2 className='text-2xl font-bold text-gray-800 mb-6'>{title}</h2>}
-
       {showFilters && (
         <div className='bg-white p-4 rounded-lg shadow-md mb-6'>
-          <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4'>
-            {/* Búsqueda */}
+          {/* <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4'>
+           
             <div className='relative flex-grow max-w-md'>
               <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
                 <Search className='h-5 w-5 text-gray-400' />
@@ -87,7 +85,7 @@ const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListP
               )}
             </div>
 
-            {/* Filtro de precio */}
+        
             <div className='flex items-center space-x-2'>
               <span className='text-sm text-gray-600'>Precio:</span>
               <input
@@ -110,17 +108,16 @@ const EventList = ({ events, title = 'Eventos', showFilters = true }: EventListP
                 placeholder='Max'
                 min='0'
               />
-              <span className='text-sm text-gray-600'>€</span>
+              <span className='text-sm text-gray-600'></span>
             </div>
 
-            {/* Botón para limpiar filtros */}
             {isFilterActive && (
               <button onClick={clearFilters} className='text-sm text-blue-600 hover:text-blue-800 flex items-center'>
                 <X className='h-4 w-4 mr-1' />
                 Limpiar filtros
               </button>
             )}
-          </div>
+          </div> */}
 
           {/* Filtros por categoría */}
           <div className='flex flex-wrap gap-2 mt-4'>

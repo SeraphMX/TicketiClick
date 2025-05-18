@@ -92,14 +92,14 @@ export default function EventDetailClient({ event }: { event: Event }) {
   }
 
   return (
-    <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-      <div className='bg-white rounded-lg shadow-md overflow-hidden'>
+    <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10'>
+      <div className='bg-white rounded-lg shadow-sm overflow-hidden'>
         {/* Imagen principal */}
-        <div className='relative h-80 md:h-96'>
+        <div className='relative h-80 md:h-1/2'>
           <img src={event.image} alt={event.title} className='w-full h-full object-cover' />
-          <div className='absolute inset-0 bg-gradient-to-t from-black opacity-60'></div>
-          <div className='absolute bottom-0 p-6 text-white w-full'>
-            <div className='flex justify-between items-end'>
+          <div className='absolute inset-0 bg-gradient-to-t from-black opacity-90'></div>
+          <div className='absolute bottom-0 p-4 text-white w-full'>
+            <div className='md:flex justify-between items-end space-y-3'>
               <div>
                 <h1 className='text-3xl md:text-4xl font-bold mb-2'>{event.title}</h1>
                 <div className='flex flex-wrap items-center gap-3'>
@@ -116,7 +116,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   </span>
                 </div>
               </div>
-              <div className='flex gap-2 items-center'>
+              <div className='flex gap-2 items-center '>
                 <span>Compartir evento</span>
                 <button
                   onClick={() => handleShare('facebook')}
@@ -200,7 +200,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
           </div>
 
           {/* Comprar boletos */}
-          <div className='bg-gray-50 p-6 rounded-lg shadow-sm'>
+          <div className='bg-blue-50 p-6 rounded-lg shadow-sm'>
             <h2 className='text-xl font-bold text-gray-800 mb-4'>Comprar boletos</h2>
 
             <div className='mb-6'>
