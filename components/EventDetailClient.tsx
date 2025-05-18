@@ -109,7 +109,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
           <img
             src={event.image}
             alt={event.title}
-            className='w-full h-96 object-cover '
+            className='w-full h-1/2 object-cover '
             style={{ viewTransitionName: `event-image-${event.slug}` }}
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black opacity-90'></div>
