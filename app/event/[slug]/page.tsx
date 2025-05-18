@@ -3,6 +3,7 @@
 import EventDetailClient from '@/components/EventDetailClient'
 import { supabase } from '@/lib/supabase'
 import { Event } from '@/lib/types'
+import { convertHtmlToText } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,18 +22,20 @@ export async function generateMetadata(props: { params: Props }) {
     }
   }
 
+  const plainDescription = event.description ? convertHtmlToText(event.description) : ''
+
   return {
     title: event.title,
-    description: event.description,
+    description: plainDescription,
     openGraph: {
       title: event.title,
-      description: event.description,
+      description: plainDescription,
       images: event.image ? [{ url: event.image, width: 1200, height: 630 }] : undefined
     },
     twitter: {
       card: 'summary_large_image',
       title: event.title,
-      description: event.description,
+      description: plainDescription,
       images: event.image ? [event.image] : undefined
     }
   }

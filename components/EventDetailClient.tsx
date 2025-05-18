@@ -5,8 +5,7 @@ import { useDispatch } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
-import { CalendarDays, ChevronDown, ChevronUp, Clock, Info, MapPin, Minus, Plus, Tag, Users } from 'lucide-react'
-import Link from 'next/link'
+import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Tag, Twitter, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -66,33 +65,81 @@ export default function EventDetailClient({ event }: { event: Event }) {
     router.push(`/event/${event.slug}/checkout`)
   }
 
+  // URLs para compartir
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareText = `¡Mira este evento: ${event.title}!`
+  const encodedShareText = encodeURIComponent(shareText)
+  const encodedUrl = encodeURIComponent(shareUrl)
+
+  // Funciones para compartir
+  const handleShare = async (platform: string) => {
+    switch (platform) {
+      case 'facebook':
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank')
+        break
+      case 'twitter':
+        window.open(`https://twitter.com/intent/tweet?text=${encodedShareText}&url=${encodedUrl}`, '_blank')
+        break
+      case 'copy':
+        try {
+          await navigator.clipboard.writeText(shareUrl)
+          alert('¡Enlace copiado!')
+        } catch (err) {
+          console.error('Error al copiar:', err)
+        }
+        break
+    }
+  }
+
   return (
     <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-      {/* Botón para volver */}
-      <div className='mb-6'>
-        <Link href='/events' className='inline-flex items-center text-blue-600 hover:text-blue-800'>
-          <ChevronUp className='h-5 w-5 mr-1' />
-          Volver a eventos
-        </Link>
-      </div>
-
       <div className='bg-white rounded-lg shadow-md overflow-hidden'>
         {/* Imagen principal */}
         <div className='relative h-80 md:h-96'>
           <img src={event.image} alt={event.title} className='w-full h-full object-cover' />
           <div className='absolute inset-0 bg-gradient-to-t from-black opacity-60'></div>
-          <div className='absolute bottom-0 left-0 p-6 text-white'>
-            <h1 className='text-3xl md:text-4xl font-bold mb-2'>{event.title}</h1>
-            <div className='flex flex-wrap items-center gap-3'>
-              <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>{category?.name}</span>
-              <span className='inline-flex items-center'>
-                <CalendarDays className='h-4 w-4 mr-1' />
-                {formatDate(event.date)}
-              </span>
-              <span className='inline-flex items-center'>
-                <Clock className='h-4 w-4 mr-1' />
-                {formatTime(event.time)}
-              </span>
+          <div className='absolute bottom-0 p-6 text-white w-full'>
+            <div className='flex justify-between items-end'>
+              <div>
+                <h1 className='text-3xl md:text-4xl font-bold mb-2'>{event.title}</h1>
+                <div className='flex flex-wrap items-center gap-3'>
+                  <span className='inline-flex items-center bg-blue-600 px-2.5 py-0.5 rounded-full text-sm font-medium'>
+                    {category?.name}
+                  </span>
+                  <span className='inline-flex items-center'>
+                    <CalendarDays className='h-4 w-4 mr-1' />
+                    {formatDate(event.date)}
+                  </span>
+                  <span className='inline-flex items-center'>
+                    <Clock className='h-4 w-4 mr-1' />
+                    {formatTime(event.time)}
+                  </span>
+                </div>
+              </div>
+              <div className='flex gap-2 items-center'>
+                <span>Compartir evento</span>
+                <button
+                  onClick={() => handleShare('facebook')}
+                  className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                  title='Compartir en Facebook'
+                >
+                  <Facebook className='h-5 w-5' />
+                </button>
+                <button
+                  onClick={() => handleShare('twitter')}
+                  className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                  title='Compartir en Twitter'
+                >
+                  <Twitter className='h-5 w-5' />
+                </button>
+                <button
+                  onClick={() => handleShare('copy')}
+                  className='p-2 hover:bg-blue-600 rounded-full transition-colors'
+                  title='Copiar enlace'
+                >
+                  <Link2 className='h-5 w-5' />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -285,8 +332,8 @@ export default function EventDetailClient({ event }: { event: Event }) {
               {event.availableTickets < quantity
                 ? 'No hay suficientes boletos'
                 : quantity === 1
-                ? 'Comprar boleto'
-                : `Comprar ${quantity} boletos`}
+                  ? 'Comprar boleto'
+                  : `Comprar ${quantity} boletos`}
             </button>
           </div>
         </div>
