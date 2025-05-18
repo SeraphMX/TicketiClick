@@ -68,7 +68,7 @@ const HeroSectionClient = () => {
             Explorar eventos
           </Link> */}
               <Link
-                href='/events/chapul-big-band'
+                href='/event/chapul-big-band'
                 className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
               >
                 Comprar entradas
