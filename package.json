@@ -62,6 +62,7 @@
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.11.1",
+    "@types/he": "^1.2.3",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
     "@types/qrcode": "^1.5.5",
