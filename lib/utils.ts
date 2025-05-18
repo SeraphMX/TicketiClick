@@ -17,3 +17,18 @@ export const formatTime = (timeString: string) => {
   const formattedHours = hours % 12 || 12 // Convertir a formato de 12 horas
   return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`
 }
+
+//Funcion para cpmvertitr html a textp plano
+export const convertHtmlToText = (html: string) => {
+  // Reemplazar etiquetas BR con espacios
+  let text = html.replace(/<br\s*\/?>/gi, ' ')
+  // Reemplazar otras etiquetas HTML
+  text = text.replace(/<[^>]+>/g, '')
+  // Decodificar entidades HTML
+  text = text.replace(/&nbsp;/gi, ' ')
+  text = text.replace(/&amp;/gi, '&')
+  text = text.replace(/&lt;/gi, '<')
+  text = text.replace(/&gt;/gi, '>')
+  // Eliminar espacios múltiples y trim
+  return text.replace(/\s+/g, ' ').trim()
+}
