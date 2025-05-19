@@ -108,6 +108,13 @@ export async function POST(req: Request) {
     const token = generateOrderToken(order.id, new Date(eventData.date))
     const downloadUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${eventData.slug}/tickets/${token}`
 
+    //Si el modo de desarrollo esta acivado no enviar correo
+    if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
+      console.log('Modo desarrollo: Omitiendo envío de correo')
+
+      return NextResponse.json({ ok: true })
+    }
+
     //Llamar internamente al endpoint de correo
     const mailResponse = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, // Usa la URL absoluta
