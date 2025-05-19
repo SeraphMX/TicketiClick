@@ -3,7 +3,7 @@ import { usePriceCalculator } from '@/hooks/usePriceCalculator'
 import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
-import { resetCheckout } from '@/store/slices/checkoutSlice'
+import { resetCheckout, resetCoupon } from '@/store/slices/checkoutSlice'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
 import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
@@ -60,7 +60,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
         error: checkout.coupon.error || ''
       })
 
-      dispatch(resetCheckout())
+      dispatch(resetCoupon())
     }, 1000)
   }, [])
 

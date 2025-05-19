@@ -126,7 +126,17 @@ const checkoutSlice = createSlice({
     },
 
     // Reiniciar checkout
-    resetCheckout: () => initialState
+    resetCheckout: () => initialState,
+
+    resetCoupon: (state) => {
+      state.coupon = {
+        code: '',
+        discount: 0,
+        isApplied: false,
+        isPercentage: false,
+        error: ''
+      }
+    }
   }
 })
 
@@ -140,6 +150,7 @@ export const {
   setPaymentIntentId,
   updateTimer,
   resetCheckout,
+  resetCoupon,
   setSelectedQuantity,
   applyCoupon,
   setCouponDiscount,
