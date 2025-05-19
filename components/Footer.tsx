@@ -34,7 +34,7 @@ const Footer = () => {
 
           {/* Enlaces rápidos */}
           <div>
-            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Enlaces Rápidos</h3>
+            <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Enlaces rápidos</h3>
             <ul className='space-y-2'>
               <li>
                 <Link href='/' className='text-gray-400 hover:text-white transition-colors'>
@@ -43,7 +43,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link href='/events' className='text-gray-400 hover:text-white transition-colors'>
-                  Eres organizador?
+                  ¿Eres organizador?
                 </Link>
               </li>
               <li>
