@@ -1,12 +1,14 @@
 'use client'
+import { usePriceCalculator } from '@/hooks/usePriceCalculator'
 import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
+import { resetCheckout } from '@/store/slices/checkoutSlice'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
 import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface OrderSummaryProps {
   event: Event
@@ -37,13 +39,36 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
   const dispatch = useDispatch()
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const quantity = selectedEvent?.quantity || 1
+  const [savedCoupon, setSavedCoupon] = useState({
+    code: '',
+    discount: 0,
+    isApplied: false,
+    isPercentage: false,
+    error: ''
+  })
 
-  // Calcular costos
-  const subtotal = event.price * quantity
-  const serviceFee = subtotal * 0.1 // 10% cargo por servicio
-  const paymentFee = subtotal * 0.05 // 5% comisión método de pago
-  const ticketFee = 10 * quantity // $10 por boleto
-  const total = subtotal + serviceFee + paymentFee + ticketFee
+  const checkout = useSelector((state: RootState) => state.checkout)
+
+  useEffect(() => {
+    setTimeout(() => {
+      // Guarda el cupón localmente
+      setSavedCoupon({
+        code: checkout.coupon.code || '',
+        discount: checkout.coupon.discount || 0,
+        isApplied: checkout.coupon.isApplied || false,
+        isPercentage: checkout.coupon.isPercentage ?? false,
+        error: checkout.coupon.error || ''
+      })
+
+      dispatch(resetCheckout())
+    }, 1000)
+  }, [])
+
+  const { subtotal, discount, serviceFee, paymentFee, ticketFee, total } = usePriceCalculator({
+    quantity,
+    unitPrice: event.price,
+    coupon: savedCoupon
+  })
 
   const handleConfirm = async () => {
     setIsProcessing(true)
@@ -65,6 +90,16 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
       console.error('Error en el proceso de pago:', error)
     }
   }
+
+  useEffect(() => {
+    const handleUnload = () => {
+      dispatch(resetCheckout())
+    }
+
+    window.addEventListener('beforeunload', handleUnload)
+
+    return () => window.removeEventListener('beforeunload', handleUnload)
+  }, [])
 
   return (
     <div className='space-y-6'>
@@ -139,6 +174,15 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
             </span>
           </div>
 
+          {discount > 0 && (
+            <div className='flex justify-between items-center bg-green-100 py-2 px-2 rounded-md'>
+              <span className='text-sm text-green-600'>Descuento aplicado</span>
+              <span className='text-sm text-green-600'>
+                ${discount.toFixed(2)} {event.currency}
+              </span>
+            </div>
+          )}
+
           <div className='border-t border-gray-200 pt-3'>
             <div className='flex justify-between items-center mb-2'>
               <button
@@ -179,7 +223,6 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
               </div>
             )}
           </div>
-
           <div className='border-t border-gray-200 pt-3'>
             <div className='flex justify-between text-base font-medium'>
               <span>Total</span>

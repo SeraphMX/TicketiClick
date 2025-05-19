@@ -1,4 +1,5 @@
 'use client'
+import { usePriceCalculator } from '@/hooks/usePriceCalculator'
 import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { RootState } from '@/store/store'
@@ -31,12 +32,20 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   const stripe = useStripe()
   const elements = useElements()
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
-  const checkoutData = useSelector((state: RootState) => state.checkout)
+
+  const checkout = useSelector((state: RootState) => state.checkout)
   const [selectedMethod, setSelectedMethod] = useState(formData.paymentMethod || '')
   const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)
   const dispatch = useDispatch()
+
+  const { subtotal, discount, serviceFee, paymentFee, ticketFee, total } = usePriceCalculator({
+    quantity: checkout.selectedQuantity,
+    unitPrice: selectedEvent?.price || 0,
+    coupon: checkout.coupon
+  })
+  console.log({ subtotal, discount, serviceFee, paymentFee, ticketFee, total })
 
   useEffect(() => {
     if (selectedMethod !== 'card') {
@@ -60,16 +69,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
     setError(null)
 
     try {
-      const quantity = selectedEvent.quantity || 1
-      const baseAmount = selectedEvent.price * quantity * 100 // Precio base en centavos por cantidad de boletos
-
-      // Comisiones por boleto:
-      const serviceFee = Math.round(baseAmount * 0.1) // 10% comisión de servicio
-      const paymentFee = Math.round(baseAmount * 0.05) // 5% comisión método de pago
-      const ticketFee = 1000 * quantity // $10 MXN en centavos por boleto
-
-      // Total a cobrar:
-      const totalAmount = baseAmount + serviceFee + paymentFee + ticketFee
+      console.log('paymentmethof')
 
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
@@ -78,14 +78,15 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          buyer_email: checkoutData.contactInfo.email,
-          buyer_phone: checkoutData.contactInfo.phone,
+          buyer_email: checkout.contactInfo.email,
+          buyer_phone: checkout.contactInfo.phone,
           event_id: selectedEvent.id,
-          amount: totalAmount,
+          amount: subtotal,
           currency: selectedEvent.currency.toLowerCase(),
           stripe_id: selectedEvent.stripe_id,
-          quantity,
-          holder_names: checkoutData.ticketCustomization.names
+          quantity: checkout.selectedQuantity,
+          holder_names: checkout.ticketCustomization.names,
+          discount: checkout.coupon.isPercentage ? Math.round((subtotal * checkout.coupon.discount) / 100) : checkout.coupon.discount
         })
       })
 
