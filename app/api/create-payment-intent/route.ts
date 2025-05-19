@@ -7,21 +7,25 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity = 1, holder_names } = await request.json()
+    const { buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity = 1, holder_names, discount } = await request.json()
+
+    console.log({ buyer_email, buyer_phone, event_id, amount, currency, stripe_id, quantity, holder_names, discount })
 
     // Comisiones por boleto
-    const desiredFixedFee = 1000 * quantity // $10 MXN en centavos por boleto
-    const desiredPlatformPercent = 0.1 // 10% de comisión para ti
+    const desiredFixedFee = 1000 * quantity // $10 MXN  por boleto
+    const desiredPlatformPercent = 0.1 // 10% de comisión para la plataforma
     const estimatedStripePercent = 0.05 // estimación de Stripe (5%)
 
-    // Calculamos el monto base de los boletos (sin comisiones)
-    const baseAmount = Math.round((amount - desiredFixedFee) / (1 + desiredPlatformPercent + estimatedStripePercent))
+    const baseAmount = (amount - discount) * 100 // Monto base (sin comisiones ni descuentos) en centavos
 
-    // Tu comisión total (10% + $10 por boleto + 5% de Stripe)
+    // Comisión total (10% + $10 por boleto + 5% de Stripe)
     const platformFee = Math.round(baseAmount * desiredPlatformPercent) + desiredFixedFee + Math.round(baseAmount * estimatedStripePercent)
+    const finalAmount = baseAmount + platformFee // Total que paga el cliente (ya incluye todo)
+
+    console.log({ desiredFixedFee, amount, platformFee, finalAmount })
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount, // Total que paga el cliente (ya incluye todo)
+      amount: finalAmount, // Total que paga el cliente
       currency,
       automatic_payment_methods: {
         enabled: true
