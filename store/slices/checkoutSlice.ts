@@ -10,6 +10,8 @@ interface CheckoutState {
     code: string
     discount: number
     isApplied: boolean
+    isPercentage?: boolean
+    error?: string
   }
   contactInfo: {
     email: string
@@ -31,7 +33,9 @@ const initialState: CheckoutState = {
   coupon: {
     code: '',
     discount: 0,
-    isApplied: false
+    isApplied: false,
+    isPercentage: false,
+    error: ''
   },
 
   contactInfo: {
@@ -63,22 +67,18 @@ const checkoutSlice = createSlice({
       state.selectedQuantity = action.payload
     },
 
-    applyCoupon: (state, action: PayloadAction<string>) => {
-      if (state.coupon.isApplied) return
+    applyCoupon: (
+      state,
+      action: PayloadAction<{ code: string; discount: number; isPercentage: boolean; isApplied: boolean; error?: string }>
+    ) => {
+      const { code, discount, isPercentage, isApplied, error } = action.payload
 
-      const code = action.payload.toLowerCase()
-      if (code === 'admin90') {
-        state.coupon = {
-          code: 'admin90',
-          discount: 0, // se calcula en el componente según el total
-          isApplied: true
-        }
-      } else {
-        state.coupon = {
-          code,
-          discount: 0,
-          isApplied: false
-        }
+      state.coupon = {
+        code,
+        discount,
+        isPercentage,
+        isApplied,
+        error: error || ''
       }
     },
 
@@ -89,7 +89,9 @@ const checkoutSlice = createSlice({
       state.coupon = {
         code: '',
         discount: 0,
-        isApplied: false
+        isApplied: false,
+        isPercentage: false,
+        error: ''
       }
     },
 
