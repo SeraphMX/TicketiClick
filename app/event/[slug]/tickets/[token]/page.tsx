@@ -64,18 +64,20 @@ export default async function TicketPage(props: { params: Props }) {
 
   console.log(order_data.stripe_payment_intent_id)
 
+  console.log(order_data)
+
   return (
     <div className='bg-gray-50 py-6'>
       <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='bg-white p-6 rounded-lg'>
           <div className='flex items-center justify-between mb-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>Los datos de tu compra</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>Los datos de tu orden</h1>
           </div>
           <p>Orden: {orderId}</p>
           <p>Fecha: {formatDate(order_data.created_at)}</p>
           <p>Email: {order_data.email}</p>
           <p>Teléfono: {order_data.phone}</p>
-          <p>Metódo de pago: Tarjeta </p>
+          {order_data.payment_status !== 'free' && <p>Metódo de pago: Tarjeta </p>}
         </div>
       </div>
       <DownloadTickets paymentIntentId={order_data.stripe_payment_intent_id} />

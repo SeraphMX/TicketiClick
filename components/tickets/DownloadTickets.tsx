@@ -2,6 +2,7 @@
 
 import { useSelector } from '@/hooks/useReduxHooks'
 import { supabase } from '@/lib/supabase'
+import { formatDate } from '@/lib/utils'
 import { RootState } from '@/store/store'
 import { jsPDF } from 'jspdf'
 import { Download, QrCode } from 'lucide-react'
@@ -64,6 +65,7 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
             eventDate: ticket.date,
             eventTime: ticket.time,
             eventLocation: ticket.location,
+            eventImage: ticket.image,
             ticketType: ticket.ticket_type,
             ticketHolder: ticket.ticket_holder ? ticket.ticket_holder : null,
             qrCode
@@ -122,7 +124,8 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
     doc.rect(0, 0, 210, 250, 'F')
 
     // Imagen principal del evento
-    const eventImg = await getImageBase64('/events/1745434434PQzWhASDd4.webp') // Ruta pública en Next.js
+    console.log(ticket.eventImage)
+    const eventImg = await getImageBase64(ticket.eventImage) // Ruta pública en Next.js
     doc.addImage(eventImg.data, eventImg.format, 14, 150, 60, 34)
 
     // QR
@@ -141,7 +144,7 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
 
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(12)
-    doc.text(`Fecha: ${ticket.eventDate}`, 90, 150)
+    doc.text(`Fecha: ${formatDate(ticket.eventDate)}`, 90, 150)
     doc.text(`Hora: ${ticket.eventTime}`, 90, 157)
     doc.text(`Lugar: ${ticket.eventLocation}`, 90, 164)
     if (ticket.ticketHolder) {
