@@ -24,10 +24,6 @@ export async function generateMetadata(props: { params: Props }) {
 
   const plainDescription = event.description ? convertHtmlToText(event.description) : ''
 
-  console.log(plainDescription)
-
-  console.log(event)
-
   return {
     title: event.title,
     description: plainDescription,
