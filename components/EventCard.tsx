@@ -90,9 +90,7 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
 
         {/* Precio y botón */}
         <div className='flex items-center justify-between mt-auto pt-4 border-t border-gray-100'>
-          <div className='text-blue-700 font-bold'>
-            {event.price.toFixed(2)} {event.currency}
-          </div>
+          <div className='text-blue-700 font-bold'>{event.price === 0 ? 'Gratuito' : `$${event.price.toFixed(2)} ${event.currency}`}</div>
 
           <div
             onClick={handleNavigate}

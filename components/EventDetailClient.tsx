@@ -13,13 +13,10 @@ import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, Map
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-import { version } from 'react'
 import { useSelector } from 'react-redux'
 interface EventWithQuantity extends Event {
   quantity: number
 }
-
-console.log(version)
 
 export default function EventDetailClient({ event }: { event: Event }) {
   const router = useRouter()
@@ -59,8 +56,6 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const handleValidateCoupon = () => {
     const result = validateCoupon(couponCode) // Devuelve { code, discount, isPercentage, isApplied }
 
-    console.log('copooooon', result)
-
     if (result.isApplied) {
       dispatch(
         applyCoupon({
@@ -72,8 +67,6 @@ export default function EventDetailClient({ event }: { event: Event }) {
         })
       )
     } else {
-      console.log('invaliiidodododod')
-
       dispatch(
         applyCoupon({
           code: '',
@@ -85,8 +78,6 @@ export default function EventDetailClient({ event }: { event: Event }) {
       )
     }
   }
-
-  console.log(checkout.coupon.error)
 
   const handlePurchase = () => {
     dispatch(setSelectedEvent({ ...event, quantity } as EventWithQuantity))
@@ -225,13 +216,19 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
           {/* Comprar boletos */}
           <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm'>
-            <h2 className='text-xl font-bold text-gray-800 mb-4'>Comprar boletos</h2>
+            <h2 className='text-xl font-bold text-gray-800 mb-4'>{event.price === 0 ? 'Obtener' : 'Comprar'} boletos</h2>
 
             <div className='mb-6 gap-2'>
               <span className='text-lg font-bold text-blue-700 mb-1'>
-                {event.price.toFixed(2)} {event.currency}
+                {event.price === 0 ? (
+                  'Gratuito'
+                ) : (
+                  <>
+                    {`${event.price.toFixed(2)} ${event.currency}`}
+                    <span className='text-sm text-gray-500 ml-2'>por boleto</span>
+                  </>
+                )}
               </span>
-              <span className='text-sm text-gray-500 ml-2 '>por boleto</span>
               <p className='text-sm text-gray-400'>Quedan {event.availableTickets} entradas.</p>
             </div>
 
@@ -256,103 +253,105 @@ export default function EventDetailClient({ event }: { event: Event }) {
               </div>
             </div>
 
-            <div className='mb-6 space-y-3'>
-              <p className='text-gray-600 flex justify-between'>
-                <span>Subtotal:</span>
-                <span>
-                  {subtotal.toFixed(2)} {event.currency}
-                </span>
-              </p>
-
-              {discount > 0 && (
-                <div className='flex justify-between items-center bg-green-100 p-3 rounded-md'>
-                  <p className='text-sm text-green-600'>Descuento aplicado:</p>
-                  <p className='text-sm text-green-600'>
-                    -{discount.toFixed(2)} {event.currency}
-                  </p>
-                </div>
-              )}
-
-              <div className='border-t border-gray-200 pt-3'>
-                <div className='flex justify-between items-center mb-2'>
-                  <button
-                    onClick={() => setShowFeeDetails(!showFeeDetails)}
-                    className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
-                  >
-                    <span className='flex items-center'>
-                      Cargos y comisiones
-                      <Info className='h-4 w-4 ml-1 text-gray-400' />
-                    </span>
-                    {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
-                  </button>
-                  <span className='text-gray-600'>
-                    {(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
-                  </span>
-                </div>
-
-                {showFeeDetails && (
-                  <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
-                    <p className='flex justify-between text-gray-600'>
-                      <span>Cargo por servicio (10%):</span>
-                      <span>
-                        {serviceFee.toFixed(2)} {event.currency}
-                      </span>
-                    </p>
-                    <p className='flex justify-between text-gray-600'>
-                      <span>Comisión bancaria (5%):</span>
-                      <span>
-                        {paymentFee.toFixed(2)} {event.currency}
-                      </span>
-                    </p>
-                    <p className='flex justify-between text-gray-600'>
-                      <span>Emisión de boleto:</span>
-                      <span>
-                        {ticketFee.toFixed(2)} {event.currency}
-                      </span>
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Cupón de descuento */}
-              <div className='border-t border-gray-200 pt-3'>
-                {!showCouponInput ? (
-                  <button onClick={() => setShowCouponInput(true)} className='text-sm text-blue-600 hover:text-blue-800'>
-                    ¿Tienes un cupón?
-                  </button>
-                ) : (
-                  <div className='space-y-2'>
-                    <div className='flex gap-2'>
-                      <input
-                        type='text'
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value)}
-                        placeholder='Ingresa tu código'
-                        className='flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm'
-                      />
-                      <button
-                        disabled={discount > 0}
-                        onClick={handleValidateCoupon}
-                        className='px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
-                      >
-                        Aplicar
-                      </button>
-                    </div>
-
-                    {checkout.coupon.error && <p className='text-sm text-red-600'>{checkout.coupon.error}</p>}
-                  </div>
-                )}
-              </div>
-
-              <div className='border-t border-gray-200 pt-3'>
-                <p className='text-lg font-bold flex justify-between'>
-                  <span>Total:</span>
+            {event.price !== 0 && (
+              <div className='mb-6 space-y-3'>
+                <p className='text-gray-600 flex justify-between'>
+                  <span>Subtotal:</span>
                   <span>
-                    {total.toFixed(2)} {event.currency}
+                    {subtotal.toFixed(2)} {event.currency}
                   </span>
                 </p>
+
+                {discount > 0 && (
+                  <div className='flex justify-between items-center bg-green-100 p-3 rounded-md'>
+                    <p className='text-sm text-green-600'>Descuento aplicado:</p>
+                    <p className='text-sm text-green-600'>
+                      -{discount.toFixed(2)} {event.currency}
+                    </p>
+                  </div>
+                )}
+
+                <div className='border-t border-gray-200 pt-3'>
+                  <div className='flex justify-between items-center mb-2'>
+                    <button
+                      onClick={() => setShowFeeDetails(!showFeeDetails)}
+                      className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
+                    >
+                      <span className='flex items-center'>
+                        Cargos y comisiones
+                        <Info className='h-4 w-4 ml-1 text-gray-400' />
+                      </span>
+                      {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
+                    </button>
+                    <span className='text-gray-600'>
+                      {(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
+                    </span>
+                  </div>
+
+                  {showFeeDetails && (
+                    <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
+                      <p className='flex justify-between text-gray-600'>
+                        <span>Cargo por servicio (10%):</span>
+                        <span>
+                          {serviceFee.toFixed(2)} {event.currency}
+                        </span>
+                      </p>
+                      <p className='flex justify-between text-gray-600'>
+                        <span>Comisión bancaria (5%):</span>
+                        <span>
+                          {paymentFee.toFixed(2)} {event.currency}
+                        </span>
+                      </p>
+                      <p className='flex justify-between text-gray-600'>
+                        <span>Emisión de boleto:</span>
+                        <span>
+                          {ticketFee.toFixed(2)} {event.currency}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Cupón de descuento */}
+                <div className='border-t border-gray-200 pt-3'>
+                  {!showCouponInput ? (
+                    <button onClick={() => setShowCouponInput(true)} className='text-sm text-blue-600 hover:text-blue-800'>
+                      ¿Tienes un cupón?
+                    </button>
+                  ) : (
+                    <div className='space-y-2'>
+                      <div className='flex gap-2'>
+                        <input
+                          type='text'
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value)}
+                          placeholder='Ingresa tu código'
+                          className='flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm'
+                        />
+                        <button
+                          disabled={discount > 0}
+                          onClick={handleValidateCoupon}
+                          className='px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                        >
+                          Aplicar
+                        </button>
+                      </div>
+
+                      {checkout.coupon.error && <p className='text-sm text-red-600'>{checkout.coupon.error}</p>}
+                    </div>
+                  )}
+                </div>
+
+                <div className='border-t border-gray-200 pt-3'>
+                  <p className='text-lg font-bold flex justify-between'>
+                    <span>Total:</span>
+                    <span>
+                      {total.toFixed(2)} {event.currency}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
 
             <button
               onClick={handlePurchase}
@@ -366,8 +365,8 @@ export default function EventDetailClient({ event }: { event: Event }) {
               {event.availableTickets < quantity
                 ? 'No hay suficientes boletos'
                 : quantity === 1
-                  ? 'Comprar boleto'
-                  : `Comprar ${quantity} boletos`}
+                  ? `${event.price !== 0 ? 'Comprar' : 'Registrar'} boleto`
+                  : `${event.price !== 0 ? 'Comprar' : 'Registrar'} ${quantity} boletos`}
             </button>
           </div>
         </div>
