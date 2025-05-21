@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       },
       application_fee_amount: platformFee, // Tu comisión
       transfer_data: {
-        destination: stripe_id // El resto va a la cuenta conectada
+        destination: process.env.NEXT_PUBLIC_DEVMODE ? 'acct_1RMhq2LhYrNjtk3X' : stripe_id // El resto va a la cuenta conectada
       },
       metadata: {
         quantity, // Guardamos la cantidad de boletos para referencia
