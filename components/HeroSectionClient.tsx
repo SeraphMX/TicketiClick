@@ -41,7 +41,7 @@ const HeroSectionClient = () => {
     }
   }
   return (
-    <section className='relative  text-white py-20 min-h-screen flex items-end'>
+    <section className='relative bg-black text-white py-20 min-h-screen flex items-end'>
       <div
         className='absolute inset-0 '
         style={{
