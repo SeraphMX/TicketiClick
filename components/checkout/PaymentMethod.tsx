@@ -45,7 +45,6 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
     unitPrice: selectedEvent?.price || 0,
     coupon: checkout.coupon
   })
-  console.log({ subtotal, discount, serviceFee, paymentFee, ticketFee, total })
 
   useEffect(() => {
     if (selectedMethod !== 'card') {
@@ -69,8 +68,6 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
     setError(null)
 
     try {
-      console.log('paymentmethof')
-
       // Create payment intent
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',

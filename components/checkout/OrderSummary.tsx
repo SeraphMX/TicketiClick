@@ -3,12 +3,12 @@ import { usePriceCalculator } from '@/hooks/usePriceCalculator'
 import { useDispatch, useSelector } from '@/hooks/useReduxHooks'
 import { Event } from '@/lib/types'
 import { formatDate, formatTime } from '@/lib/utils'
-import { resetCheckout, resetCoupon } from '@/store/slices/checkoutSlice'
+import { resetCheckout, resetCoupon, setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
 import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface OrderSummaryProps {
   event: Event
@@ -27,7 +27,8 @@ const translatePaymentMethod = (method: string) => {
   const translations: Record<string, string> = {
     card: 'Tarjeta de crédito/débito',
     transfer: 'Transferencia bancaria',
-    oxxo: 'Pago en OXXO'
+    oxxo: 'Pago en OXXO',
+    free: 'Entrada gratuita'
   }
   return translations[method] || method
 }
@@ -47,9 +48,44 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
     error: ''
   })
 
+  const hasRunRef = useRef(false)
+
   const checkout = useSelector((state: RootState) => state.checkout)
 
   useEffect(() => {
+    if (hasRunRef.current) return
+    hasRunRef.current = true
+
+    const processPayment = async () => {
+      // Si el evento es gratuito generar la orden de compra
+      if (event.price === 0) {
+        console.log('Evento gratuito')
+        // Create payment intent
+        const response = await fetch('/api/create-free-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            buyer_email: checkout.contactInfo.email,
+            buyer_phone: checkout.contactInfo.phone,
+            event_id: event.id,
+            quantity: checkout.selectedQuantity,
+            holder_names: checkout.ticketCustomization.names
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error('Hubo un error al crear la orden')
+        }
+
+        const { paymentIntentId } = await response.json()
+        console.log('Orden de compra generada:', paymentIntentId)
+
+        dispatch(setPaymentIntentId(paymentIntentId))
+      }
+    }
+
     setTimeout(() => {
       // Guarda el cupón localmente
       setSavedCoupon({
@@ -62,6 +98,8 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
 
       dispatch(resetCoupon())
     }, 1000)
+
+    processPayment()
   }, [])
 
   const { subtotal, discount, serviceFee, paymentFee, ticketFee, total } = usePriceCalculator({
@@ -103,15 +141,30 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
 
   return (
     <div className='space-y-6'>
-      <div className='flex items-center'>
-        <h2 className='text-xl font-bold text-gray-900'>Resumen de compra</h2>
-      </div>
+      {event.price > 0 ? (
+        <>
+          <div className='flex items-center'>
+            <h2 className='text-xl font-bold text-gray-900'>Resumen de compra</h2>
+          </div>
 
-      <p className='text-sm text-gray-600'>
-        La compra se ha realizado correctamente. Ahora puedes ver los detalles de tu pedido y descargar tus boletos. También te hemos
-        enviado un correo electrónico con esta información por si necesitas acceder a ellos más tarde. ¡Gracias por tu compra y disfruta el
-        evento!
-      </p>
+          <p className='text-sm text-gray-600'>
+            La compra se ha realizado correctamente. Ahora puedes ver los detalles de tu pedido y descargar tus boletos. También te hemos
+            enviado un correo electrónico con esta información por si necesitas acceder a ellos más tarde. ¡Gracias por tu compra y disfruta
+            el evento!
+          </p>
+        </>
+      ) : (
+        <>
+          <div className='flex items-center'>
+            <h2 className='text-xl font-bold text-gray-900'>Registro completo</h2>
+          </div>
+
+          <p className='text-sm text-gray-600'>
+            Tu registro se ha realizado correctamente. Ahora puedes descargar tus boletos. También te hemos enviado un correo electrónico
+            con esta información por si necesitas acceder a ellos más tarde. ¡Disfruta el evento!
+          </p>
+        </>
+      )}
 
       {/* Detalles del evento */}
       <div className='bg-gray-50 rounded-lg p-4'>
@@ -165,74 +218,77 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
       </div>
 
       {/* Resumen de costos */}
-      <div className='border-t border-gray-200 pt-4'>
-        <div className='space-y-3'>
-          <div className='flex justify-between '>
-            <span className='text-gray-600'>Subtotal</span>
-            <span>
-              ${subtotal.toFixed(2)} {event.currency}
-            </span>
-          </div>
 
-          {discount > 0 && (
-            <div className='flex justify-between items-center bg-green-100 py-2 px-2 rounded-md'>
-              <span className='text-sm text-green-600'>Descuento aplicado</span>
-              <span className='text-sm text-green-600'>
-                ${discount.toFixed(2)} {event.currency}
+      {event.price > 0 && (
+        <div className='border-t border-gray-200 pt-4'>
+          <div className='space-y-3'>
+            <div className='flex justify-between '>
+              <span className='text-gray-600'>Subtotal</span>
+              <span>
+                ${subtotal.toFixed(2)} {event.currency}
               </span>
             </div>
-          )}
 
-          <div className='border-t border-gray-200 pt-3'>
-            <div className='flex justify-between items-center mb-2'>
-              <button
-                onClick={() => setShowFeeDetails(!showFeeDetails)}
-                className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
-              >
-                <span className='flex items-center'>
-                  Cargos y comisiones
-                  <Info className='h-4 w-4 ml-1 text-gray-400' />
+            {discount > 0 && (
+              <div className='flex justify-between items-center bg-green-100 py-2 px-2 rounded-md'>
+                <span className='text-sm text-green-600'>Descuento aplicado</span>
+                <span className='text-sm text-green-600'>
+                  ${discount.toFixed(2)} {event.currency}
                 </span>
-                {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
-              </button>
-              <span className='text-gray-600'>
-                ${(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
-              </span>
-            </div>
-
-            {showFeeDetails && (
-              <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
-                <p className='flex justify-between text-gray-600'>
-                  <span>Cargo por servicio (10%):</span>
-                  <span>
-                    {serviceFee.toFixed(2)} {event.currency}
-                  </span>
-                </p>
-                <p className='flex justify-between text-gray-600'>
-                  <span>Comisión bancaria (5%):</span>
-                  <span>
-                    {paymentFee.toFixed(2)} {event.currency}
-                  </span>
-                </p>
-                <p className='flex justify-between text-gray-600'>
-                  <span>Emisión de boleto:</span>
-                  <span>
-                    {ticketFee.toFixed(2)} {event.currency}
-                  </span>
-                </p>
               </div>
             )}
-          </div>
-          <div className='border-t border-gray-200 pt-3'>
-            <div className='flex justify-between text-base font-medium'>
-              <span>Total</span>
-              <span>
-                ${total.toFixed(2)} {event.currency}
-              </span>
+
+            <div className='border-t border-gray-200 pt-3'>
+              <div className='flex justify-between items-center mb-2'>
+                <button
+                  onClick={() => setShowFeeDetails(!showFeeDetails)}
+                  className='text-sm text-gray-600 hover:text-gray-800 flex items-center'
+                >
+                  <span className='flex items-center'>
+                    Cargos y comisiones
+                    <Info className='h-4 w-4 ml-1 text-gray-400' />
+                  </span>
+                  {showFeeDetails ? <ChevronUp className='h-4 w-4 ml-1' /> : <ChevronDown className='h-4 w-4 ml-1' />}
+                </button>
+                <span className='text-gray-600'>
+                  ${(serviceFee + paymentFee + ticketFee).toFixed(2)} {event.currency}
+                </span>
+              </div>
+
+              {showFeeDetails && (
+                <div className='bg-gray-100 p-3 rounded-md space-y-2 text-sm'>
+                  <p className='flex justify-between text-gray-600'>
+                    <span>Cargo por servicio (10%):</span>
+                    <span>
+                      {serviceFee.toFixed(2)} {event.currency}
+                    </span>
+                  </p>
+                  <p className='flex justify-between text-gray-600'>
+                    <span>Comisión bancaria (5%):</span>
+                    <span>
+                      {paymentFee.toFixed(2)} {event.currency}
+                    </span>
+                  </p>
+                  <p className='flex justify-between text-gray-600'>
+                    <span>Emisión de boleto:</span>
+                    <span>
+                      {ticketFee.toFixed(2)} {event.currency}
+                    </span>
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className='border-t border-gray-200 pt-3'>
+              <div className='flex justify-between text-base font-medium'>
+                <span>Total</span>
+                <span>
+                  ${total.toFixed(2)} {event.currency}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Botón de confirmación */}
       <div className='flex justify-end'>

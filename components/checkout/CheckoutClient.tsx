@@ -17,20 +17,20 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
-// Pasos del checkout
-const CHECKOUT_STEPS = [
-  { id: 1, title: 'Contacto' },
-  { id: 2, title: 'Verificación' },
-  { id: 3, title: 'Personalización' },
-  { id: 4, title: 'Pago' },
-  { id: 5, title: 'Confirmación' }
-]
-
 interface CheckoutClientProps {
   event: Event
 }
 
 export default function CheckoutClient({ event }: CheckoutClientProps) {
+  // Pasos del checkout
+  const CHECKOUT_STEPS = [
+    { id: 1, title: 'Contacto' },
+    { id: 2, title: 'Verificación' },
+    { id: 3, title: 'Personalización' },
+    ...(event.price > 0 ? [{ id: 4, title: 'Pago' }] : []),
+    { id: 5, title: 'Confirmación' }
+  ]
+
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const router = useRouter()
   const { user } = useAuth()
@@ -42,7 +42,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
     otpVerified: false,
     ticketName: '',
     ticketColor: '#FFFFFF',
-    paymentMethod: ''
+    paymentMethod: 'free'
   })
 
   // Timer para el checkout
@@ -147,12 +147,12 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
                 setFormData((prev) => ({ ...prev, ...data }))
                 setCurrentStep(4)
               }}
-              onSkip={() => setCurrentStep(4)}
+              onSkip={() => setCurrentStep(event.price > 0 ? 4 : 5)}
               onBack={() => setCurrentStep(2)}
             />
           )}
 
-          {currentStep === 4 && (
+          {currentStep === 4 && event.price > 0 && (
             <PaymentMethod
               formData={formData}
               onSubmit={(method) => {
@@ -172,7 +172,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
                 alert('¡Compra realizada con éxito!')
                 router.push('/dashboard/user')
               }}
-              onBack={() => setCurrentStep(4)}
+              onBack={() => setCurrentStep(event.price > 0 ? 4 : 3)}
             />
           )}
         </div>
