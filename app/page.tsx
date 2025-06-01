@@ -30,7 +30,7 @@ export default async function Home() {
       <section className='py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex justify-between items-center mb-8'>
           <h2 className='text-2xl sm:text-3xl font-bold text-gray-800'>Eventos Destacados</h2>
-          <Link href='/events' className='inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors'>
+          <Link href='/eventos' className='inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors'>
             Ver todos
             <ArrowRight className='h-4 w-4 ml-1' />
           </Link>

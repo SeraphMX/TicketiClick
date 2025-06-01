@@ -34,7 +34,7 @@ const Navbar = () => {
               <Link href='/' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
                 Inicio
               </Link>
-              <Link href='/events' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
+              <Link href='/eventos' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
                 Eventos
               </Link>
               {user && (
@@ -99,7 +99,7 @@ const Navbar = () => {
             Inicio
           </Link>
           <Link
-            href='/events'
+            href='/eventos'
             className='block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600'
             onClick={() => setIsMenuOpen(false)}
           >

@@ -68,7 +68,7 @@ export default function LoginPage() {
           {/* Cabecera */}
           <div className='px-6 pt-8 pb-6 bg-gradient-to-r from-blue-700 to-zinc-800 text-white'>
             <h1 className='text-2xl font-bold mb-1'>Iniciar Sesión</h1>
-            <p className='text-blue-100'>Accede a tu cuenta para comprar boletos y más</p>
+            <p className='text-blue-100'>Accede a tu cuenta en ticketi</p>
           </div>
 
           {/* Formulario */}

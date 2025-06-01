@@ -40,7 +40,7 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
   useEffect(() => {
     const fetchTickets = async () => {
       if (!paymentIntentId) {
-        router.push('/events')
+        router.push('/eventos')
         return
       }
 
@@ -52,7 +52,7 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
 
       if (error || !data) {
         console.error('Error al obtener tickets:', error)
-        router.push('/events')
+        router.push('/eventos')
         return
       }
 

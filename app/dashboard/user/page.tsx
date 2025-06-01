@@ -77,7 +77,7 @@ export default function UserDashboardPage() {
             Parece que aún no has comprado ningún boleto. Explora los eventos disponibles y empieza a disfrutar.
           </p>
           <a
-            href='/events'
+            href='/eventos'
             className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700'
           >
             Explorar eventos
