@@ -1,18 +1,20 @@
 export default function PrivacyPolicyPage() {
   return (
     <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-      <p>
+      <h1 className='text-3xl font-bold text-gray-900 mb-8'>Aviso de privacidad</h1>
+      <p className='text-gray-700 mb-6'>
         En <strong>Ticketi</strong>, operado por <strong>Ambitious Growth Leaders Alliance S.A. de C.V.</strong>, nos comprometemos a
         proteger tu privacidad y a manejar tus datos personales con responsabilidad y conforme a la ley aplicable.
       </p>
-      <h1 className='text-3xl font-bold text-gray-900 mb-8'>1. Responsable del tratamiento</h1>
 
       <div className='prose prose-blue max-w-none'>
         <section className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-900 mb-4'>1. Información que Recopilamos</h2>
-          <p>Razón social: Ambitious Growth Leaders Alliance S.A. de C.V. </p>
-          <p>Domicilio: Ocampo 29b 20, San Mateo, Metepec, Estado de México, C.P. 52140 </p>
-          <p>Correo electrónico de contacto: hola@ticketi.click</p>
+          <h2 className='text-2xl font-semibold text-gray-900 mb-4'>1. Responsable del tratamiento</h2>
+          <div className='text-gray-600 mb-4'>
+            <p>Razón social: Ambitious Growth Leaders Alliance S.A. de C.V. </p>
+            <p>Domicilio: Ocampo 29b 20, San Mateo, Metepec, Estado de México, C.P. 52140 </p>
+            <p>Correo electrónico de contacto: hola@ticketi.click</p>
+          </div>
         </section>
 
         <section className='mb-8'>
