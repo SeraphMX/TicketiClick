@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
           </p>
         </section>
         <section className='mb-8'>
-          <h2 className='text-2xl font-semibold text-gray-900 mb-4'>4. Tus Derechos como usuario</h2>
+          <h2 className='text-2xl font-semibold text-gray-900 mb-4'>7. Tus Derechos como usuario</h2>
           <p className='text-gray-600 mb-4'>Tienes derecho a:</p>
           <ul className='list-disc pl-6 text-gray-600 mb-4'>
             <li>Acceder a tu información personal</li>
