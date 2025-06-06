@@ -1,5 +1,3 @@
-// app/event/[slug]/page.tsx
-
 import EventDetailClient from '@/components/EventDetailClient'
 import { supabase } from '@/lib/supabase'
 import { Event } from '@/lib/types'
@@ -37,7 +35,7 @@ export async function generateMetadata(props: { params: Props }) {
       card: 'summary_large_image',
       title: event.title,
       description: plainDescription,
-      images: `${process.env.NEXT_PUBLIC_BASE_URL}${event.image}` ? [event.image] : undefined
+      images: `${event.image}` ? [event.image] : undefined
     }
   }
 }
