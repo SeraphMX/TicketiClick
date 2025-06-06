@@ -24,13 +24,14 @@ export async function generateMetadata(props: { params: Props }) {
 
   const plainDescription = event.description ? convertHtmlToText(event.description) : ''
 
+  //TODO:checkar viarbles de entorno
   return {
     title: event.title,
     description: plainDescription,
     openGraph: {
       title: event.title,
       description: plainDescription,
-      images: event.image ? [{ url: `${process.env.NEXT_PUBLIC_BASE_URL}${event.image}`, width: 1200, height: 630 }] : undefined
+      images: event.image ? [{ url: `${event.image}`, width: 1200, height: 630 }] : undefined
     },
     twitter: {
       card: 'summary_large_image',
