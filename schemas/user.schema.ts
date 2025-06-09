@@ -2,7 +2,10 @@ import { z } from 'zod'
 
 export const createUser = z.object({
   phone: z.string().min(10, { message: 'Número de teléfono inválido' }),
-  email: z.string().email({ message: 'Email inválido' })
+  email: z.string().email({ message: 'Email inválido' }),
+  terms: z.boolean().refine((val) => val, {
+    message: 'Debes aceptar los términos y condiciones'
+  })
 })
 export type CreateUser = z.infer<typeof createUser>
 
