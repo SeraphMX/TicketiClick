@@ -3,8 +3,10 @@
 
 import { useDispatch } from '@/hooks/useReduxHooks'
 import { setOtpVerified } from '@/store/slices/checkoutSlice'
+import { RootState } from '@/store/store'
 import { ArrowLeft, Check, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 interface OtpVerificationProps {
   phone: string
@@ -19,6 +21,7 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
   const [isVerified, setIsVerified] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const rxContactInfo = useSelector((state: RootState) => state.checkout.contactInfo)
   const dispatch = useDispatch()
 
   // Timer para reenvío
@@ -34,6 +37,10 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
 
     return () => clearInterval(timer)
   }, [timeLeft])
+
+  useEffect(() => {
+    console.log('isVerifying cambió a:', isVerifying)
+  }, [isVerifying])
 
   // Manejar cambio en inputs
   const handleChange = async (index: number, value: string) => {
@@ -56,13 +63,25 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
       try {
         setIsVerifying(true)
 
+        //console.log(isVerifying)
+
         // Verificar si estamos en modo desarrollo y el código es 123456
         const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
-        if (isDevMode && completeOtp === '123456') {
-          console.log('Modo desarrollo: Aceptando código OTP 123456 como válido')
-          setIsVerified(true)
-          dispatch(setOtpVerified(true))
-          setTimeout(onVerified, 1500)
+        if (isDevMode) {
+          if (completeOtp !== '123456') {
+            setTimeout(() => {
+              //setIsVerifying(false)
+              setError('Código inválido usa 123456. Por favor, intenta de nuevo.')
+              // Limpiar inputs
+              setOtp(['', '', '', '', '', ''])
+              document.getElementById('otp-0')?.focus()
+            }, 1500) // Simular tiempo de verificación
+          } else {
+            console.log('Modo desarrollo: Aceptando código OTP 123456 como válido')
+            setIsVerified(true)
+            dispatch(setOtpVerified(true))
+            setTimeout(onVerified, 1500)
+          }
           return
         }
 
@@ -168,15 +187,6 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
           <span className='font-medium text-gray-900'>{formatPhone(phone)}</span>
         </p>
 
-        {/* Mensaje de modo desarrollo */}
-        {process.env.NEXT_PUBLIC_DEVMODE === 'true' && (
-          <div className='bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4'>
-            <p className='text-yellow-700 text-sm'>
-              <strong>Modo desarrollo activo:</strong> Usa el código <strong>123456</strong> para continuar
-            </p>
-          </div>
-        )}
-
         {/* Inputs OTP */}
         <div className='flex justify-center gap-2 mb-6'>
           {otp.map((digit, index) => (
@@ -226,6 +236,16 @@ export default function OtpVerification({ phone, onVerified, onBack }: OtpVerifi
           </div>
         )}
       </div>
+
+      {/* Mensaje de modo desarrollo */}
+      {process.env.NEXT_PUBLIC_DEVMODE === 'true' && (
+        <div className='bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4'>
+          <p className='text-yellow-700 text-sm'>
+            <strong>Modo desarrollo activo:</strong> Usa el código <strong>123456</strong> para continuar, la opción de crear cuenta esta:
+            <strong>{rxContactInfo.createAccount ? ' activada' : ' desactivada'}</strong>
+          </p>
+        </div>
+      )}
     </div>
   )
 }
