@@ -1,6 +1,7 @@
 // app/api/send-email/route.ts
 
 import { renderMail } from '@/lib/emails/renderMail.server'
+import { EmailTemplate } from '@/types/email'
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 
@@ -19,11 +20,24 @@ export async function POST(request: Request) {
 
   try {
     const html = await renderMail(template, templateProps)
+    let mailSubject = subject || 'Notificación de Ticketi'
+
+    switch (template as EmailTemplate) {
+      case 'register':
+        mailSubject = 'Crea tu cuenta en Ticketi'
+        break
+      case 'welcome':
+        mailSubject = '¡Bienvenido a Ticketi!'
+        break
+      case 'purchaseConfirmation':
+        mailSubject = 'Confirmación de compra en Ticketi'
+        break
+    }
 
     await transporter.sendMail({
       from: '"Ticketi" <notificaciones@ticketi.click>',
       to,
-      subject: subject, // Ej: "Bienvenido a Ticketi"
+      subject: mailSubject,
       html
     })
 
