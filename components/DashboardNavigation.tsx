@@ -1,6 +1,6 @@
 'use client'
 // components/DashboardNavigation.tsx
-// Navegación para el dashboard
+// Navegación para el dashboard actualizada para Supabase
 
 import { useAuth } from '@/hooks/useAuth'
 import { BarChart, CalendarDays, ChevronRight, LayoutDashboard, Settings, Ticket, Users } from 'lucide-react'
@@ -75,13 +75,21 @@ const DashboardNavigation = () => {
 
   const navigation = getNavigation()
 
+  // Función para traducir roles
+  const translateRole = (role: string) => {
+    const translations: Record<string, string> = {
+      user: 'Usuario',
+      organizer: 'Organizador',
+      admin: 'Administrador'
+    }
+    return translations[role] || role
+  }
+
   return (
     <div className='bg-white rounded-lg shadow-md overflow-hidden'>
       <div className='p-4 bg-blue-700 text-white'>
         <h2 className='text-xl font-semibold'>Dashboard</h2>
-        <p className='text-sm text-blue-200'>
-          Rol: {user.role === 'user' ? 'Usuario' : user.role === 'organizer' ? 'Organizador' : 'Administrador'}
-        </p>
+        <p className='text-sm text-blue-200'>Rol: {translateRole(user.role)}</p>
       </div>
 
       <nav className='p-3'>

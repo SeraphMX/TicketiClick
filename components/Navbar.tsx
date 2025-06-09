@@ -41,6 +41,11 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  const handleLogout = async () => {
+    await logout()
+    setIsMenuOpen(false)
+  }
+
   return (
     <nav
       className={`
@@ -82,11 +87,15 @@ const Navbar = () => {
               {user ? (
                 <div className='flex items-center'>
                   <div className='flex items-center mr-4'>
-                    <img className='h-8 w-8 rounded-full border-2 border-white' src={user.avatar} alt={user.name} />
-                    <span className='ml-2'>{user.name}</span>
+                    <img
+                      className='h-8 w-8 rounded-full border-2 border-white'
+                      src={user.avatar || `https://i.pravatar.cc/150?img=${user.id.slice(-1)}`}
+                      alt={user.full_name || user.email}
+                    />
+                    <span className='ml-2'>{user.full_name || user.email}</span>
                   </div>
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 transition-colors'
                   >
                     <LogOut className='h-4 w-4 mr-1' />
@@ -100,7 +109,7 @@ const Navbar = () => {
                     className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-900 hover:bg-gray-800 transition-colors'
                   >
                     <User className='h-4 w-4 mr-1' />
-                    Crear evento
+                    Iniciar Sesión
                   </Link>
                 </>
               )}
@@ -148,14 +157,15 @@ const Navbar = () => {
           {user ? (
             <>
               <div className='px-3 py-2 flex items-center'>
-                <img className='h-8 w-8 rounded-full border-2 border-white' src={user.avatar} alt={user.name} />
-                <span className='ml-2 text-white'>{user.name}</span>
+                <img
+                  className='h-8 w-8 rounded-full border-2 border-white'
+                  src={user.avatar || `https://i.pravatar.cc/150?img=${user.id.slice(-1)}`}
+                  alt={user.full_name || user.email}
+                />
+                <span className='ml-2 text-white'>{user.full_name || user.email}</span>
               </div>
               <button
-                onClick={() => {
-                  logout()
-                  setIsMenuOpen(false)
-                }}
+                onClick={handleLogout}
                 className='w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700'
               >
                 <LogOut className='h-5 w-5 mr-2' />

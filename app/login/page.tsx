@@ -1,24 +1,32 @@
 'use client'
 // app/login/page.tsx
-// Página de inicio de sesión
+// Página de inicio de sesión actualizada para Supabase
 
 import { useAuth } from '@/hooks/useAuth'
 import { motion } from 'framer-motion'
 import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const { login, isLoading } = useAuth()
+  const { login, isLoading, user } = useAuth()
   const router = useRouter()
+
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (user && !isLoading) {
+      router.push('/dashboard')
+    }
+  }, [user, isLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
 
     // Validación básica
     if (!email || !password) {
@@ -26,44 +34,40 @@ export default function LoginPage() {
       return
     }
 
+    if (!email.includes('@')) {
+      setError('Por favor, ingresa un email válido')
+      return
+    }
+
     try {
       const success = await login(email, password)
 
       if (success) {
-        // Redirigir al dashboard o a la página principal
-        router.push('/dashboard')
+        // La redirección se maneja en el useEffect
+        console.log('Login exitoso')
       } else {
-        setError('Credenciales inválidas. Intenta de nuevo.')
+        setError('Credenciales inválidas. Por favor, verifica tu email y contraseña.')
       }
     } catch (err) {
+      console.error('Login error:', err)
       setError('Error al iniciar sesión. Intenta de nuevo más tarde.')
     }
   }
 
-  // Opciones de demo login
-  const demoUsers = [
-    { email: 'juan@ejemplo.com', role: 'Usuario' },
-    { email: 'maria@ejemplo.com', role: 'Organizador' },
-    { email: 'carlos@ejemplo.com', role: 'Administrador' }
-  ]
-
-  const handleDemoLogin = async (demoEmail: string) => {
-    try {
-      // Usar contraseña ficticia para el demo
-      const success = await login(demoEmail, 'password123')
-
-      if (success) {
-        router.push('/dashboard')
-      } else {
-        setError('Error en el acceso demo. Intenta de nuevo.')
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión demo. Intenta de nuevo más tarde.')
-    }
+  // Si ya está autenticado, mostrar loading
+  if (user && !isLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+        <div className='text-center'>
+          <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto'></div>
+          <p className='mt-4 text-gray-600'>Redirigiendo...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50 '>
+    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
       <motion.div
         className='px-4 sm:px-6 w-full max-w-md'
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -72,9 +76,9 @@ export default function LoginPage() {
       >
         <div className='bg-white rounded-lg shadow-md overflow-hidden'>
           {/* Cabecera */}
-          <div className='px-6 pt-8 pb-6 '>
+          <div className='px-6 pt-8 pb-6'>
             <h1 className='text-2xl font-bold mb-1'>Iniciar Sesión</h1>
-            <p className=''>Accede a tu cuenta en ticketi</p>
+            <p>Accede a tu cuenta en Ticketi</p>
           </div>
 
           {/* Formulario */}
@@ -98,6 +102,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                   placeholder='tu@email.com'
+                  disabled={isLoading}
                 />
               </div>
 
@@ -113,11 +118,13 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                     placeholder='••••••••'
+                    disabled={isLoading}
                   />
                   <button
                     type='button'
                     onClick={() => setShowPassword(!showPassword)}
                     className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className='h-5 w-5 text-gray-400' /> : <Eye className='h-5 w-5 text-gray-400' />}
                   </button>
@@ -126,7 +133,12 @@ export default function LoginPage() {
 
               <div className='flex items-center justify-between'>
                 <div className='flex items-center'>
-                  <input id='remember-me' type='checkbox' className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded' />
+                  <input
+                    id='remember-me'
+                    type='checkbox'
+                    className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                    disabled={isLoading}
+                  />
                   <label htmlFor='remember-me' className='ml-2 block text-sm text-gray-700'>
                     Recordarme
                   </label>
@@ -142,11 +154,18 @@ export default function LoginPage() {
               <button
                 type='submit'
                 disabled={isLoading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors ${
                   isLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
-                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                {isLoading ? (
+                  <>
+                    <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3'></div>
+                    Iniciando sesión...
+                  </>
+                ) : (
+                  'Iniciar sesión'
+                )}
               </button>
             </form>
 
@@ -160,23 +179,15 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Demo Users */}
-          {/* <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
-              <h3 className='text-sm font-medium text-gray-700 mb-3'>Accesos para demostración:</h3>
-              <div className='space-y-2'>
-                {demoUsers.map((demo) => (
-                  <button
-                    key={demo.email}
-                    onClick={() => handleDemoLogin(demo.email)}
-                    className='w-full text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center'
-                  >
-                    <span>{demo.email}</span>
-                    <span className='bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full'>{demo.role}</span>
-                  </button>
-                ))}
-              </div>
-              <p className='text-xs text-gray-500 mt-2'>* Haz clic en cualquier usuario demo para iniciar sesión automáticamente</p>
-            </div> */}
+          {/* Información de desarrollo */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
+              <p className='text-xs text-gray-500'>
+                <strong>Modo desarrollo:</strong> Si no tienes una cuenta, puedes registrarte o usar las credenciales que hayas creado en
+                Supabase.
+              </p>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
