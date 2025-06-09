@@ -3,6 +3,7 @@
 // Página de inicio de sesión
 
 import { useAuth } from '@/hooks/useAuth'
+import { motion } from 'framer-motion'
 import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -62,13 +63,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='min-h-screen  bg-gray-50 py-20'>
-      <div className='max-w-md mx-auto px-4 sm:px-6'>
+    <div className='min-h-screen flex items-center justify-center bg-gray-50 '>
+      <motion.div
+        className='px-4 sm:px-6 w-full max-w-md'
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, y: 20, scale: 0.8 }}
+        transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 20 }}
+      >
         <div className='bg-white rounded-lg shadow-md overflow-hidden'>
           {/* Cabecera */}
-          <div className='px-6 pt-8 pb-6 bg-blue-600 text-white'>
+          <div className='px-6 pt-8 pb-6 '>
             <h1 className='text-2xl font-bold mb-1'>Iniciar Sesión</h1>
-            <p className='text-blue-100'>Accede a tu cuenta en ticketi</p>
+            <p className=''>Accede a tu cuenta en ticketi</p>
           </div>
 
           {/* Formulario */}
@@ -172,7 +178,7 @@ export default function LoginPage() {
               <p className='text-xs text-gray-500 mt-2'>* Haz clic en cualquier usuario demo para iniciar sesión automáticamente</p>
             </div> */}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
