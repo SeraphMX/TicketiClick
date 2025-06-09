@@ -85,10 +85,10 @@ export default function EventDetailClient({ event }: { event: Event }) {
 
     if (document.startViewTransition) {
       document.startViewTransition(() => {
-        router.push(`/event/${event.slug}/checkout`)
+        router.push(`/evento/${event.slug}/checkout`)
       })
     } else {
-      router.push(`/event/${event.slug}/checkout`)
+      router.push(`/evento/${event.slug}/checkout`)
     }
   }
 

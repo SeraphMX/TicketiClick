@@ -30,41 +30,41 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
 
   const handleFormSubmit = async (data: ContactFormData) => {
     try {
-      // Formatear número de teléfono
-      const formattedPhone = data.phone.startsWith('+') ? data.phone : `+52${data.phone}`
-
-      // Validar el teléfono primero
-      const validateResponse = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate-phone`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          phone: formattedPhone
-        })
-      })
-
-      const validateResult = await validateResponse.json()
-
-      if (!validateResult.isValid || !validateResult.isMobile) {
-        throw new Error('Por favor, ingresa un número de teléfono móvil válido')
-      }
-
-      const formattedData = { ...data, phone: formattedPhone }
-
-      // Actualizar el estado en Redux
-      dispatch(setContactInfo(formattedData))
-
       // Verificar si estamos en modo desarrollo
       const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
 
-      console.log('Modo desarrollo:', isDevMode)
+      // Formatear número de teléfono
+      const formattedPhone = `+52${data.phone}`
 
       if (isDevMode) {
-        console.log('Modo desarrollo: Omitiendo envío de OTP')
+        console.log('Omitiendo verificación de teléfono en modo desarrollo')
+      } else {
+        // Validar el teléfono primero
+        const validateResponse = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate-phone`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            phone: formattedPhone
+          })
+        })
+
+        const validateResult = await validateResponse.json()
+
+        if (!validateResult.isValid || !validateResult.isMobile) {
+          throw new Error('Por favor, ingresa un número de teléfono móvil válido')
+        }
+      }
+
+      // Actualizar el estado en Redux
+      dispatch(setContactInfo(data))
+
+      if (isDevMode) {
+        console.log('Omitiendo envío de OTP en modo desarrollo')
         // Continuar directamente con el siguiente paso
-        onSubmit(formattedData)
+        onSubmit(data)
         return
       }
 
@@ -88,7 +88,7 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
 
       if (result.success) {
         // Continuar con el siguiente paso
-        onSubmit(formattedData)
+        onSubmit(data)
       } else {
         throw new Error(result.message || 'Error al enviar el código de verificación')
       }
@@ -159,6 +159,8 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
                 className={`block w-full pl-10 pr-3 py-2 border ${
                   errors.email ? 'border-red-300' : 'border-gray-300'
                 } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500`}
+                placeholder='Escribe tu correo electrónico'
+                maxLength={254}
               />
             </div>
             {errors.email && <p className='mt-1 text-sm text-red-600'>{errors.email.message}</p>}
@@ -178,6 +180,16 @@ export default function ContactForm({ formData, onSubmit }: ContactFormProps) {
           </div>
         </div>
       </div>
+
+      {/* Mensaje de modo desarrollo */}
+      {process.env.NEXT_PUBLIC_DEVMODE === 'true' && (
+        <div className='bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4'>
+          <p className='text-yellow-700 text-sm'>
+            <strong>Modo desarrollo activo:</strong> No se verificara el número de teléfono ni se enviará OTP. Puedes continuar con
+            cualquier número.
+          </p>
+        </div>
+      )}
 
       <div className='flex justify-end'>
         <button

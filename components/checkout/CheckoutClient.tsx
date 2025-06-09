@@ -32,6 +32,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   ]
 
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
+  const rxClientInfo = useSelector((state: RootState) => state.checkout.contactInfo)
   const router = useRouter()
   const { user } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
@@ -51,7 +52,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   useEffect(() => {
     // Redirigir al evento si no hay evento seleccionado en el estado de Redux
     if (!selectedEvent) {
-      router.push(`/event/${event.slug}`)
+      router.push(`/evento/${event.slug}`)
       return
     }
 
@@ -68,7 +69,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   useEffect(() => {
     if (expired && currentStep !== 5) {
       alert('El tiempo para completar la compra ha expirado')
-      router.push(`/event/${event.slug}`)
+      router.push(`/evento/${event.slug}`)
     }
   }, [expired, event.slug, router, currentStep])
 
@@ -88,7 +89,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
         {/* Timer */}
         {currentStep !== 5 && (
           <div className='bg-white p-4 rounded-lg shadow-md mb-6 flex items-center justify-between'>
-            <Link href={`/event/${event.slug}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
+            <Link href={`/evento/${event.slug}`} className='text-blue-600 hover:text-blue-800 flex items-center'>
               <ArrowLeft className='h-5 w-5 mr-1' />
               Volver al evento
             </Link>
@@ -135,6 +136,14 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
               phone={formData.phone}
               onVerified={() => {
                 setFormData((prev) => ({ ...prev, otpVerified: true }))
+                //Si la opcion de crear cuenta crear cuenta de usuario
+                if (rxClientInfo.createAccount && !user) {
+                  fetch('/api/send-register-link', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: rxClientInfo.email, phone: rxClientInfo.phone })
+                  })
+                }
                 setCurrentStep(3)
               }}
               onBack={() => setCurrentStep(1)}
