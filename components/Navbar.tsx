@@ -1,23 +1,54 @@
 'use client'
-// components/Navbar.tsx
-// Barra de navegación principal
-
 import { useAuth } from '@/hooks/useAuth'
 import { LogOut, Menu, User, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const Navbar = () => {
   const { user, logout } = useAuth()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  // Estado para controlar si el navbar se muestra o no
+  const [showNavbar, setShowNavbar] = useState(true)
+
+  // Referencia para guardar la posición previa del scroll
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY < 0) return
+
+      // Si el scroll actual es mayor que el anterior, significa que estás bajando, ocultamos el navbar
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setShowNavbar(false)
+      } else {
+        // Si haces scroll hacia arriba, mostramos el navbar
+        setShowNavbar(true)
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
   return (
-    <nav className='bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md'>
+    <nav
+      className={`
+      fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md
+      transition-transform duration-200 ease-in-out
+      ${showNavbar ? 'translate-y-0' : '-translate-y-full'}
+    `}
+    >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-14'>
           {/* Logo y Nombre */}
