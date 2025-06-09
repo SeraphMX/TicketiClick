@@ -24,7 +24,7 @@ const CompleteRegistration = () => {
           <ThumbsUp className='h-12 w-12 text-blue-600' />
         </div>
         <p className='text-sm text-gray-600 mb-4'>
-          Haz creado tu cuenta, ahora puedes iniciar sesión y usar todas las funciones de <strong>Ticketi</strong>.
+          Haz creado tu cuenta, ahora puedes iniciar sesión y usar todas las funciones de Ticketi.
         </p>
         <p className='text-xs text-gray-600 mb-4'>
           Hemos enviado un correo de confirmación a tu correo electrónico, por favor verifica tu bandeja de entrada y confirma tu correo
