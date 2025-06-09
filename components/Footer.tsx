@@ -48,7 +48,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link href='/dashboard' className='text-gray-400 hover:text-white transition-colors'>
-                  Mi cuenta
+                  Accede a tu cuenta
                 </Link>
               </li>
             </ul>

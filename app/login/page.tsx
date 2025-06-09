@@ -62,11 +62,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 py-12'>
+    <div className='min-h-screen  bg-gray-50 py-20'>
       <div className='max-w-md mx-auto px-4 sm:px-6'>
         <div className='bg-white rounded-lg shadow-md overflow-hidden'>
           {/* Cabecera */}
-          <div className='px-6 pt-8 pb-6 bg-gradient-to-r from-blue-700 to-zinc-800 text-white'>
+          <div className='px-6 pt-8 pb-6 bg-blue-600 text-white'>
             <h1 className='text-2xl font-bold mb-1'>Iniciar Sesión</h1>
             <p className='text-blue-100'>Accede a tu cuenta en ticketi</p>
           </div>
@@ -147,7 +147,7 @@ export default function LoginPage() {
             <div className='mt-6'>
               <p className='text-sm text-gray-600 text-center'>
                 ¿No tienes una cuenta?{' '}
-                <Link href='#' className='font-medium text-blue-600 hover:text-blue-500'>
+                <Link href='/crear-cuenta' className='font-medium text-blue-600 hover:text-blue-500'>
                   Regístrate aquí
                 </Link>
               </p>
@@ -155,22 +155,22 @@ export default function LoginPage() {
           </div>
 
           {/* Demo Users */}
-          <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
-            <h3 className='text-sm font-medium text-gray-700 mb-3'>Accesos para demostración:</h3>
-            <div className='space-y-2'>
-              {demoUsers.map((demo) => (
-                <button
-                  key={demo.email}
-                  onClick={() => handleDemoLogin(demo.email)}
-                  className='w-full text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center'
-                >
-                  <span>{demo.email}</span>
-                  <span className='bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full'>{demo.role}</span>
-                </button>
-              ))}
-            </div>
-            <p className='text-xs text-gray-500 mt-2'>* Haz clic en cualquier usuario demo para iniciar sesión automáticamente</p>
-          </div>
+          {/* <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
+              <h3 className='text-sm font-medium text-gray-700 mb-3'>Accesos para demostración:</h3>
+              <div className='space-y-2'>
+                {demoUsers.map((demo) => (
+                  <button
+                    key={demo.email}
+                    onClick={() => handleDemoLogin(demo.email)}
+                    className='w-full text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center'
+                  >
+                    <span>{demo.email}</span>
+                    <span className='bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full'>{demo.role}</span>
+                  </button>
+                ))}
+              </div>
+              <p className='text-xs text-gray-500 mt-2'>* Haz clic en cualquier usuario demo para iniciar sesión automáticamente</p>
+            </div> */}
         </div>
       </div>
     </div>
