@@ -1,10 +1,16 @@
 import { motion } from 'framer-motion'
 import { ThumbsUp } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 
 const CompleteRegistration = () => {
   const { handleStep, previousStep, nextStep } = useWizard()
+  const router = useRouter()
+  const handleComplete = () => {
+    console.log('Finalizando el registro')
+    router.push('/dashboard') // Redirige al usuario a la página de inicio de sesión
+  }
 
   return (
     <motion.section
@@ -32,10 +38,7 @@ const CompleteRegistration = () => {
         </p>
       </div>
       <div className='flex justify-end'>
-        <Button color='danger' variant='light' onPress={previousStep}>
-          Atras
-        </Button>
-        <Button color='primary' onPress={nextStep}>
+        <Button color='primary' onPress={() => (window.location.href = '/dashboard')} className='mr-2'>
           Ir a mi cuenta
         </Button>
       </div>

@@ -1,23 +1,30 @@
-import { confirmUser } from '@/schemas/user.schema'
+import { completeUser } from '@/schemas/user.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 
+import { userService } from '@/services/userService'
+import { setSuccess } from '@/store/slices/registerSlice'
+import { RootState } from '@/store/store'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Input } from '../ui/input'
 
 const CompleteAccountData = () => {
   const [showPassword, setShowPassword] = useState(false)
   const { handleStep, previousStep, nextStep } = useWizard()
+  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
+  const dispatch = useDispatch()
+
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm({
-    resolver: zodResolver(confirmUser),
+    resolver: zodResolver(completeUser),
     mode: 'onSubmit',
     defaultValues: {
       phone: '',
@@ -33,8 +40,18 @@ const CompleteAccountData = () => {
     async (data) => {
       try {
         console.log('Datos de registro:', data)
+        const login = await userService.signUp({
+          email: signUpData.email,
+          password: data.password,
+          metadata: { full_name: data.name, role: 'user', phone: signUpData.metadata.phone }
+        })
+        console.log('Cuenta creada exitosamente')
+        console.log(login)
+        dispatch(setSuccess(true))
+        nextStep()
       } catch (error) {
         console.error('Error al crear la cuenta:', error)
+        dispatch(setSuccess(false))
       }
     },
     (errors) => console.warn('Errores de validación:', errors)
@@ -79,11 +96,8 @@ const CompleteAccountData = () => {
           isInvalid={!!errors.password2}
           errorMessage={errors.password2?.message}
         />
-        <div className='flex justify-between'>
-          <Button color='danger' variant='light' onPress={previousStep}>
-            Atras
-          </Button>
-          <Button color='primary' onPress={nextStep}>
+        <div className='flex justify-end'>
+          <Button color='primary' type='submit'>
             Finalizar
           </Button>
         </div>

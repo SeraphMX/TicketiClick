@@ -1,5 +1,3 @@
-// src/services/userService.ts
-
 import { supabase } from '@/lib/supabase'
 import { SignInParams, SignUpParams } from '@/types/user'
 
@@ -15,7 +13,7 @@ export const userService = {
 
     if (error) throw error
 
-    // Ejemplo: insertar en tabla "clientes"
+    // Insertar datos en la tabla 'profiles' si el usuario se creó correctamente
     if (data.user) {
       const metadata = data.user.user_metadata
 

@@ -1,14 +1,96 @@
-import { InputOtp } from '@heroui/react'
+import { setOtpVerified } from '@/store/slices/registerSlice'
+import { RootState } from '@/store/store'
+import { InputOtp, Spinner } from '@heroui/react'
 import { motion } from 'framer-motion'
-import { Phone } from 'lucide-react'
-import { useState } from 'react'
+import { CircleCheckBig, Phone, TriangleAlert } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 
 const OTPVerification = () => {
   const { handleStep, previousStep, nextStep } = useWizard()
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [timeLeft, setTimeLeft] = useState(30)
+  const [canResend, setCanResend] = useState(false)
+  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
+  const OTPVerified = useSelector((state: RootState) => state.register.otpVerified)
+  const dispatch = useDispatch()
 
-  const [value, setValue] = useState('')
+  const [OTPCode, setOTPCode] = useState('')
+
+  const handleVerifyOTP = async () => {
+    setIsVerifying(true)
+    setError(null)
+    try {
+      console.log('Verificando OTP:', OTPCode)
+
+      // Simulación de verificación exitosa
+      setTimeout(() => {
+        if (OTPCode !== '123456') {
+          // Simula un código OTP correcto
+          setError('Código OTP inválido')
+          setOTPCode('')
+          setIsVerifying(false)
+          return
+        }
+
+        setIsVerifying(false)
+        dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
+        console.log('OTP verificado correctamente')
+
+        setTimeout(() => {
+          console.log('Avanzando al siguiente paso del wizard')
+          nextStep() // Avanza al siguiente paso del wizard
+        }, 1000)
+
+        //handleStep(2) // Avanza al siguiente paso del wizard
+      }, 2000)
+    } catch (error) {
+      console.error('Error al verificar OTP:', error)
+      setIsVerifying(false)
+    }
+  }
+
+  const handleResendOTP = () => {
+    // Aquí iría la lógica para reenviar el OTP
+
+    if (!canResend) {
+      console.warn('No se puede reenviar el OTP aún. Espera a que se complete el tiempo de espera.')
+      return
+    }
+    setTimeLeft(30)
+    setCanResend(false)
+    setIsVerifying(false)
+    setError(null)
+
+    console.log('Reenviando OTP al número:', signUpData.metadata.phone)
+    setOTPCode('') // Limpia el campo de OTP
+
+    // Simulación de reenvío exitoso
+    setTimeout(() => {
+      console.log('OTP reenviado correctamente')
+    }, 2000)
+  }
+
+  // Timer para reenvío
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      setCanResend(true)
+      return
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [timeLeft])
+
+  useEffect(() => {
+    dispatch(setOtpVerified(false))
+  }, [])
 
   return (
     <motion.section
@@ -30,36 +112,59 @@ const OTPVerification = () => {
         <p className='text-sm text-gray-600 mb-4'>
           Hemos enviado un código al número
           <br />
-          <span className='font-medium text-gray-900'> 546546546654 </span>
+          <span className='text-xl font-semibold text-gray-900'> {signUpData.metadata.phone} </span>
         </p>
 
         {/* Inputs OTP */}
-        <div className='flex justify-center gap-2 mb-6'>
-          <InputOtp length={6} value={value} onValueChange={setValue} size='lg' />
-          {/* {otp.map((digit, index) => (
-            <input
-              key={index}
-              id={`otp-${index}`}
-              type='text'
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              className={`w-12 h-12 text-center text-xl font-semibold border rounded-lg
-                      ${isVerified ? 'border-green-500 bg-green-50 text-green-600' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}
-                    `}
-              disabled={isVerified || isVerifying}
-            />
-          ))} */}
+        <div className='flex flex-col items-center justify-center gap-2 mb-6'>
+          <InputOtp
+            length={6}
+            value={OTPCode}
+            onValueChange={setOTPCode}
+            size='lg'
+            autoFocus
+            disabled={isVerifying || OTPVerified}
+            onComplete={handleVerifyOTP}
+            //errorMessage={error ? 'Código OTP inválido' : undefined}
+          />
+          {isVerifying && (
+            <div className='flex items-center justify-center gap-2 mt-4'>
+              <Spinner size='sm' variant='default' />
+              <p className='text-blue-600'>Verificando código...</p>
+            </div>
+          )}
+
+          {OTPVerified && (
+            <div className='flex items-center justify-center gap-2 mt-4 text-green-600'>
+              <CircleCheckBig />
+              <span>Código verificado</span>
+            </div>
+          )}
+          {error && (
+            <div className='flex items-center justify-center gap-2 mt-4 text-red-500'>
+              <TriangleAlert />
+              <span>Código inválido</span>
+            </div>
+          )}
         </div>
+        {!OTPVerified && !isVerifying && (
+          <p className='text-sm text-gray-500 text-balance'>
+            Si no recibiste el código, puedes cambiar tu número de teléfono volviendo al paso anterior o{' '}
+            {timeLeft > 0 && `esperar ${timeLeft} segundos para `}
+            <button type='button' className='text-blue-600 hover:text-blue-500 focus:outline-none' onClick={handleResendOTP}>
+              reintentarlo
+            </button>
+            .
+          </p>
+        )}
       </div>
       <div className='flex justify-between'>
         <Button color='danger' variant='light' onPress={previousStep}>
           Atras
         </Button>
-        <Button color='primary' onPress={nextStep}>
+        {/* <Button color='primary' onPress={nextStep} isDisabled={!OTPVerified || isVerifying}>
           Siguiente
-        </Button>
+        </Button> */}
       </div>
     </motion.section>
   )

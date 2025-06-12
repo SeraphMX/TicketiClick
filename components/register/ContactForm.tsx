@@ -1,14 +1,19 @@
 import { createUser } from '@/schemas/user.schema'
+import { setEmailPhoneTerms } from '@/store/slices/registerSlice'
+import { RootState } from '@/store/store'
 import { Checkbox } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
 const ContactForm = () => {
   const { handleStep, previousStep, nextStep } = useWizard()
+  const dispatch = useDispatch()
+  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
   const {
     register,
     handleSubmit,
@@ -17,9 +22,9 @@ const ContactForm = () => {
     resolver: zodResolver(createUser),
     mode: 'onSubmit',
     defaultValues: {
-      phone: '',
-      email: '',
-      terms: false
+      phone: signUpData.metadata.phone || '',
+      email: signUpData.email || '',
+      terms: signUpData.terms || false
     }
   })
 
@@ -27,6 +32,9 @@ const ContactForm = () => {
     async (data) => {
       try {
         console.log('Datos de registro:', data)
+        //TODO: Verificar telefono que sea movil
+        dispatch(setEmailPhoneTerms({ email: data.email, phone: data.phone, terms: data.terms }))
+        nextStep() // Avanza al siguiente paso del wizard
       } catch (error) {
         console.error('Error al crear la cuenta:', error)
       }
@@ -45,7 +53,7 @@ const ContactForm = () => {
     >
       <form className='space-y-4 bg-white p-6 rounded-lg rounded-t-none shadow-md w-full' onSubmit={handleCreateAccount}>
         <h1 className='text-2xl font-bold text-center '>¡Regístrate en Ticketi!</h1>
-        <p className='mt-4 text-sm'>
+        <p className='mt-4 text-sm text-gray-600'>
           Para crear tu cuenta primero tenemos que verificar tus medios de contacto, esto nos asegura poder comunicarnos contigo.
         </p>
         <Input
@@ -71,7 +79,7 @@ const ContactForm = () => {
           <div>{errors.terms && <span className='text-red-500 text-xs mt-1'>{errors.terms.message}</span>}</div>
         </Checkbox>
         <div className='flex items-center justify-end mt-4'>
-          <Button color='primary' onPress={nextStep}>
+          <Button color='primary' type='submit'>
             Iniciar verificación
           </Button>
         </div>
