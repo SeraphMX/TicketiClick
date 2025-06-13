@@ -2,7 +2,13 @@
 export interface SignUpParams {
   email: string
   password: string
-  metadata?: Record<string, any> // puedes tiparlo mejor si sabes los campos
+  terms?: boolean | true
+
+  metadata: {
+    full_name: string
+    phone: string
+    role?: 'user' | 'organizer'
+  }
 }
 
 export interface SignInParams {

@@ -11,7 +11,16 @@ const CreateAccountMail = ({ link }: { link: string }) => (
       <Container style={container}>
         <Section style={coverSection}>
           <Section style={imageSection}>
-            <Img src={`https://dev-ticketi.netlify.app/branding/logo-ticketi-full.png`} width='191' height='62' alt='Logo ticketi' />
+            <Img
+              src={`https://dev-ticketi.netlify.app/branding/logo-ticketi-full.png`}
+              width='191'
+              height='62'
+              alt='Logo ticketi'
+              style={{
+                display: 'inline-block',
+                margin: '0 auto'
+              }}
+            />
           </Section>
           <Section style={upperSection}>
             <Heading style={h1}>Crea tu cuenta en Ticketi</Heading>
