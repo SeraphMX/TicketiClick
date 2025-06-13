@@ -1,7 +1,7 @@
 import { userService } from '@/services/userService'
 import { setOtpVerified } from '@/store/slices/registerSlice'
 import { RootState } from '@/store/store'
-import { InputOtp, Spinner } from '@heroui/react'
+import { Alert, InputOtp, Spinner } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { CircleCheckBig, Phone, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -24,28 +24,12 @@ const OTPVerification = () => {
   const handleVerifyOTP = async () => {
     setIsVerifying(true)
     setError(null)
+    // Verificar si estamos en modo desarrollo
+    const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
     try {
-      console.log('Verificando OTP:', otpCode)
-      const verifyOtp = await userService.verifyOTP(signUpData.metadata.phone, otpCode)
-      console.log('Respuesta de verificación OTP:', verifyOtp)
+      if (isDevMode) {
+        console.log('Modo desarrollo activo, omitiendo verificación real de OTP')
 
-      if (verifyOtp.error) {
-        console.log(verifyOtp.error)
-        setError(verifyOtp.error)
-        setOtpCode('')
-        setIsVerifying(false)
-        return
-      }
-
-      if (!verifyOtp.success) {
-        setError('Código OTP inválido')
-        setOtpCode('')
-        setIsVerifying(false)
-        return
-      }
-
-      //Modo desarrollo, aprueba el OTP si es '123456'
-      if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
         // Simulación de verificación exitosa
         setTimeout(() => {
           if (otpCode !== '123456') {
@@ -65,16 +49,33 @@ const OTPVerification = () => {
           }, 1000)
         }, 2000)
         return
-      }
+      } else {
+        const verifyOtp = await userService.verifyOTP(signUpData.metadata.phone, otpCode)
 
-      if (verifyOtp.status === 'approved') {
-        console.log('OTP verificado correctamente')
-        setIsVerifying(false)
-        dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
-        setTimeout(() => {
-          nextStep() // Avanza al siguiente paso del wizard
-        }, 1000)
-        return
+        if (verifyOtp.error) {
+          console.log(verifyOtp.error)
+          setError(verifyOtp.error)
+          setOtpCode('')
+          setIsVerifying(false)
+          return
+        }
+
+        if (!verifyOtp.success) {
+          setError('Código OTP inválido')
+          setOtpCode('')
+          setIsVerifying(false)
+          return
+        }
+
+        if (verifyOtp.status === 'approved') {
+          console.log('OTP verificado correctamente')
+          setIsVerifying(false)
+          dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
+          setTimeout(() => {
+            nextStep() // Avanza al siguiente paso del wizard
+          }, 1000)
+          return
+        }
       }
     } catch (error) {
       console.error('Error al verificar OTP:', error)
@@ -182,6 +183,21 @@ const OTPVerification = () => {
           </p>
         )}
       </div>
+      {/* Información de desarrollo */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className=' border-t border-gray-100'>
+          <Alert
+            classNames={{ alertIcon: 'fill-none' }}
+            icon={<TriangleAlert />}
+            color='warning'
+            title='Modo de desarrollo activo'
+            variant='flat'
+            className='text-sm'
+          >
+            El código para verificación es: 123456
+          </Alert>
+        </div>
+      )}
       <div className='flex justify-between'>
         <Button color='danger' variant='light' onPress={previousStep}>
           Atras

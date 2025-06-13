@@ -38,7 +38,7 @@ const CompleteRegistration = () => {
         </p>
       </div>
       <div className='flex justify-end'>
-        <Button color='primary' onPress={() => (window.location.href = '/dashboard')} className='mr-2'>
+        <Button color='primary' onPress={handleComplete} className='mr-2'>
           Ir a mi cuenta
         </Button>
       </div>

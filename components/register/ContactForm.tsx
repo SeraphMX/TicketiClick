@@ -2,9 +2,10 @@ import { createUser } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
 import { setEmailPhoneTerms } from '@/store/slices/registerSlice'
 import { RootState } from '@/store/store'
-import { Checkbox } from '@heroui/react'
+import { Alert, Checkbox } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
+import { TriangleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -154,6 +155,21 @@ const ContactForm = () => {
             Iniciar verificación
           </Button>
         </div>
+        {/* Información de desarrollo */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className=' border-t border-gray-100'>
+            <Alert
+              classNames={{ alertIcon: 'fill-none' }}
+              icon={<TriangleAlert />}
+              color='warning'
+              title='Modo de desarrollo activo'
+              variant='flat'
+              className='text-sm'
+            >
+              El código OTP no será enviado
+            </Alert>
+          </div>
+        )}
       </form>
     </motion.section>
   )
