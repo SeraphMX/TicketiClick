@@ -1,3 +1,4 @@
+import { userService } from '@/services/userService'
 import { setOtpVerified } from '@/store/slices/registerSlice'
 import { RootState } from '@/store/store'
 import { InputOtp, Spinner } from '@heroui/react'
@@ -18,42 +19,70 @@ const OTPVerification = () => {
   const OTPVerified = useSelector((state: RootState) => state.register.otpVerified)
   const dispatch = useDispatch()
 
-  const [OTPCode, setOTPCode] = useState('')
+  const [otpCode, setOtpCode] = useState('')
 
   const handleVerifyOTP = async () => {
     setIsVerifying(true)
     setError(null)
     try {
-      console.log('Verificando OTP:', OTPCode)
+      console.log('Verificando OTP:', otpCode)
+      const verifyOtp = await userService.verifyOTP(signUpData.metadata.phone, otpCode)
+      console.log('Respuesta de verificación OTP:', verifyOtp)
 
-      // Simulación de verificación exitosa
-      setTimeout(() => {
-        if (OTPCode !== '123456') {
-          // Simula un código OTP correcto
-          setError('Código OTP inválido')
-          setOTPCode('')
+      if (verifyOtp.error) {
+        console.log(verifyOtp.error)
+        setError(verifyOtp.error)
+        setOtpCode('')
+        setIsVerifying(false)
+        return
+      }
+
+      if (!verifyOtp.success) {
+        setError('Código OTP inválido')
+        setOtpCode('')
+        setIsVerifying(false)
+        return
+      }
+
+      //Modo desarrollo, aprueba el OTP si es '123456'
+      if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
+        // Simulación de verificación exitosa
+        setTimeout(() => {
+          if (otpCode !== '123456') {
+            // Simula un código OTP correcto
+            setError('Código OTP inválido')
+            setOtpCode('')
+            setIsVerifying(false)
+            return
+          }
+
           setIsVerifying(false)
-          return
-        }
+          dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
 
+          setTimeout(() => {
+            console.log('Avanzando al siguiente paso del wizard')
+            nextStep() // Avanza al siguiente paso del wizard
+          }, 1000)
+        }, 2000)
+        return
+      }
+
+      if (verifyOtp.status === 'approved') {
+        console.log('OTP verificado correctamente')
         setIsVerifying(false)
         dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
-        console.log('OTP verificado correctamente')
-
         setTimeout(() => {
-          console.log('Avanzando al siguiente paso del wizard')
           nextStep() // Avanza al siguiente paso del wizard
         }, 1000)
-
-        //handleStep(2) // Avanza al siguiente paso del wizard
-      }, 2000)
+        return
+      }
     } catch (error) {
       console.error('Error al verificar OTP:', error)
       setIsVerifying(false)
     }
   }
 
-  const handleResendOTP = () => {
+  const handleResendOTP = async () => {
     // Aquí iría la lógica para reenviar el OTP
 
     if (!canResend) {
@@ -64,14 +93,9 @@ const OTPVerification = () => {
     setCanResend(false)
     setIsVerifying(false)
     setError(null)
+    setOtpCode('') // Limpia el campo de OTP
 
-    console.log('Reenviando OTP al número:', signUpData.metadata.phone)
-    setOTPCode('') // Limpia el campo de OTP
-
-    // Simulación de reenvío exitoso
-    setTimeout(() => {
-      console.log('OTP reenviado correctamente')
-    }, 2000)
+    const resendOtp = await userService.sendOTP(signUpData.metadata.phone)
   }
 
   // Timer para reenvío
@@ -119,8 +143,8 @@ const OTPVerification = () => {
         <div className='flex flex-col items-center justify-center gap-2 mb-6'>
           <InputOtp
             length={6}
-            value={OTPCode}
-            onValueChange={setOTPCode}
+            value={otpCode}
+            onValueChange={setOtpCode}
             size='lg'
             autoFocus
             disabled={isVerifying || OTPVerified}
@@ -143,7 +167,7 @@ const OTPVerification = () => {
           {error && (
             <div className='flex items-center justify-center gap-2 mt-4 text-red-500'>
               <TriangleAlert />
-              <span>Código inválido</span>
+              <span>{error}</span>
             </div>
           )}
         </div>

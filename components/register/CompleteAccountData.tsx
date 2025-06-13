@@ -39,14 +39,12 @@ const CompleteAccountData = () => {
   const handleCreateAccount = handleSubmit(
     async (data) => {
       try {
-        console.log('Datos de registro:', data)
+        //console.log('Datos de registro:', data)
         const login = await userService.signUp({
           email: signUpData.email,
           password: data.password,
           metadata: { full_name: data.name, role: 'user', phone: signUpData.metadata.phone }
         })
-        console.log('Cuenta creada exitosamente')
-        console.log(login)
         dispatch(setSuccess(true))
         nextStep()
       } catch (error) {
