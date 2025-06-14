@@ -27,6 +27,27 @@ export const userService = {
     })
     return await validateResponse.json()
   },
+  async sendWelcomeEmail(email: string) {
+    console.log('Enviando correo de bienvenida a:', email)
+    const response = await fetch('/api/mail/send-welcome-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    })
+
+    if (!response.ok) {
+      throw new Error('Error al verificar el correo electrónico')
+    }
+
+    return await response.json()
+  },
+  async VerifyEmail(email: string) {
+    console.log('Verificando correo electrónico:', email)
+    const { data, error } = await supabase.rpc('verify_email', { p_email: email })
+    if (error) throw new Error(error.message || 'Error al consultar la base de datos.')
+  },
   async sendOTP(mobileNumber: string) {
     // Formatear número de teléfono
     const formattedPhone = `+52${mobileNumber}`
@@ -107,6 +128,9 @@ export const userService = {
         phone: metadata?.phone || ''
       })
       if (insertError) throw insertError
+
+      // Enviar correo de bienvenida
+      await this.sendWelcomeEmail(email)
     }
 
     return data

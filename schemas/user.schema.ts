@@ -43,3 +43,8 @@ export const loginUser = z.object({
   password: z.string().min(8).max(100)
 })
 export type LoginUser = z.infer<typeof loginUser>
+
+export const verifyEmail = z.object({
+  email: z.string().email({ message: 'El correo electrónico no es válido' })
+})
+export type VerifyEmail = z.infer<typeof verifyEmail>
