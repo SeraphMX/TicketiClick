@@ -15,6 +15,8 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
 const ContactForm = () => {
+  // Verificar si estamos en modo desarrollo
+  const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const { nextStep } = useWizard()
   const dispatch = useDispatch()
   const signUpData = useSelector((state: RootState) => state.register.signUpParams)
@@ -156,7 +158,7 @@ const ContactForm = () => {
           </Button>
         </div>
         {/* Información de desarrollo */}
-        {process.env.NODE_ENV === 'development' && (
+        {isDevMode && (
           <div className=' border-t border-gray-100'>
             <Alert
               classNames={{ alertIcon: 'fill-none' }}
@@ -165,6 +167,7 @@ const ContactForm = () => {
               title='Modo de desarrollo activo'
               variant='flat'
               className='text-sm'
+              hideIconWrapper
             >
               El código OTP no será enviado
             </Alert>

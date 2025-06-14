@@ -10,6 +10,8 @@ import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 
 const OTPVerification = () => {
+  // Verificar si estamos en modo desarrollo
+  const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const { handleStep, previousStep, nextStep } = useWizard()
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -24,8 +26,7 @@ const OTPVerification = () => {
   const handleVerifyOTP = async () => {
     setIsVerifying(true)
     setError(null)
-    // Verificar si estamos en modo desarrollo
-    const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
+
     try {
       if (isDevMode) {
         console.log('Modo desarrollo activo, omitiendo verificación real de OTP')
@@ -184,7 +185,7 @@ const OTPVerification = () => {
         )}
       </div>
       {/* Información de desarrollo */}
-      {process.env.NODE_ENV === 'development' && (
+      {isDevMode && (
         <div className=' border-t border-gray-100'>
           <Alert
             classNames={{ alertIcon: 'fill-none' }}
@@ -193,6 +194,7 @@ const OTPVerification = () => {
             title='Modo de desarrollo activo'
             variant='flat'
             className='text-sm'
+            hideIconWrapper
           >
             El código para verificación es: 123456
           </Alert>
