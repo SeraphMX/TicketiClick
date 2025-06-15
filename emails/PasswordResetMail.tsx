@@ -1,7 +1,7 @@
 import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
 import { CSSProperties } from 'react'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `https://${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
 
 const PasswordResetMail = ({ link }: { link: string }) => (
   <Html>

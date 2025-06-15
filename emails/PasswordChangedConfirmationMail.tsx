@@ -1,7 +1,7 @@
 import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
 import { CSSProperties } from 'react'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `https://${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
 
 const PasswordChangedConfirmationMail = ({ link }: { link: string }) => (
   <Html>
@@ -26,7 +26,7 @@ const PasswordChangedConfirmationMail = ({ link }: { link: string }) => (
             <Heading style={h1}>Contraseña cambiada</Heading>
             <Text style={mainText}>
               Haz cambiado tu contraseña exitosamente. Si no has realizado este cambio, tu cuenta podría estar en riesgo. Puedes volver a
-              solicitar un enlace para cambiar tu contraseña si es necesario.
+              cambiar tu contraseña si es necesario usando el siguente enlace.
             </Text>
             <Section style={verificationSection}>
               <Button style={button} href={link}>
