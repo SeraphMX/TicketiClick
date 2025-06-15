@@ -1,5 +1,6 @@
 import { userService } from '@/services/userService'
-import { setOtpVerified } from '@/store/slices/registerSlice'
+import { setOtpVerified } from '@/store/slices/otpSlice'
+
 import { RootState } from '@/store/store'
 import { InputOtp, Spinner } from '@heroui/react'
 import { CircleCheckBig, Phone, TriangleAlert } from 'lucide-react'
@@ -18,7 +19,7 @@ const OTPVerification = ({ phone, devMode, onSuccess }: OTPVerificationProps) =>
   const [error, setError] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState(30)
   const [canResend, setCanResend] = useState(false)
-  const OTPVerified = useSelector((state: RootState) => state.register.otpVerified)
+  const OTPVerified = useSelector((state: RootState) => state.otp.otpVerified)
   const dispatch = useDispatch()
 
   const [otpCode, setOtpCode] = useState('')
