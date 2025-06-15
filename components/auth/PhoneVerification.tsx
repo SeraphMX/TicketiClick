@@ -1,8 +1,10 @@
+import { userService } from '@/services/userService'
+import { setEmail } from '@/store/slices/recoverAccountSlice'
 import { RootState } from '@/store/store'
 import { Alert } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { TriangleAlert } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import OTPVerification from '../otp/OTPVerification'
 import { Button } from '../ui/button'
@@ -12,9 +14,21 @@ const PhoneVerification = () => {
   const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const { goToStep, nextStep } = useWizard()
   const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
+  const dispatch = useDispatch()
 
-  const onSuccess = () => {
+  const onSuccess = async () => {
     console.log('OTP verificado exitosamente')
+
+    //Traer correo
+    const response = await userService.getEmailByPhone(recoverAccountData.phone)
+    console.log('Email obtenido:', response)
+
+    if (response) {
+      dispatch(setEmail(response.email))
+    } else {
+      console.log('No se pudo obtener el correo electrónico asociado al número de teléfono')
+    }
+
     nextStep() // Avanza al siguiente paso del wizard
   }
 
