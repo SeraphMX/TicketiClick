@@ -35,7 +35,7 @@ const ConfirmAccountMailClient = ({ email, phone }: { email: string; phone: stri
         await userService.signUp({
           email: data.email,
           password: data.password,
-          metadata: { full_name: data.name, role: 'user', phone: data.phone }
+          metadata: { full_name: data.name, role: 'customer', phone: data.phone }
         })
 
         setIsCompleted(true)
