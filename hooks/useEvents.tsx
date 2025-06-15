@@ -2,12 +2,12 @@
 // hooks/useEvents.tsx
 // Hook para gestionar eventos
 
+import { supabase } from '@/lib/supabase'
 import { Event, EventFormData } from '@/lib/types'
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 
 // Hook para obtener y manipular eventos
-export const useEvents = (organizerId?: number) => {
+export const useEvents = (organizerId?: string) => {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,11 +45,7 @@ export const useEvents = (organizerId?: number) => {
   const getEvent = async (id: number): Promise<Event | undefined> => {
     setLoading(true)
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('events_view')
-        .select('*')
-        .eq('id', id)
-        .single()
+      const { data, error: supabaseError } = await supabase.from('events_view').select('*').eq('id', id).single()
 
       if (supabaseError) {
         throw supabaseError
@@ -66,7 +62,7 @@ export const useEvents = (organizerId?: number) => {
   }
 
   // Función para crear un nuevo evento
-  const createEvent = async (eventData: EventFormData, organizerId: number): Promise<Event | null> => {
+  const createEvent = async (eventData: EventFormData, organizerId: string): Promise<Event | null> => {
     setLoading(true)
     try {
       const { data, error: supabaseError } = await supabase

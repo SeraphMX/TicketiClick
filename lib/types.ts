@@ -41,7 +41,7 @@ export interface Event {
   image: string
   category: string // Ahora es el slug de la categoría
   category_name?: string // Nombre de la categoría para mostrar
-  organizerId: number
+  organizerId: string
   availableTickets: number
   featured: boolean
   stripe_id: string
