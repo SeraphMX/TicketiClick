@@ -31,7 +31,7 @@ export default function DashboardPage() {
   // Determinar qué acciones mostrar según el rol
   const getActions = () => {
     switch (user.role) {
-      case 'user':
+      case 'customer':
         return [
           {
             title: 'Mis Boletos',
@@ -89,7 +89,7 @@ export default function DashboardPage() {
           <LayoutDashboard className='h-6 w-6 text-blue-600 mr-2' />
           <h2 className='text-xl font-bold text-gray-800'>Resumen</h2>
         </div>
-        <p className='text-gray-600 mt-1'>Bienvenido, {user.name}. Aquí tienes un resumen de tu actividad.</p>
+        <p className='text-gray-600 mt-1'>Bienvenido, {user.full_name.split(' ')[0]}. Aquí tienes un resumen de tu actividad.</p>
       </div>
 
       {/* Tarjetas de acción */}
@@ -131,7 +131,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Contenido específico según rol */}
-      {user.role === 'user' && (
+      {user.role === 'customer' && (
         <div className='border rounded-lg overflow-hidden'>
           <div className='bg-gray-50 px-4 py-3 border-b'>
             <h3 className='text-sm font-medium text-gray-700'>Boletos recientes</h3>
