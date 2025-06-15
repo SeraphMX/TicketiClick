@@ -7,6 +7,7 @@ import storage from 'redux-persist/lib/storage'
 import authReducer from './slices/authSlice'
 import checkoutReducer from './slices/checkoutSlice'
 import eventsReducer from './slices/eventsSlice'
+import otpReducer from './slices/otpSlice'
 import recoverAccountReducer from './slices/recoverAccountSlice'
 import registerReducer from './slices/registerSlice'
 
@@ -27,7 +28,8 @@ export const store = configureStore({
     checkout: persistedCheckoutReducer,
     events: eventsReducer,
     register: registerReducer,
-    recoverAccount: recoverAccountReducer
+    recoverAccount: recoverAccountReducer,
+    otp: otpReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
