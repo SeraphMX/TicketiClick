@@ -31,6 +31,7 @@ export default function LoginPage() {
     setError,
     clearErrors,
     setValue,
+    trigger,
 
     formState: { errors }
   } = useForm({
@@ -87,17 +88,20 @@ export default function LoginPage() {
   )
 
   const handleUserExists = async (email: string) => {
-    clearErrors('email')
-    const userExists = await userService.isEmailRegistered(email)
+    const isValid = await trigger('email') // Ejecuta validación solo de email
+    if (isValid) {
+      clearErrors('email')
+      const userExists = await userService.isEmailRegistered(email)
 
-    if (userExists) {
-      setUserCanLogin(true)
-    } else {
-      setUserCanLogin(false)
-      setError('email', {
-        type: 'manual',
-        message: 'Este correo electrónico no está registrado.'
-      })
+      if (userExists) {
+        setUserCanLogin(true)
+      } else {
+        setUserCanLogin(false)
+        setError('email', {
+          type: 'manual',
+          message: 'Este correo electrónico no está registrado.'
+        })
+      }
     }
   }
 
