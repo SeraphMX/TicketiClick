@@ -43,7 +43,7 @@ const CompleteAccountData = () => {
         const login = await userService.signUp({
           email: signUpData.email,
           password: data.password,
-          metadata: { full_name: data.name, role: 'user', phone: signUpData.metadata.phone }
+          metadata: { full_name: data.name, role: 'customer', phone: signUpData.metadata.phone }
         })
         dispatch(setSuccess(true))
         nextStep()
