@@ -31,7 +31,7 @@ const DashboardNavigation = () => {
 
     // Enlaces específicos para cada rol
     const roleSpecificLinks = {
-      user: [
+      customer: [
         {
           name: 'Mis Boletos',
           href: '/dashboard/user',
@@ -78,7 +78,7 @@ const DashboardNavigation = () => {
   // Función para traducir roles
   const translateRole = (role: string) => {
     const translations: Record<string, string> = {
-      user: 'Usuario',
+      customer: 'Usuario',
       organizer: 'Organizador',
       admin: 'Administrador'
     }
