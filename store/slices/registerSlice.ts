@@ -20,7 +20,7 @@ const initialState: RegisterState = {
     metadata: {
       full_name: '',
       phone: '',
-      role: 'user'
+      role: 'customer'
     }
   },
   otpVerified: false
