@@ -10,7 +10,7 @@ interface Profile {
   id: string
   full_name: string
   phone: string
-  role: 'customer' | 'organizer' | 'admin'
+  role: 'user' | 'organizer' | 'admin'
   avatar_url?: string
 }
 

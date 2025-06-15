@@ -8,6 +8,7 @@ import { useTickets } from '@/hooks/useTickets'
 import { ArrowRight, CalendarDays, LayoutDashboard, Ticket as TicketIcon, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -15,8 +16,15 @@ export default function DashboardPage() {
   const { tickets } = useTickets(user?.id)
   const router = useRouter()
 
+  console.log('User:', user)
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+    }
+  }, [user, router])
+
   if (!user) {
-    router.push('/login')
     return null
   }
 
