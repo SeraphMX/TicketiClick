@@ -1,9 +1,7 @@
 'use client'
-import { RootState } from '@/store/store'
 import { Progress } from '@heroui/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
 import { Wizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 import ResetComplete from './ResetComplete'
@@ -16,7 +14,6 @@ interface PasswordResetMailClientProps {
 const PasswordResetMailClient = ({ email }: PasswordResetMailClientProps) => {
   const router = useRouter()
   const [progress, setProgress] = useState(0)
-  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
   const handleStepChange = (step: number) => {
     const totalSteps = 4
     const currentStep = step + 1 // Wizard steps are zero-indexed, so we add 1 for percentage calculation
@@ -63,7 +60,7 @@ const PasswordResetMailClient = ({ email }: PasswordResetMailClientProps) => {
         <>
           <Progress aria-label='Progreso' value={progress} size='sm' />
           <Wizard onStepChange={handleStepChange}>
-            <SetPassword email={signUpData.email} />
+            <SetPassword email={email} />
             <ResetComplete />
           </Wizard>
         </>
