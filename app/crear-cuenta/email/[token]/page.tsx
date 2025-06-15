@@ -5,26 +5,20 @@ type Props = Promise<{ token: string }>
 export default async function CreateAccountMail(props: { params: Props }) {
   const { token } = await props.params
 
-  try {
-    const payload = verifyAccountToken(token)
+  const payload = verifyAccountToken(token)
 
-    if (!payload || !payload.email) {
-      return (
+  console.log(payload)
+
+  return (
+    <div className='min-h-screen flex items-center p-6'>
+      {!payload || !payload.email ? (
         <div>
           <h1>Token inválido o expirado</h1>
-          <p>Por favor solicita un nuevo enlace de verificación.</p>
+          <p>Si quieres crear una cuenta en ticketi </p>
         </div>
-      )
-    }
-
-    const { email, phone } = payload
-
-    return (
-      <div className='min-h-screen flex items-center  p-6 '>
-        <ConfirmAccountMailClient email={email} phone={phone} />
-      </div>
-    )
-  } catch (err) {
-    console.error('Token inválido o expirado', err)
-  }
+      ) : (
+        <ConfirmAccountMailClient email={payload.email} phone={payload.phone} />
+      )}
+    </div>
+  )
 }

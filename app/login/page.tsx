@@ -67,7 +67,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+    <div className='min-h-screen flex items-center justify-center '>
       <motion.div
         className='px-4 sm:px-6 w-full max-w-md'
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -145,9 +145,9 @@ export default function LoginPage() {
                 </div>
 
                 <div className='text-sm'>
-                  <a href='#' className='font-medium text-blue-600 hover:text-blue-500'>
+                  <Link href='/cuenta/reset-password' className='font-medium text-blue-600 hover:text-blue-500'>
                     ¿Olvidaste tu contraseña?
-                  </a>
+                  </Link>
                 </div>
               </div>
 

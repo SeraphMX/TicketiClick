@@ -1,4 +1,5 @@
-export type EmailTemplate = 'register' | 'welcome' | 'purchaseConfirmation'
+export type EmailTemplate = 'register' | 'welcome' | 'purchaseConfirmation' | 'passwordReset' | 'passwordChangedConfirmation'
+export type EmailActions = 'create-account' | 'verify-account' | 'password-reset' | 'password-changed' | 'purchase-confirmation'
 
 export type EmailProps = {
   to: string

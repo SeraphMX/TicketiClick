@@ -18,11 +18,24 @@ export function generateAccountToken(email: string, phone: string) {
   return jwt.sign({ email, phone }, SECRET, { expiresIn: '24h' })
 }
 
-export function verifyAccountToken(token: string): { email: string; phone: string } {
+export function verifyAccountToken(token: string): { email: string; phone: string } | null {
   try {
     return jwt.verify(token, SECRET) as { email: string; phone: string }
   } catch (err) {
-    console.error('Error al verificar el token:', err)
-    return { email: '', phone: '' } // Retorna campos vacíos si el token es inválido
+    console.warn('Error al verificar el token:', err)
+    return null
+  }
+}
+
+export function generateEmailVerifyToken(email: string) {
+  return jwt.sign({ email }, SECRET, { expiresIn: '24h' })
+}
+
+export function verifyEmailVerifyToken(token: string): { email: string } | null {
+  try {
+    return jwt.verify(token, SECRET) as { email: string }
+  } catch (err) {
+    console.warn('Error al verificar el token:', err)
+    return null
   }
 }

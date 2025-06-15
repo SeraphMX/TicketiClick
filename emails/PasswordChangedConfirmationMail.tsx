@@ -1,13 +1,13 @@
-import { Body, Button, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
 import { CSSProperties } from 'react'
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `https://${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
 
-const CreateAccountMail = ({ link }: { link: string }) => (
+const PasswordChangedConfirmationMail = ({ link }: { link: string }) => (
   <Html>
     <Head />
     <Body style={main}>
-      <Preview>Completa tu registro en ticketi</Preview>
+      <Preview>Acabas de cambiar tu contraseña</Preview>
       <Container style={container}>
         <Section style={coverSection}>
           <Section style={imageSection}>
@@ -23,41 +23,30 @@ const CreateAccountMail = ({ link }: { link: string }) => (
             />
           </Section>
           <Section style={upperSection}>
-            <Heading style={h1}>Crea tu cuenta en Ticketi</Heading>
+            <Heading style={h1}>Contraseña cambiada</Heading>
             <Text style={mainText}>
-              Para completar el proceso de creación de cuenta, haz clic en el siguiente enlace para completar tu registro:
+              Haz cambiado tu contraseña exitosamente. Si no has realizado este cambio, tu cuenta podría estar en riesgo. Puedes volver a
+              cambiar tu contraseña si es necesario usando el siguente enlace.
             </Text>
             <Section style={verificationSection}>
-              <Button style={button} href={link} target='_blank'>
-                Crear cuenta
+              <Button style={button} href={link}>
+                Cambiar contraseña
               </Button>
             </Section>
           </Section>
-          <Hr />
-          <Section style={lowerSection}>
-            <Text style={cautionText}>
-              Al crear una cuenta en Ticketi, podrás gestionar tus eventos, comprar entradas y recibir notificaciones importantes.
-            </Text>
-          </Section>
         </Section>
         <Text style={footerText}>
-          Este enlace es válido por 24 horas. Si no completas el registro dentro de este tiempo, deberás solicitar un nuevo enlace. Si no
-          has solicitado la creación de una cuenta, puedes ignorar este correo electrónico. Este mensaje fue enviado por{' '}
-          <Link href='https://ticketi.click' target='_blank'>
-            Ticketi.click
-          </Link>
-          , conoce nuestro{' '}
-          <Link href='https://ticketi.click/privacidad' target='_blank'>
-            aviso de privacidad
-          </Link>
-          .
+          El enlace para volver a cambiar tu contraseña es válido por 24 horas. Si no cambias tu contraseña, conservaras la anterior. Si
+          quieres cambiar la contraseña deberás solicitar un nuevo <Link href={`${baseUrl}/cuenta/reset-password`}>enlace aqui</Link>. Este
+          mensaje fue enviado por <Link href='https://ticketi.click'>Ticketi.click</Link>, conoce nuestro{' '}
+          <Link href={`${baseUrl}/privacidad`}>aviso de privacidad</Link>.
         </Text>
       </Container>
     </Body>
   </Html>
 )
 
-export default CreateAccountMail
+export default PasswordChangedConfirmationMail
 
 const main = {
   backgroundColor: '#fff',
@@ -110,8 +99,6 @@ const coverSection = { backgroundColor: '#fff' }
 
 const upperSection = { padding: '25px 35px' }
 
-const lowerSection = { padding: '25px 35px' }
-
 const footerText = {
   ...text,
   fontSize: '11px',
@@ -124,5 +111,3 @@ const verificationSection: CSSProperties = {
 }
 
 const mainText = { ...text, marginBottom: '14px' }
-
-const cautionText = { ...text, margin: '0px' }

@@ -1,13 +1,13 @@
-import { Body, Button, Container, Head, Heading, Hr, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
+import { Body, Button, Container, Head, Heading, Html, Img, Link, Preview, Section, Text } from '@react-email/components'
 import { CSSProperties } from 'react'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `https://${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
 
-const CreateAccountMail = ({ link }: { link: string }) => (
+const WelcomeMail = ({ link }: { link: string }) => (
   <Html>
     <Head />
     <Body style={main}>
-      <Preview>Completa tu registro en ticketi</Preview>
+      <Preview>Verifica tu correo electrónico</Preview>
       <Container style={container}>
         <Section style={coverSection}>
           <Section style={imageSection}>
@@ -23,26 +23,22 @@ const CreateAccountMail = ({ link }: { link: string }) => (
             />
           </Section>
           <Section style={upperSection}>
-            <Heading style={h1}>Crea tu cuenta en Ticketi</Heading>
+            <Heading style={h1}>¡Bienvenido a Ticketi!</Heading>
             <Text style={mainText}>
-              Para completar el proceso de creación de cuenta, haz clic en el siguiente enlace para completar tu registro:
+              Para completar tu registro, por favor verifica tu correo electrónico. Este paso es necesario para proteger la seguridad de tu
+              cuenta y garantizar que recibas todas las notificaciones importantes sobre tus eventos. Haz clic en el siguiente enlace para
+              confirmar tu correo:
             </Text>
             <Section style={verificationSection}>
               <Button style={button} href={link} target='_blank'>
-                Crear cuenta
+                Verificar
               </Button>
             </Section>
           </Section>
-          <Hr />
-          <Section style={lowerSection}>
-            <Text style={cautionText}>
-              Al crear una cuenta en Ticketi, podrás gestionar tus eventos, comprar entradas y recibir notificaciones importantes.
-            </Text>
-          </Section>
         </Section>
         <Text style={footerText}>
-          Este enlace es válido por 24 horas. Si no completas el registro dentro de este tiempo, deberás solicitar un nuevo enlace. Si no
-          has solicitado la creación de una cuenta, puedes ignorar este correo electrónico. Este mensaje fue enviado por{' '}
+          Este enlace es válido por 24 horas. Si no verificas tu dirección de correo, deberás solicitar un nuevo enlace. Este mensaje fue
+          enviado por{' '}
           <Link href='https://ticketi.click' target='_blank'>
             Ticketi.click
           </Link>
@@ -57,7 +53,7 @@ const CreateAccountMail = ({ link }: { link: string }) => (
   </Html>
 )
 
-export default CreateAccountMail
+export default WelcomeMail
 
 const main = {
   backgroundColor: '#fff',
@@ -110,8 +106,6 @@ const coverSection = { backgroundColor: '#fff' }
 
 const upperSection = { padding: '25px 35px' }
 
-const lowerSection = { padding: '25px 35px' }
-
 const footerText = {
   ...text,
   fontSize: '11px',
@@ -124,5 +118,3 @@ const verificationSection: CSSProperties = {
 }
 
 const mainText = { ...text, marginBottom: '14px' }
-
-const cautionText = { ...text, margin: '0px' }
