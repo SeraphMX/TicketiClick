@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 interface OTPVerificationProps {
-  phone: string  
+  phone: string
   devMode?: boolean | false
   onSuccess: () => void
 }
-const OTPVerification = ({ phone,  devMode, onSuccess }: OTPVerificationProps) => {
+const OTPVerification = ({ phone, devMode, onSuccess }: OTPVerificationProps) => {
   // Verificar si estamos en modo desarrollo
   const isDevMode = devMode
   const [isVerifying, setIsVerifying] = useState(false)
@@ -45,7 +45,6 @@ const OTPVerification = ({ phone,  devMode, onSuccess }: OTPVerificationProps) =
           dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
 
           setTimeout(() => {
-            console.log('Avanzando al siguiente paso del wizard')
             onSuccess() //Llama a la función onSuccess para avanzar al siguiente paso
           }, 1000)
         }, 2000)
