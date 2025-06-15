@@ -1,11 +1,10 @@
 import { userService } from '@/services/userService'
-import { resetRecoverAccount } from '@/store/slices/recoverAccountSlice'
 import { RootState } from '@/store/store'
 import { Alert } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { ThumbsUp, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import { Button } from '../ui/button'
 
@@ -14,11 +13,9 @@ const ResetComplete = () => {
   const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const router = useRouter()
   const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
-  const dispatch = useDispatch()
-  const { handleStep, previousStep, goToStep } = useWizard()
+  const { goToStep } = useWizard()
 
   const handleGoToLogin = () => {
-    dispatch(resetRecoverAccount())
     router.push('/login')
   }
 

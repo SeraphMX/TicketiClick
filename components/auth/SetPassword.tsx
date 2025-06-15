@@ -1,6 +1,8 @@
 'use client'
 import { resetPassword } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
+import { resetOtpState } from '@/store/slices/otpSlice'
+import { resetRecoverAccount } from '@/store/slices/recoverAccountSlice'
 import { RootState } from '@/store/store'
 import { Button } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,7 +10,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import { Input } from '../ui/input'
 
@@ -21,6 +23,7 @@ const SetPassword = ({ email }: SetPasswordProps) => {
   const { nextStep } = useWizard()
   const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
   const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useDispatch()
 
   const {
     register,
@@ -46,6 +49,10 @@ const SetPassword = ({ email }: SetPasswordProps) => {
         if (response.status !== 'success') {
           throw new Error('Error al restablecer la contraseña')
         }
+
+        dispatch(resetRecoverAccount())
+        dispatch(resetOtpState())
+
         nextStep()
       } catch (error) {
         console.log('SetPassword:', error)
