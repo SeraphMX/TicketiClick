@@ -2,10 +2,23 @@
 // Interfaces y tipos para la aplicación
 
 import { Ticket, TicketStatus } from '@/data/tickets'
-import { User, UserRole } from '@/data/users'
 
-// Re-exportando para facilitar importaciones
-export type { Ticket, TicketStatus, User, UserRole }
+// Re-exportando para facilidad de importaciones
+export type { Ticket, TicketStatus }
+
+// Definición de roles de usuario
+export type UserRole = 'user' | 'organizer' | 'admin'
+
+// Interfaz para usuarios (actualizada para Supabase)
+export interface User {
+  id: string // UUID de Supabase
+  email: string
+  full_name: string
+  phone: string
+  role: UserRole
+  avatar?: string
+  avatar_url?: string
+}
 
 // Interfaz para categorías de eventos
 export interface EventCategory {

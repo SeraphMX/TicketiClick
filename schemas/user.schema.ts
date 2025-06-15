@@ -39,8 +39,8 @@ export const completeUser = z
   })
 
 export const loginUser = z.object({
-  email: z.string().email(),
-  password: z.string().min(8).max(100)
+  email: z.string().min(1, { message: 'El email es requerido' }).email({ message: 'Email inválido' }),
+  password: z.string().min(1, { message: 'La contraseña es requerida' }).min(8, { message: 'Mínimo 8 caracteres' }).max(100)
 })
 export type LoginUser = z.infer<typeof loginUser>
 
