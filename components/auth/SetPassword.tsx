@@ -1,15 +1,14 @@
 'use client'
 import { resetPassword } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
-import { setEmail } from '@/store/slices/recoverAccountSlice'
 import { RootState } from '@/store/store'
 import { Button } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useWizard } from 'react-use-wizard'
 import { Input } from '../ui/input'
 
@@ -19,9 +18,9 @@ interface SetPasswordProps {
 
 const SetPassword = ({ email }: SetPasswordProps) => {
   const [showPassword, setShowPassword] = useState(false)
-  const { handleStep, previousStep, nextStep } = useWizard()
+  const { nextStep } = useWizard()
   const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
-  const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -32,7 +31,7 @@ const SetPassword = ({ email }: SetPasswordProps) => {
     mode: 'onSubmit',
     defaultValues: {
       phone: recoverAccountData.phone || '',
-      email: recoverAccountData.email || '',
+      email: recoverAccountData.email || email,
       password: '',
       password2: ''
     }
@@ -40,37 +39,22 @@ const SetPassword = ({ email }: SetPasswordProps) => {
 
   const handleResetPassword = handleSubmit(
     async (data) => {
+      setIsLoading(true)
       try {
-        await userService.resetPassword(data.email, data.password)
+        const response = await userService.passwordChange(email, data.password)
+
+        if (response.status !== 'success') {
+          throw new Error('Error al restablecer la contraseña')
+        }
         nextStep()
       } catch (error) {
-        console.log('Error resetear el password:', error)
+        console.log('SetPassword:', error)
+      } finally {
+        setIsLoading(false)
       }
     },
     (errors) => console.warn('Errores de validación:', errors)
   )
-
-  //Si el usuario viene desde la verificacion de OTP, vamos a obtener el correo desde la base
-  useEffect(() => {
-    const fetchEmail = async () => {
-      const email = await userService.getEmailByPhone(recoverAccountData.phone)
-
-      if (email) {
-        dispatch(setEmail(email))
-      } else {
-        console.log('No se pudo obtener el correo electrónico asociado al número de teléfono')
-      }
-    }
-
-    if (!email) {
-      // Si no trae correo viene de OTP
-      fetchEmail()
-    } else {
-      // Si trae correo viene de la verificacion de correo
-      dispatch(setEmail(email))
-    }
-    fetchEmail()
-  }, [email])
 
   return (
     <motion.section
@@ -112,7 +96,7 @@ const SetPassword = ({ email }: SetPasswordProps) => {
           errorMessage={errors.password2?.message}
         />
         <div className='flex justify-end'>
-          <Button color='primary' type='submit'>
+          <Button color='primary' type='submit' isLoading={isLoading}>
             Restablecer
           </Button>
         </div>
