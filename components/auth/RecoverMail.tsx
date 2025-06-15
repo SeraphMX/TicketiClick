@@ -13,7 +13,7 @@ const RecoverMail = () => {
   // Verificar si estamos en modo desarrollo
   const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const router = useRouter()
-  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
+  const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
   const dispatch = useDispatch()
   const { handleStep, previousStep, goToStep } = useWizard()
 
@@ -24,7 +24,7 @@ const RecoverMail = () => {
   }
 
   const sendEmail = async () => {
-    await userService.sendEmail(signUpData.email, 'password-reset')
+    await userService.sendEmail(recoverAccountData.email, 'password-reset')
   }
 
   return (
