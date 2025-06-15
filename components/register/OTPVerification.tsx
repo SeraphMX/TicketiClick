@@ -97,7 +97,16 @@ const OTPVerification = () => {
     setError(null)
     setOtpCode('') // Limpia el campo de OTP
 
-    const resendOtp = await userService.sendOTP(signUpData.metadata.phone)
+    if (isDevMode) {
+      console.log('Modo desarrollo activo, reenviando OTP simulado')
+      // Simulación de reenvío exitoso
+      setTimeout(() => {
+        console.log('OTP reenviado exitosamente')
+      }, 2000)
+      return
+    } else {
+      await userService.sendOTP(signUpData.metadata.phone)
+    }
   }
 
   // Timer para reenvío
