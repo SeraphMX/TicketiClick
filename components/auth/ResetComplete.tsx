@@ -1,5 +1,5 @@
 import { userService } from '@/services/userService'
-import { resetRegisterState } from '@/store/slices/registerSlice'
+import { resetRecoverAccount } from '@/store/slices/recoverAccountSlice'
 import { RootState } from '@/store/store'
 import { Alert } from '@heroui/react'
 import { motion } from 'framer-motion'
@@ -13,17 +13,17 @@ const ResetComplete = () => {
   // Verificar si estamos en modo desarrollo
   const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const router = useRouter()
-  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
+  const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
   const dispatch = useDispatch()
   const { handleStep, previousStep, goToStep } = useWizard()
 
-  const handleGoToAccount = () => {
-    dispatch(resetRegisterState())
-    router.push('/dashboard')
+  const handleGoToLogin = () => {
+    dispatch(resetRecoverAccount())
+    router.push('/login')
   }
 
   const sendPasswordChangedEmail = async () => {
-    await userService.sendEmail(signUpData.email, 'password-changed')
+    await userService.sendEmail(recoverAccountData.email, 'password-changed')
   }
 
   return (
@@ -49,7 +49,7 @@ const ResetComplete = () => {
       </p>
 
       <div className='flex justify-end'>
-        <Button variant='ghost' color='primary' onPress={handleGoToAccount}>
+        <Button variant='ghost' color='primary' onPress={handleGoToLogin}>
           Ir a mi cuenta
         </Button>
       </div>
