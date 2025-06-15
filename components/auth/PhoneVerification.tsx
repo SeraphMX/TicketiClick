@@ -43,7 +43,7 @@ const PhoneVerification = () => {
       }}
       className='space-y-4 bg-white p-6 rounded-lg rounded-t-none shadow-md w-full max-w-md mx-auto'
     >
-      <OTPVerification phone={recoverAccountData.phone} devMode={true} onSuccess={onSuccess} />
+      <OTPVerification phone={recoverAccountData.phone} devMode={isDevMode} onSuccess={onSuccess} />
       {/* Información de desarrollo */}
       {isDevMode && (
         <div className='border-1 border-gray-100 space-y-2 p-1'>
