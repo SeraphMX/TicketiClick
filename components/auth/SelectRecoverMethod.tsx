@@ -1,6 +1,5 @@
 import { verifyEmail, verifyPhone } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
-import { setOtpTarget } from '@/store/slices/otpSlice'
 import { setEmail, setPhone } from '@/store/slices/recoverAccountSlice'
 import { addToast, Tab, Tabs } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,6 +13,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 
 const SelectRecoverMethod = () => {
+  const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
   const [isLoadingEmail, setIsLoadingEmail] = useState(false)
   const [disabledSendMail, setDisabledSendMail] = useState(false)
   const [isLoadingPhone, setIsLoadingPhone] = useState(false)
@@ -83,6 +83,7 @@ const SelectRecoverMethod = () => {
   const watchPhoneNumber = watchPhone('phone')
 
   const onSubmitPhone = handleSubmitPhone(async (data) => {
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
     setIsLoadingPhone(true)
     try {
       const isPhoneRegistered = await userService.isPhoneRegistered(data.phone)
@@ -90,9 +91,15 @@ const SelectRecoverMethod = () => {
         setErrorPhone('phone', { type: 'manual', message: 'Este teléfono no está registrado en la plataforma' })
         return
       }
-      await userService.sendOTP(data.phone)
+      if (isDevMode) {
+        console.log('Modo desarrollo activo, omitiendo envio de OTP')
+        await delay(2000)
+        console.log('Envío simulado exitoso')
+      } else {
+        await userService.sendOTP(data.phone)
+      }
+
       dispatch(setPhone(data.phone))
-      dispatch(setOtpTarget(data.phone))
       goToStep(2) // Asumiendo que el paso 2 es el de verificación de teléfono
     } catch {
       addToast({ title: 'Error', description: 'Intenta de nuevo.', color: 'danger' })
