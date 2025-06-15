@@ -48,3 +48,18 @@ export const verifyEmail = z.object({
   email: z.string().email({ message: 'El correo electrónico no es válido' })
 })
 export type VerifyEmail = z.infer<typeof verifyEmail>
+
+export const verifyPhone = z.object({
+  phone: z.string().min(10, { message: 'Número de teléfono inválido' }).regex(/^\d+$/, { message: 'Número de teléfono inválido' })
+})
+export type VerifyPhone = z.infer<typeof verifyPhone>
+
+export const resetPassword = z
+  .object({
+    password: z.string().min(8, { message: 'Mínimo 8 caracteres' }).max(100),
+    password2: z.string().nonempty({ message: 'Debes confirmar tu contraseña' })
+  })
+  .refine((data) => data.password === data.password2, {
+    message: 'Las contraseñas no coinciden',
+    path: ['password2']
+  })
