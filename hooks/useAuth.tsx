@@ -3,6 +3,7 @@
 // Hook para autenticación con Supabase
 
 import { supabase } from '@/lib/supabase'
+import { userService } from '@/services/userService'
 import { User } from '@supabase/supabase-js'
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 
@@ -10,8 +11,7 @@ interface Profile {
   id: string
   full_name: string
   phone: string
-  role: 'user' | 'organizer' | 'admin'
-  avatar_url?: string
+  role: 'customer' | 'organizer' | 'admin'
 }
 
 interface AuthUser extends Profile {
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Función para obtener el perfil del usuario
   const getUserProfile = async (userId: string): Promise<Profile | null> => {
     try {
-      const { data, error } = await supabase.from('profiles').select('id, full_name, phone, role, avatar_url').eq('id', userId).single()
+      const { data, error } = await supabase.from('profiles').select('id, full_name, phone, role').eq('id', userId).single()
 
       if (error) {
         console.error('Error fetching profile:', error)
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ...profile,
         email: supabaseUser.email || '',
         // Mapear avatar para compatibilidad con el código existente
-        avatar: profile.avatar_url || `https://i.pravatar.cc/150?img=${profile.id.slice(-1)}`
+        avatar: `https://i.pravatar.cc/150?img=${profile.id.slice(-1)}`
       } as AuthUser & { avatar: string }
 
       setUser(authUser)
@@ -74,8 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: supabaseUser.email || '',
         full_name: supabaseUser.user_metadata?.full_name || 'Usuario',
         phone: supabaseUser.user_metadata?.phone || '',
-        role: 'user',
-        avatar: `https://i.pravatar.cc/150?img=${supabaseUser.id.slice(-1)}`
+        role: 'customer'
       } as AuthUser & { avatar: string }
 
       setUser(basicUser)
@@ -128,7 +127,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true)
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.toLowerCase().trim(),
         password
@@ -157,6 +155,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, userData: { full_name: string; phone: string }): Promise<boolean> => {
     try {
       setIsLoading(true)
+
+      //TODO:Implementar el uso del servicio de usuario en este hook
 
       const { data, error } = await supabase.auth.signUp({
         email: email.toLowerCase().trim(),
@@ -205,12 +205,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       setIsLoading(true)
-      const { error } = await supabase.auth.signOut()
-
-      if (error) {
-        console.error('Logout error:', error)
-      }
-
+      userService.signOut()
       setUser(null)
     } catch (error) {
       console.error('Logout exception:', error)
