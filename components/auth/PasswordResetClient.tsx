@@ -12,7 +12,7 @@ import SetPassword from './SetPassword'
 
 const PasswordResetClient = () => {
   const [progress, setProgress] = useState(0)
-  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
+  const recoverAccountData = useSelector((state: RootState) => state.recoverAccount)
   const handleStepChange = (step: number) => {
     const totalSteps = 4
     const currentStep = step + 1 // Wizard steps are zero-indexed, so we add 1 for percentage calculation
@@ -48,7 +48,7 @@ const PasswordResetClient = () => {
         <SelectRecoverMethod />
         <RecoverMail />
         <PhoneVerification />
-        <SetPassword email={signUpData.email} />
+        <SetPassword email={recoverAccountData.email} />
         <ResetComplete />
       </Wizard>
     </section>
