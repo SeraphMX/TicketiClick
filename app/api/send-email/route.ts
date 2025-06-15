@@ -34,6 +34,7 @@ export async function POST(request: Request) {
         break
       case 'passwordReset':
         mailSubject = 'Restablecimiento de contraseña'
+        break
       case 'passwordChangedConfirmation':
         mailSubject = 'Confirmación de cambio de contraseña'
         break
