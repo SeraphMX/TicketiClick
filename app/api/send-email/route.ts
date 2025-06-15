@@ -32,6 +32,12 @@ export async function POST(request: Request) {
       case 'purchaseConfirmation':
         mailSubject = 'Confirmación de compra en Ticketi'
         break
+      case 'passwordReset':
+        mailSubject = 'Restablecimiento de contraseña'
+        break
+      case 'passwordChangedConfirmation':
+        mailSubject = 'Confirmación de cambio de contraseña'
+        break
     }
 
     await transporter.sendMail({

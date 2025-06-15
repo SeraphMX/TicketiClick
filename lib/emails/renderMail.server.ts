@@ -2,6 +2,8 @@
 'use server'
 
 import CreateAccountMail from '@/emails/CreateAccountMail'
+import PasswordChangedConfirmationMail from '@/emails/PasswordChangedConfirmationMail'
+import PasswordResetMail from '@/emails/PasswordResetMail'
 import WelcomeMail from '@/emails/WelcomeMail'
 import { EmailTemplate } from '@/types/email'
 import { render } from '@react-email/render'
@@ -16,6 +18,10 @@ export const renderMail = async (template: EmailTemplate, props: any) => {
       return render(React.createElement(WelcomeMail, props))
     case 'purchaseConfirmation':
       return render(React.createElement(PurchaseConfirmation, props))
+    case 'passwordReset':
+      return render(React.createElement(PasswordResetMail, props))
+    case 'passwordChangedConfirmation':
+      return render(React.createElement(PasswordChangedConfirmationMail, props))
     default:
       throw new Error(`Template ${template} no existe`)
   }

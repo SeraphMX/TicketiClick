@@ -1,24 +1,25 @@
 import { userService } from '@/services/userService'
-import { setOtpVerified } from '@/store/slices/registerSlice'
+import { setOtpVerified } from '@/store/slices/otpSlice'
+
 import { RootState } from '@/store/store'
-import { Alert, InputOtp, Spinner } from '@heroui/react'
-import { motion } from 'framer-motion'
+import { InputOtp, Spinner } from '@heroui/react'
 import { CircleCheckBig, Phone, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useWizard } from 'react-use-wizard'
-import { Button } from '../ui/button'
 
-const OTPVerification = () => {
+interface OTPVerificationProps {
+  phone: string
+  devMode?: boolean | false
+  onSuccess: () => void
+}
+const OTPVerification = ({ phone, devMode, onSuccess }: OTPVerificationProps) => {
   // Verificar si estamos en modo desarrollo
-  const isDevMode = process.env.NEXT_PUBLIC_DEVMODE === 'true'
-  const { handleStep, previousStep, nextStep } = useWizard()
+  const isDevMode = devMode
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState(30)
   const [canResend, setCanResend] = useState(false)
-  const signUpData = useSelector((state: RootState) => state.register.signUpParams)
-  const OTPVerified = useSelector((state: RootState) => state.register.otpVerified)
+  const OTPVerified = useSelector((state: RootState) => state.otp.otpVerified)
   const dispatch = useDispatch()
 
   const [otpCode, setOtpCode] = useState('')
@@ -45,13 +46,12 @@ const OTPVerification = () => {
           dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
 
           setTimeout(() => {
-            console.log('Avanzando al siguiente paso del wizard')
-            nextStep() // Avanza al siguiente paso del wizard
+            onSuccess() //Llama a la función onSuccess para avanzar al siguiente paso
           }, 1000)
         }, 2000)
         return
       } else {
-        const verifyOtp = await userService.verifyOTP(signUpData.metadata.phone, otpCode)
+        const verifyOtp = await userService.verifyOTP(phone, otpCode)
 
         if (verifyOtp.error) {
           console.log(verifyOtp.error)
@@ -73,7 +73,7 @@ const OTPVerification = () => {
           setIsVerifying(false)
           dispatch(setOtpVerified(true)) // Actualiza el estado de verificación del OTP
           setTimeout(() => {
-            nextStep() // Avanza al siguiente paso del wizard
+            onSuccess() //Llama a la función onSuccess para avanzar al siguiente paso
           }, 1000)
           return
         }
@@ -97,16 +97,7 @@ const OTPVerification = () => {
     setError(null)
     setOtpCode('') // Limpia el campo de OTP
 
-    if (isDevMode) {
-      console.log('Modo desarrollo activo, reenviando OTP simulado')
-      // Simulación de reenvío exitoso
-      setTimeout(() => {
-        console.log('OTP reenviado exitosamente')
-      }, 2000)
-      return
-    } else {
-      await userService.sendOTP(signUpData.metadata.phone)
-    }
+    const resendOtp = await userService.sendOTP(phone)
   }
 
   // Timer para reenvío
@@ -128,16 +119,7 @@ const OTPVerification = () => {
   }, [])
 
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 300,
-        damping: 30
-      }}
-      className='space-y-4 bg-white p-6 rounded-lg rounded-t-none shadow-md w-full max-w-md mx-auto'
-    >
+    <>
       <h1 className='text-2xl font-bold  text-center'>Verificación</h1>
 
       <div className='text-center'>
@@ -147,7 +129,7 @@ const OTPVerification = () => {
         <p className='text-sm text-gray-600 mb-4'>
           Hemos enviado un código al número
           <br />
-          <span className='text-xl font-semibold text-gray-900'> {signUpData.metadata.phone} </span>
+          <span className='text-xl font-semibold text-gray-900'> {phone} </span>
         </p>
 
         {/* Inputs OTP */}
@@ -193,31 +175,7 @@ const OTPVerification = () => {
           </p>
         )}
       </div>
-      {/* Información de desarrollo */}
-      {isDevMode && (
-        <div className=' border-t border-gray-100'>
-          <Alert
-            classNames={{ alertIcon: 'fill-none' }}
-            icon={<TriangleAlert />}
-            color='warning'
-            title='Modo de desarrollo activo'
-            variant='flat'
-            className='text-sm'
-            hideIconWrapper
-          >
-            El código para verificación es: 123456
-          </Alert>
-        </div>
-      )}
-      <div className='flex justify-between'>
-        <Button color='danger' variant='light' onPress={previousStep}>
-          Atras
-        </Button>
-        {/* <Button color='primary' onPress={nextStep} isDisabled={!OTPVerified || isVerifying}>
-          Siguiente
-        </Button> */}
-      </div>
-    </motion.section>
+    </>
   )
 }
 
