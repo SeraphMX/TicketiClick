@@ -8,8 +8,7 @@ export async function POST(request: Request) {
     if (!phone) {
       return NextResponse.json({ error: 'El teléfono es requerido' }, { status: 400 })
     }
-
-    const email = userService.getEmailByPhone(phone)
+    const email = await userService.getEmailByPhone(phone)
 
     return NextResponse.json({ email })
   } catch (error) {
