@@ -7,7 +7,7 @@ export interface SignUpParams {
   metadata: {
     full_name: string
     phone: string
-    role?: 'user' | 'organizer'
+    role?: 'customer' | 'organizer'
   }
 }
 
