@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 
 import { useAuth } from '@/hooks/useAuth'
 import { loginUser } from '@/schemas/user.schema'
+import { userService } from '@/services/userService'
 import { Checkbox, Spinner } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
@@ -18,15 +19,17 @@ import { useForm } from 'react-hook-form'
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
-
   const { login, isLoading, user } = useAuth()
+  const [userCanLogin, setUserCanLogin] = useState(true)
   const router = useRouter()
+  const [loginAttempts, setLoginAttempts] = useState(0)
 
   const {
     register,
     watch,
     handleSubmit,
     setError,
+    clearErrors,
     setValue,
 
     formState: { errors }
@@ -52,10 +55,29 @@ export default function LoginPage() {
       try {
         const success = await login(data.email, data.password)
 
-        if (success) {
-          // Redirigir al dashboard después de iniciar sesión
-        } else {
-          setLoginError('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
+        if (!success) {
+          //setLoginError('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
+          setLoginAttempts((prev) => prev + 1)
+          const maxAttempts = 5
+          const remainingAttempts = maxAttempts - loginAttempts - 1
+          //TODO: Registrar el intento de inicio de sesión
+          if (loginAttempts === maxAttempts - 1) {
+            setLoginError('Has alcanzado el número máximo de intentos. Por favor, inténtalo más tarde o restablece tu contraseña.')
+            setUserCanLogin(false)
+            return
+          }
+
+          if (loginAttempts >= 2) {
+            setLoginError(
+              `Te ${remainingAttempts > 1 ? 'quedan' : 'queda solo un'} ${remainingAttempts && remainingAttempts} ${remainingAttempts > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
+            )
+            return
+          }
+
+          setError('password', {
+            type: 'manual',
+            message: 'Contraseña incorrecta'
+          })
         }
       } catch (error) {
         console.error('Error al iniciar sesión:', error)
@@ -63,6 +85,21 @@ export default function LoginPage() {
     },
     (errors) => console.warn('Errores de validación:', errors)
   )
+
+  const handleUserExists = async (email: string) => {
+    clearErrors('email')
+    const userExists = await userService.isEmailRegistered(email)
+
+    if (userExists) {
+      setUserCanLogin(true)
+    } else {
+      setUserCanLogin(false)
+      setError('email', {
+        type: 'manual',
+        message: 'Este correo electrónico no está registrado.'
+      })
+    }
+  }
 
   // Si ya está autenticado, mostrar loading
   if (user && !isLoading) {
@@ -93,8 +130,8 @@ export default function LoginPage() {
           {/* Formulario */}
           <div className='p-6'>
             {loginError && (
-              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-start'>
-                <AlertCircle className='h-5 w-5 mr-2 text-red-500 mt-0.5' />
+              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-star'>
+                <AlertCircle size={50} className='mr-2 text-red-500 ' />
                 <span>{loginError}</span>
               </div>
             )}
@@ -104,7 +141,10 @@ export default function LoginPage() {
                 isInvalid={!!errors.email}
                 errorMessage={errors.email?.message}
                 label='Correo electrónico'
-                isDisabled={isLoading}
+                isDisabled={isLoading || loginAttempts >= 5}
+                onBlur={(e) => {
+                  handleUserExists(e.target.value)
+                }}
               />
 
               <Input
@@ -123,11 +163,11 @@ export default function LoginPage() {
                 }
                 isInvalid={!!errors.password}
                 errorMessage={errors.password?.message}
-                isDisabled={isLoading}
+                isDisabled={isLoading || !userCanLogin}
               />
 
               <div className='flex items-center justify-between'>
-                <Checkbox>
+                <Checkbox isDisabled={isLoading || !userCanLogin}>
                   <span className='text-sm'>Recordarme</span>
                 </Checkbox>
                 <div className='text-sm'>
@@ -137,7 +177,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button type='submit' isDisabled={isLoading} isLoading={isLoading} fullWidth color='primary'>
+              <Button type='submit' isDisabled={isLoading || !userCanLogin} isLoading={isLoading} fullWidth color='primary'>
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
               </Button>
             </form>
