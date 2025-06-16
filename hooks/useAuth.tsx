@@ -27,6 +27,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null)
@@ -55,7 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null)
       return
     }
-
     const profile = await getUserProfile(supabaseUser.id)
 
     if (profile) {
