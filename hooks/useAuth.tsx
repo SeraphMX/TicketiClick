@@ -205,7 +205,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       setIsLoading(true)
-      userService.signOut()
+      await userService.signOut()
       setUser(null)
     } catch (error) {
       console.error('Logout exception:', error)
