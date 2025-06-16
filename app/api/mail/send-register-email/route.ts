@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const token = generateAccountToken(email, phone)
     const link = `${process.env.NEXT_PUBLIC_BASE_URL}/crear-cuenta/email/${token}`
 
-    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/mail/send`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: email, template: 'register', templateProps: { link } })
