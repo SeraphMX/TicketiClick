@@ -54,7 +54,9 @@ const PasswordResetMailClient = ({ email }: PasswordResetMailClientProps) => {
           <p className='text-gray-600 text-sm'>
             El enlace de restablecimiento ha expirado o no es válido. Por favor, solicita un nuevo enlace para intentarlo otra vez.
           </p>
-          <Button color='primary' onPress={handleBackToRecover} />
+          <Button color='primary' onPress={handleBackToRecover}>
+            Restablecer contraseña
+          </Button>
         </section>
       ) : (
         <>
