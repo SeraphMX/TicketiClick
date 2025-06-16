@@ -18,6 +18,7 @@ const CompleteAccountData = () => {
   const { handleStep, previousStep, nextStep } = useWizard()
   const signUpData = useSelector((state: RootState) => state.register.signUpParams)
   const dispatch = useDispatch()
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
@@ -27,8 +28,8 @@ const CompleteAccountData = () => {
     resolver: zodResolver(completeUser),
     mode: 'onSubmit',
     defaultValues: {
-      phone: '',
-      email: '',
+      phone: signUpData.metadata.phone || '',
+      email: signUpData.email || '',
       name: '',
       password: '',
       password2: '',
@@ -39,6 +40,7 @@ const CompleteAccountData = () => {
   const handleCreateAccount = handleSubmit(
     async (data) => {
       try {
+        setIsLoading(true)
         //console.log('Datos de registro:', data)
         const login = await userService.signUp({
           email: signUpData.email,
@@ -50,6 +52,8 @@ const CompleteAccountData = () => {
       } catch (error) {
         console.error('Error al crear la cuenta:', error)
         dispatch(setSuccess(false))
+      } finally {
+        setIsLoading(false)
       }
     },
     (errors) => console.warn('Errores de validación:', errors)
@@ -95,7 +99,7 @@ const CompleteAccountData = () => {
           errorMessage={errors.password2?.message}
         />
         <div className='flex justify-end'>
-          <Button color='primary' type='submit'>
+          <Button color='primary' type='submit' isLoading={isLoading}>
             Finalizar
           </Button>
         </div>
