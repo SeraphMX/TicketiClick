@@ -10,6 +10,7 @@ import TicketCustomization from '@/components/checkout/TicketCustomization'
 import { useAuth } from '@/hooks/useAuth'
 import { useCheckoutTimer } from '@/hooks/useCheckoutTimer'
 import { Event } from '@/lib/types'
+import { userService } from '@/services/userService'
 import { RootState } from '@/store/store'
 import { ArrowLeft, Clock } from 'lucide-react'
 import Link from 'next/link'
@@ -138,11 +139,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
                 setFormData((prev) => ({ ...prev, otpVerified: true }))
                 //Si la opcion de crear cuenta crear cuenta de usuario
                 if (rxClientInfo.createAccount && !user) {
-                  fetch('/api/send-register-link', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: rxClientInfo.email, phone: rxClientInfo.phone })
-                  })
+                  userService.sendEmail(rxClientInfo.email, 'create-account', { phone: rxClientInfo.phone })
                 }
                 setCurrentStep(3)
               }}

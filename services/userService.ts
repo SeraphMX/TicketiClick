@@ -59,46 +59,6 @@ export const userService = {
     return await response.json()
   },
   /**
-   * Envía un correo electrónico de bienvenida al usuario después de registrarse.
-   * @param email - El correo electrónico del usuario.
-   * @returns La respuesta del servidor al enviar el correo.
-   */
-  async sendWelcomeEmail(email: string) {
-    console.log('Enviando correo de bienvenida a:', email)
-    const response = await fetch('/api/mail/send-welcome-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    })
-
-    if (!response.ok) {
-      throw new Error('Error al verificar el correo electrónico')
-    }
-
-    return await response.json()
-  },
-  /**
-   * Envía un correo electrónico para restablecer la contraseña del usuario.
-   * @param email - El correo electrónico del usuario.
-   * @returns La respuesta del servidor al enviar el correo.
-   */
-  async sendPasswordResetEmail(email: string) {
-    console.log('Enviando correo de restablecimiento de contraseña a:', email)
-    const response = await fetch('/api/mail/send-password-reset-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    })
-    if (!response.ok) {
-      throw new Error('Error al enviar el correo de restablecimiento de contraseña')
-    }
-    return await response.json()
-  },
-  /**
    * Cambia la contraseña del usuario.
    * @param email - El correo electrónico del usuario.
    * @param password - La nueva contraseña del usuario.
@@ -128,7 +88,7 @@ export const userService = {
    * Las acciones deben estar definidas en el tipo `EmailActions`.
    * @returns La respuesta del servidor al enviar el correo.
    */
-  async sendEmail(email: string, action: EmailActions) {
+  async sendEmail(email: string, action: EmailActions, props?: Record<string, any>) {
     console.log('Enviando correo electrónico:', email, 'con acción:', action)
 
     const endPoints = {
@@ -143,6 +103,13 @@ export const userService = {
       throw new Error('Acción no válida para enviar correo electrónico')
     }
 
+    // Si se pasan propiedades adicionales, las incluimos en el cuerpo del mensaje
+    let bodyProps = { email }
+    if (props) {
+      console.log('Propiedades adicionales para el correo:', props)
+      bodyProps = { email, ...props }
+    }
+
     //console.log('Endpoint para enviar correo:', endPoints[action])
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${endPoints[action]}`, {
@@ -150,7 +117,7 @@ export const userService = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email })
+      body: JSON.stringify(bodyProps)
     })
 
     if (!response.ok) {
@@ -261,7 +228,7 @@ export const userService = {
       if (insertError) throw insertError
 
       // Enviar correo de bienvenida
-      await this.sendWelcomeEmail(email)
+      await this.sendEmail(email, 'verify-account')
     }
 
     return data

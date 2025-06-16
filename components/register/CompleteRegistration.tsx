@@ -22,7 +22,7 @@ const CompleteRegistration = () => {
   }
 
   const sendWelcomeEmail = async () => {
-    await userService.sendWelcomeEmail(signUpData.email)
+    await userService.sendEmail(signUpData.email, 'verify-account')
   }
 
   return (

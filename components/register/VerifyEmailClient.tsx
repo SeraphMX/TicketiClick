@@ -44,7 +44,7 @@ const VerifyEmailClient = ({ email }: VerifyEmailProps) => {
           return
         }
 
-        await userService.sendWelcomeEmail(data.email)
+        await userService.sendEmail(data.email, 'verify-account')
 
         addToast({
           title: 'Verificación reenviada',
