@@ -29,7 +29,7 @@ export const userService = {
    * @returns El correo electrónico asociado al número de teléfono.
    */
   async getEmailByPhone(phone: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/account/get-email-by-phone`, {
+    const response = await fetch(`/api/account/get-email-by-phone`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone })

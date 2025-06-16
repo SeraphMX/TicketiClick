@@ -117,7 +117,7 @@ export async function POST(req: Request) {
 
     //Llamar internamente al endpoint de correo
     const mailResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, // Usa la URL absoluta
+      `/api/send-email`, // Usa la URL absoluta
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
