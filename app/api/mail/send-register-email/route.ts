@@ -5,14 +5,14 @@ export async function POST(request: Request) {
   const { email, phone } = await request.json()
 
   try {
-    if (!email) {
-      return NextResponse.json({ error: 'El email es requerido' }, { status: 400 })
+    if (!email || !phone) {
+      return NextResponse.json({ error: 'El email y teléfono son requeridos' }, { status: 400 })
     }
 
     const token = generateAccountToken(email, phone)
     const link = `${process.env.NEXT_PUBLIC_BASE_URL}/crear-cuenta/email/${token}`
 
-    await fetch(`/api/send-email`, {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: email, template: 'register', templateProps: { link } })
