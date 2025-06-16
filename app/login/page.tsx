@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/hooks/useAuth'
 import { loginUser } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
+import { setEmail } from '@/store/slices/registerSlice'
 import { Checkbox, Spinner } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
@@ -15,6 +16,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -23,6 +25,7 @@ export default function LoginPage() {
   const [userCanLogin, setUserCanLogin] = useState(true)
   const router = useRouter()
   const [loginAttempts, setLoginAttempts] = useState(0)
+  const dispatch = useDispatch()
 
   const {
     register,
@@ -101,6 +104,7 @@ export default function LoginPage() {
           type: 'manual',
           message: 'Este correo electrónico no está registrado.'
         })
+        dispatch(setEmail({ email })) // Guardar el email en el store
       }
     }
   }

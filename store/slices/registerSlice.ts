@@ -34,6 +34,10 @@ const registerSlice = createSlice({
       const { role } = action.payload
       state.signUpParams.metadata.role = role
     },
+    setEmail(state, action) {
+      const { email } = action.payload
+      state.signUpParams.email = email
+    },
     setEmailPhoneTerms: (state, action) => {
       const { email, phone, terms } = action.payload
       state.signUpParams.email = email
@@ -61,7 +65,16 @@ const registerSlice = createSlice({
   }
 })
 
-export const { setEmailPhoneTerms, setFullNamePassword, setOtpVerified, setLoading, setError, resetRegisterState, setRole, setSuccess } =
-  registerSlice.actions
+export const {
+  setEmail,
+  setEmailPhoneTerms,
+  setFullNamePassword,
+  setOtpVerified,
+  setLoading,
+  setError,
+  resetRegisterState,
+  setRole,
+  setSuccess
+} = registerSlice.actions
 
 export default registerSlice.reducer
