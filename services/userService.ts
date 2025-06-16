@@ -145,7 +145,7 @@ export const userService = {
 
     //console.log('Endpoint para enviar correo:', endPoints[action])
 
-    const response = await fetch(endPoints[action], {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}${endPoints[action]}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
