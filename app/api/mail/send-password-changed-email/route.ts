@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const token = generateEmailVerifyToken(email)
     const link = `${process.env.NEXT_PUBLIC_BASE_URL}/cuenta/reset-password/${token}`
 
-    await fetch(`/api/send-email`, {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/send-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to: email, template: 'passwordChangedConfirmation', templateProps: { link } })
