@@ -1,55 +1,77 @@
 'use client'
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Accordion, AccordionItem } from '@heroui/react'
 
 export default function FAQPage() {
   return (
-    <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+    <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16  '>
       <h1 className='text-3xl font-bold text-gray-900 mb-8'>Preguntas Frecuentes</h1>
-
-      <Accordion type='single' collapsible className='space-y-4'>
-        <AccordionItem value='item-1'>
-          <AccordionTrigger className='text-left'>¿Cómo compro boletos?</AccordionTrigger>
-          <AccordionContent>
-            Para comprar boletos, simplemente navega a través de nuestros eventos disponibles, selecciona el que te interese, elige la
-            cantidad de boletos que deseas y procede al checkout. Aceptamos diversos métodos de pago y recibirás tus boletos por correo
-            electrónico inmediatamente después de la compra.
-          </AccordionContent>
+      <Accordion itemClasses={{ title: 'font-semibold text-medium' }}>
+        <AccordionItem
+          key='1'
+          aria-label='¿Cómo puedo comprar boletos en ticketi.click?'
+          title='¿Cómo puedo comprar boletos en ticketi.click?'
+        >
+          Selecciona el evento de tu interés, elige tus asientos o zona (si aplica), añade los boletos al carrito y completa el proceso de
+          pago.
         </AccordionItem>
-
-        <AccordionItem value='item-2'>
-          <AccordionTrigger className='text-left'>¿Cómo recibo mis boletos?</AccordionTrigger>
-          <AccordionContent>
-            Una vez completada tu compra, recibirás tus boletos en formato digital a través del correo electrónico que proporcionaste
-            durante la compra. También podrás acceder a tus boletos en cualquier momento desde tu cuenta en la sección "Mis Boletos".
-          </AccordionContent>
+        <AccordionItem key='2' aria-label='¿Qué métodos de pago aceptan?' title='¿Qué métodos de pago aceptan?'>
+          Aceptamos tarjetas de crédito y débito (Visa, MasterCard), transferencias bancarias y pagos en efectivo a través de OXXO Pay.
         </AccordionItem>
-
-        <AccordionItem value='item-3'>
-          <AccordionTrigger className='text-left'>¿Puedo obtener un reembolso?</AccordionTrigger>
-          <AccordionContent>
-            Las políticas de reembolso varían según el evento y el organizador. En general, los reembolsos están disponibles hasta 48 horas
-            antes del evento, a menos que se especifique lo contrario en los términos específicos del evento.
-          </AccordionContent>
+        <AccordionItem key='3' aria-label='¿Puedo elegir mis asientos al comprar?' title='¿Puedo elegir mis asientos al comprar?'>
+          Sí el evento cuenta con asientos numerados, podrás seleccionarlos desde el mapa interactivo. En eventos con acceso general, solo
+          eliges la cantidad de boletos.
         </AccordionItem>
-
-        <AccordionItem value='item-4'>
-          <AccordionTrigger className='text-left'>¿Qué hago si no puedo asistir al evento?</AccordionTrigger>
-          <AccordionContent>
-            Si no puedes asistir al evento, tienes varias opciones: 1. Solicitar un reembolso (si está dentro del período permitido) 2.
-            Transferir tus boletos a otra persona 3. Contactar al organizador del evento para opciones específicas
-          </AccordionContent>
+        <AccordionItem key='4' aria-label='¿Cuántos boletos puedo comprar por evento?' title='¿Cuántos boletos puedo comprar por evento?'>
+          El límite habitual es de 2 boletos por usuario, aunque puede variar según el evento. Consulta los detalles específicos en cada
+          ficha de evento.
         </AccordionItem>
-
-        <AccordionItem value='item-5'>
-          <AccordionTrigger className='text-left'>¿Los boletos son transferibles?</AccordionTrigger>
-          <AccordionContent>
-            Sí, los boletos son transferibles en la mayoría de los casos. Puedes transferir tus boletos a otra persona actualizando la
-            información del titular del boleto en tu cuenta. Ten en cuenta que algunos eventos pueden tener restricciones específicas sobre
-            la transferencia de boletos.
-          </AccordionContent>
+        <AccordionItem key='5' aria-label='¿Cómo y cuándo recibiré mis boletos?' title='¿Cómo y cuándo recibiré mis boletos?'>
+          Una vez confirmado el pago, recibirás tus boletos electrónicos (e-tickets) en formato PDF directamente en tu correo electrónico.
+        </AccordionItem>
+        <AccordionItem
+          key='6'
+          aria-label='¿Qué hago si no recibí mis boletos o la confirmación de compra?'
+          title='¿Qué hago si no recibí mis boletos o la confirmación de compra?'
+        >
+          Revisa tu bandeja de entrada y carpeta de spam. Si no los encuentras, escríbenos a nuestro correo de soporte con tu nombre y
+          número de pedido.
+        </AccordionItem>
+        <AccordionItem key='7' aria-label='¿Puedo cancelar o cambiar mis boletos?' title='¿Puedo cancelar o cambiar mis boletos?'>
+          No. Todas las ventas son finales, a menos que el evento sea cancelado o modificado por el organizador.
+        </AccordionItem>
+        <AccordionItem
+          key='8'
+          aria-label='¿Puedo transferir mis boletos a otra persona?'
+          title='¿Puedo transferir mis boletos a otra persona?'
+        >
+          Sí, puedes reenviar el archivo PDF a la persona que asistirá. Se recomienda que esa persona presente el boleto digital con código
+          QR desde su dispositivo móvil.
+        </AccordionItem>
+        <AccordionItem
+          key='9'
+          aria-label='¿Qué sucede si el evento se cancela o cambia de fecha?'
+          title='¿Qué sucede si el evento se cancela o cambia de fecha?'
+        >
+          Te informaremos por correo electrónico con los pasos a seguir para solicitar tu reembolso o para usar tus boletos en la nueva
+          fecha.
+        </AccordionItem>
+        <AccordionItem
+          key='10'
+          aria-label='¿Cómo puedo contactar al equipo de soporte de ticketi.click?'
+          title='¿Cómo puedo contactar al equipo de soporte de ticketi.click?'
+        >
+          Puedes escribirnos al correo: <a href='mailto:hola@ticketi.click'>hola@ticketi.click</a>
         </AccordionItem>
       </Accordion>
+
+      <section>
+        <h2 className='text-2xl font-semibold text-gray-900 mt-12 mb-4'>¿No encontraste tu respuesta?</h2>
+        <p className='text-gray-600 mb-6'>
+          Si tienes más preguntas o necesitas ayuda adicional, no dudes en contactarnos a través de nuestro correo electrónico o redes
+          sociales.
+        </p>
+      </section>
     </div>
   )
 }
