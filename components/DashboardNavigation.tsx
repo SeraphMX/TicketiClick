@@ -2,14 +2,15 @@
 // components/DashboardNavigation.tsx
 // Navegación para el dashboard actualizada para Supabase
 
-import { useAuth } from '@/hooks/useAuth'
+import { RootState } from '@/store/store'
 import { BarChart, CalendarDays, ChevronRight, LayoutDashboard, Settings, Ticket, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSelector } from 'react-redux'
 
 const DashboardNavigation = () => {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
 
   // Si no hay usuario, no mostramos nada
   if (!user) return null
@@ -118,7 +119,7 @@ const DashboardNavigation = () => {
 
       <div className='p-4 border-t'>
         <Link
-          href='/settings'
+          href='/dashboard/config'
           className='flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors'
         >
           <Settings className='mr-3 h-5 w-5 text-gray-500' />

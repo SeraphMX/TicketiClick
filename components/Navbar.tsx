@@ -1,15 +1,18 @@
 'use client'
-import { useAuth } from '@/hooks/useAuth'
+import { logoutUser } from '@/store/slices/authSlice'
+import { AppDispatch, RootState } from '@/store/store'
 import { User } from '@heroui/react'
 import { CircleUserRound, LogOut, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from './ui/button'
 
 const Navbar = () => {
-  const { user, logout } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
 
   // Estado para controlar si el navbar se muestra o no
   const [showNavbar, setShowNavbar] = useState(true)
@@ -44,7 +47,7 @@ const Navbar = () => {
   }
 
   const handleLogout = async () => {
-    await logout()
+    dispatch(logoutUser())
     setIsMenuOpen(false)
   }
 

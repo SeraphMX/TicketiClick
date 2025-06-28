@@ -3,12 +3,14 @@
 // Página de dashboard para usuarios - Mis boletos
 
 import TicketCard from '@/components/TicketCard'
-import { useAuth } from '@/hooks/useAuth'
+
 import { useTickets } from '@/hooks/useTickets'
+import { RootState } from '@/store/store'
 import { Ticket as TicketIcon } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 export default function UserDashboardPage() {
-  const { user } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
   const { tickets, loading } = useTickets(user?.id)
 
   if (loading) {

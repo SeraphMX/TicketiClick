@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { EmailActions } from '@/types/email'
-import { SignInParams, SignUpParams } from '@/types/user'
+import { Profile, SignInParams, SignUpParams } from '@/types/user'
 
 export const userService = {
   /**
@@ -246,6 +246,13 @@ export const userService = {
     })
 
     if (error) throw error
+    return data
+  },
+
+  async getUserProfile(userId: string): Promise<Profile> {
+    const { data, error } = await supabase.from('profiles').select('id, full_name, phone, role').eq('id', userId).single()
+
+    if (error || !data) throw new Error('No se pudo obtener el perfil del usuario.')
     return data
   },
 

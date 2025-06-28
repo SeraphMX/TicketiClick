@@ -38,11 +38,11 @@ export const completeUser = z
     path: ['password2']
   })
 
-export const loginUser = z.object({
+export const loginUserForm = z.object({
   email: z.string().min(1, { message: 'El email es requerido' }).email({ message: 'Email inválido' }),
   password: z.string().min(1, { message: 'La contraseña es requerida' }).min(8, { message: 'Mínimo 8 caracteres' }).max(100)
 })
-export type LoginUser = z.infer<typeof loginUser>
+export type LoginUserForm = z.infer<typeof loginUserForm>
 
 export const verifyEmail = z.object({
   email: z.string().email({ message: 'El correo electrónico no es válido' })

@@ -2,27 +2,19 @@
 // app/dashboard/page.tsx
 // Página principal del dashboard
 
-import { useAuth } from '@/hooks/useAuth'
 import { useEvents } from '@/hooks/useEvents'
 import { useTickets } from '@/hooks/useTickets'
+import { RootState } from '@/store/store'
 import { ArrowRight, CalendarDays, LayoutDashboard, Ticket as TicketIcon, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
   const { events } = useEvents()
   const { tickets } = useTickets(user?.id)
   const router = useRouter()
-
-  console.log('User:', user)
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-    }
-  }, [user, router])
 
   if (!user) {
     return null

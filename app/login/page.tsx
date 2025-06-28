@@ -4,10 +4,11 @@ import { Input } from '@/components/ui/input'
 // app/login/page.tsx
 // Página de inicio de sesión actualizada para Supabase
 
-import { useAuth } from '@/hooks/useAuth'
-import { loginUser } from '@/schemas/user.schema'
+import { loginUserForm } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
+import { loginUser } from '@/store/slices/authSlice'
 import { setEmail } from '@/store/slices/registerSlice'
+import { AppDispatch, RootState } from '@/store/store'
 import { Checkbox, Spinner } from '@heroui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
@@ -16,16 +17,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [loginError, setLoginError] = useState<string | null>(null)
-  const { login, isLoading, user } = useAuth()
-  const [userCanLogin, setUserCanLogin] = useState(true)
-  const router = useRouter()
   const [loginAttempts, setLoginAttempts] = useState(0)
-  const dispatch = useDispatch()
+  const [userCanLogin, setUserCanLogin] = useState(true)
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
+
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
 
   const {
     register,
@@ -38,7 +40,7 @@ export default function LoginPage() {
 
     formState: { errors }
   } = useForm({
-    resolver: zodResolver(loginUser),
+    resolver: zodResolver(loginUserForm),
     mode: 'onSubmit',
     defaultValues: {
       email: '',
@@ -48,47 +50,51 @@ export default function LoginPage() {
 
   // Redirigir si ya está autenticado
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && user.id && !isLoading) {
       router.push('/dashboard')
     }
   }, [user, isLoading, router])
 
-  const handleSignIn = handleSubmit(
-    async (data) => {
-      setLoginError(null) // Reiniciar error de inicio de sesión
-      try {
-        const success = await login(data.email, data.password)
+  // Controla los intentos y mensajes según el error global
+  useEffect(() => {
+    if (error) {
+      setLoginAttempts((prev) => prev + 1)
+      const maxAttempts = 5
+      const remainingAttempts = maxAttempts - loginAttempts - 1
 
-        if (!success) {
-          //setLoginError('Credenciales incorrectas. Por favor, inténtalo de nuevo.')
-          setLoginAttempts((prev) => prev + 1)
-          const maxAttempts = 5
-          const remainingAttempts = maxAttempts - loginAttempts - 1
-          //TODO: Registrar el intento de inicio de sesión
-          if (loginAttempts === maxAttempts - 1) {
-            setLoginError('Has alcanzado el número máximo de intentos. Por favor, inténtalo más tarde o restablece tu contraseña.')
-            setUserCanLogin(false)
-            return
-          }
-
-          if (loginAttempts >= 2) {
-            setLoginError(
-              `Te ${remainingAttempts > 1 ? 'quedan' : 'queda solo un'} ${remainingAttempts && remainingAttempts} ${remainingAttempts > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
-            )
-            return
-          }
-
-          setError('password', {
-            type: 'manual',
-            message: 'Contraseña incorrecta'
-          })
-        }
-      } catch (error) {
-        console.error('Error al iniciar sesión:', error)
+      if (loginAttempts >= maxAttempts - 1) {
+        setUserCanLogin(false)
       }
-    },
-    (errors) => console.warn('Errores de validación:', errors)
-  )
+    }
+  }, [error])
+
+  // Maneja el submit
+  interface SignInFormData {
+    email: string
+    password: string
+  }
+
+  const handleSignIn = async (data: SignInFormData): Promise<void> => {
+    if (!userCanLogin) return
+
+    dispatch(loginUser({ email: data.email, password: data.password }))
+  }
+
+  // Puedes mostrar mensajes personalizados según loginAttempts y authError
+  const renderErrorMessage = () => {
+    if (!error) return null
+
+    const maxAttempts = 5
+    const remainingAttempts = maxAttempts - loginAttempts
+
+    if (loginAttempts >= maxAttempts) {
+      return 'Has alcanzado el número máximo de intentos. Por favor, inténtalo más tarde o restablece tu contraseña.'
+    } else if (loginAttempts >= 3) {
+      return `Te quedan ${remainingAttempts} ${remainingAttempts > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
+    } else {
+      return error // Mensaje genérico del error
+    }
+  }
 
   const handleUserExists = async (email: string) => {
     const isValid = await trigger('email') // Ejecuta validación solo de email
@@ -143,7 +149,7 @@ export default function LoginPage() {
                 <span>{loginError}</span>
               </div>
             )}
-            <form onSubmit={handleSignIn} className='space-y-4'>
+            <form onSubmit={handleSubmit(handleSignIn)} className='space-y-4'>
               <Input
                 {...register('email')}
                 isInvalid={!!errors.email}
