@@ -3,12 +3,13 @@
 // Página de administración de usuarios
 
 import { mockUsers } from '@/data/users'
-import { useAuth } from '@/hooks/useAuth'
+import { RootState } from '@/store/store'
 import { AlertCircle, Edit, Search, Trash, UserPlus } from 'lucide-react'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function AdminUsersPage() {
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const [searchTerm, setSearchTerm] = useState('')
   const [loading] = useState(false)
 

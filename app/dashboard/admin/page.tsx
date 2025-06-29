@@ -2,7 +2,6 @@
 // app/dashboard/admin/page.tsx
 // Panel de administración principal
 
-import { useAuth } from '@/hooks/useAuth'
 import { useEvents } from '@/hooks/useEvents'
 import { useTickets } from '@/hooks/useTickets'
 import { BarChart, CalendarDays, DollarSign, TicketIcon, TrendingUp, UsersRound } from 'lucide-react'
@@ -72,7 +71,7 @@ const SimpleLineChart = () => {
 }
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const { events } = useEvents()
   const { tickets } = useTickets()
 

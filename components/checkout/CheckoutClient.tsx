@@ -7,7 +7,6 @@ import OrderSummary from '@/components/checkout/OrderSummary'
 import OtpVerification from '@/components/checkout/OtpVerification'
 import PaymentMethod from '@/components/checkout/PaymentMethod'
 import TicketCustomization from '@/components/checkout/TicketCustomization'
-import { useAuth } from '@/hooks/useAuth'
 import { useCheckoutTimer } from '@/hooks/useCheckoutTimer'
 import { Event } from '@/lib/types'
 import { userService } from '@/services/userService'
@@ -35,7 +34,7 @@ export default function CheckoutClient({ event }: CheckoutClientProps) {
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
   const rxClientInfo = useSelector((state: RootState) => state.checkout.contactInfo)
   const router = useRouter()
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState({
     email: '',

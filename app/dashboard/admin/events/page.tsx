@@ -2,14 +2,15 @@
 // app/dashboard/admin/events/page.tsx
 // Página de administración de eventos
 
-import { useAuth } from '@/hooks/useAuth'
 import { useEvents } from '@/hooks/useEvents'
+import { RootState } from '@/store/store'
 import { CalendarDays, Edit, Filter, PlusCircle, Search, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function AdminEventsPage() {
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const { events, loading } = useEvents()
   const [searchTerm, setSearchTerm] = useState('')
 

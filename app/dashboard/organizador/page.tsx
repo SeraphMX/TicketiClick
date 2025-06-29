@@ -3,18 +3,22 @@
 // Página de dashboard para organizadores - Mis eventos
 
 import EventCard from '@/components/EventCard'
-import EventForm from '@/components/EventForm'
-import { useAuth } from '@/hooks/useAuth'
+import EventForm from '@/components/organizer/EventForm'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+
 import { useEvents } from '@/hooks/useEvents'
 import { EventFormData } from '@/lib/types'
-import { CalendarDays, Edit, PlusCircle, Search, Trash } from 'lucide-react'
+import { RootState } from '@/store/store'
+import { CalendarDays, Edit, PlusCircle, Trash } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function OrganizerDashboardPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const { events, loading, createEvent } = useEvents(user?.id)
 
   const [showForm, setShowForm] = useState(false)
@@ -133,19 +137,12 @@ export default function OrganizerDashboardPage() {
 
       {/* Búsqueda y filtros */}
       {!showForm && (
-        <div className='mb-6'>
-          <div className='relative'>
-            <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-              <Search className='h-5 w-5 text-gray-400' />
-            </div>
-            <input
-              type='text'
-              className='block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
-              placeholder='Buscar en mis eventos...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className='mb-6 flex items-center '>
+          <Input label='Buscar en mis eventos...' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          <Button color='primary'>
+            <PlusCircle size={20} />
+            Crear nuevo evento
+          </Button>
         </div>
       )}
 
@@ -165,14 +162,12 @@ export default function OrganizerDashboardPage() {
                       <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Fecha
                       </th>
-                      <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Ubicación
-                      </th>
+
                       <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Precio
                       </th>
                       <th scope='col' className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Boletos disponibles
+                        Ventas
                       </th>
                       <th scope='col' className='px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider'>
                         Acciones
@@ -197,13 +192,14 @@ export default function OrganizerDashboardPage() {
                           <div className='text-sm text-gray-900'>{event.date}</div>
                           <div className='text-sm text-gray-500'>{event.time}</div>
                         </td>
-                        <td className='px-6 py-4 whitespace-nowrap'>
-                          <div className='text-sm text-gray-900'>{event.location}</div>
-                        </td>
+
                         <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>
                           {event.price.toFixed(2)} {event.currency}
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
+                          <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
+                            1 /
+                          </span>
                           <span className='px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800'>
                             {event.availableTickets}
                           </span>
