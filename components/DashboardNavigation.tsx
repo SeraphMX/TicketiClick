@@ -43,7 +43,7 @@ const DashboardNavigation = () => {
       organizer: [
         {
           name: 'Mis Eventos',
-          href: '/dashboard/organizer',
+          href: '/dashboard/organizador',
           icon: <CalendarDays className='h-5 w-5' />,
           exact: false
         }

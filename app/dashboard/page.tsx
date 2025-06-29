@@ -39,14 +39,14 @@ export default function DashboardPage() {
             title: 'Mis Eventos',
             description: 'Gestionar tus eventos',
             icon: <CalendarDays className='h-8 w-8 text-blue-600' />,
-            href: '/dashboard/organizer',
+            href: '/dashboard/organizador',
             count: events.filter((e) => e.organizerId === user.id).length
           },
           {
             title: 'Crear Evento',
             description: 'Publica un nuevo evento',
             icon: <CalendarDays className='h-8 w-8 text-green-600' />,
-            href: '/dashboard/organizer?action=new',
+            href: '/dashboard/organizador?action=new',
             isAction: true
           }
         ]
