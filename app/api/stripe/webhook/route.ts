@@ -23,12 +23,15 @@ export async function POST(req: Request) {
     }
 
     event = stripe.webhooks.constructEvent(rawBody, stripeSignature, process.env.STRIPE_WEBHOOK_SECRET!)
+
+    console.log('After constructing event:', event)
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('❌ Webhook Error:', message)
     return NextResponse.json({ message: `Webhook Error: ${message}` }, { status: 400 })
   }
 
+  console.log(event.type)
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object as Stripe.PaymentIntent
     const metadata = paymentIntent.metadata
@@ -108,12 +111,12 @@ export async function POST(req: Request) {
     const token = generateOrderToken(order.id, new Date(eventData.date))
     const downloadUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${eventData.slug}/tickets/${token}`
 
-    //Si el modo de desarrollo esta acivado no enviar correo
-    if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
-      console.log('Modo desarrollo: Omitiendo envío de correo')
+    // //Si el modo de desarrollo esta acivado no enviar correo
+    // if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
+    //   console.log('Modo desarrollo: Omitiendo envío de correo')
 
-      return NextResponse.json({ ok: true })
-    }
+    //   return NextResponse.json({ ok: true })
+    // }
 
     //Llamar internamente al endpoint de correo
     const mailResponse = await fetch(
