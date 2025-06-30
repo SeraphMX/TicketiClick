@@ -6,6 +6,7 @@ import { formatDate, formatTime } from '@/lib/utils'
 import { resetCheckout, resetCoupon, setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
+import { motion } from 'framer-motion'
 import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -19,7 +20,6 @@ interface OrderSummaryProps {
     paymentMethod: string
   }
   onConfirm: () => void
-  onBack: () => void
 }
 
 // Traductor de métodos de pago
@@ -33,7 +33,7 @@ const translatePaymentMethod = (method: string) => {
   return translations[method] || method
 }
 
-export default function OrderSummary({ event, formData, onConfirm, onBack }: OrderSummaryProps) {
+export default function OrderSummary({ event, formData, onConfirm }: OrderSummaryProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [showFeeDetails, setShowFeeDetails] = useState(false)
   const router = useRouter()
@@ -140,7 +140,16 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
   }, [])
 
   return (
-    <div className='space-y-6'>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }}
+      className='space-y-4'
+    >
       {event.price > 0 ? (
         <>
           <div className='flex items-center'>
@@ -316,6 +325,6 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
           )}
         </button>
       </div>
-    </div>
+    </motion.section>
   )
 }
