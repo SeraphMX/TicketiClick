@@ -35,6 +35,9 @@ const PhoneVerification = () => {
       className='space-y-4'
     >
       <OTPVerification phone={rxClientInfo.phone} devMode={isDevMode} onSuccess={onSuccess} />
+      <Button variant='ghost' onPress={() => goToStep(0)}>
+        Atras
+      </Button>
       {/* Información de desarrollo */}
       {isDevMode && (
         <div className='border-1 border-gray-100 space-y-2 p-1'>
@@ -49,9 +52,6 @@ const PhoneVerification = () => {
           >
             El código para verificación es: 123456
           </Alert>
-          <Button color='warning' variant='light' onPress={() => goToStep(0)}>
-            Atras
-          </Button>
         </div>
       )}
     </motion.section>
