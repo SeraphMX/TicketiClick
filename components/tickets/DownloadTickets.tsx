@@ -1,11 +1,10 @@
 'use client'
 
-import { useSelector } from '@/hooks/useReduxHooks'
 import { supabase } from '@/lib/supabase'
 import { formatDate } from '@/lib/utils'
-import { RootState } from '@/store/store'
-import { jsPDF } from 'jspdf'
-import { Download, QrCode } from 'lucide-react'
+import { Spinner } from '@heroui/react'
+import { Document, Page, PDFDownloadLink, Image as RenderImage, StyleSheet, Text, View } from '@react-pdf/renderer'
+
 import { useRouter } from 'next/navigation'
 import QRCode from 'qrcode'
 import { useEffect, useState } from 'react'
@@ -23,19 +22,137 @@ interface TicketData {
 }
 
 interface DownloadTicketsProps {
-  paymentIntentId?: string | null
+  paymentIntentId?: string
+}
+
+const styles = StyleSheet.create({
+  page: { padding: 20, fontFamily: 'Helvetica' },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
+
+  // Contenedor del QR y texto
+  section: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 5, // opcional, si tu versión lo soporta
+    marginBottom: 20
+  },
+
+  // Contenedor del texto
+  infoBox: {
+    padding: 10,
+    width: 300, // asegúrate de no hacerlo más ancho que el A4 menos el QR
+    marginLeft: -30
+  },
+
+  text: {
+    marginBottom: 4,
+    fontSize: 16,
+    color: '#111'
+  },
+
+  qrImage: { width: 250 },
+  eventImage: { width: '100%', height: 'auto', marginBottom: 10 },
+  logoImage: { width: 100 },
+
+  footer: {
+    textAlign: 'center',
+    backgroundColor: '#1e3a8b',
+    padding: 20,
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    color: 'white',
+    fontSize: 14,
+    marginTop: 20
+  }
+})
+
+const loadWebPAsPngBase64 = async (src: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = src
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+
+      const ctx = canvas.getContext('2d')
+      ctx?.drawImage(img, 0, 0)
+
+      const pngBase64 = canvas.toDataURL('image/png')
+      resolve(pngBase64)
+    }
+
+    img.onerror = reject
+  })
+}
+
+function TicketPDF({ ticket }: { ticket: TicketData }) {
+  return (
+    <Document>
+      <Page size='A4' style={styles.page}>
+        <RenderImage src={ticket.eventImage} style={styles.eventImage} />
+
+        <View style={styles.section}>
+          <RenderImage src={ticket.qrCode} style={styles.qrImage} />
+
+          <View style={styles.infoBox}>
+            <Text style={styles.title}>{ticket.eventName}</Text>
+            <Text style={styles.text}>
+              Fecha: {formatDate(ticket.eventDate)} {ticket.eventTime}
+            </Text>
+            <Text style={styles.text}>{ticket.eventLocation}</Text>
+            {ticket.ticketHolder && <Text style={styles.text}>Titular: {ticket.ticketHolder}</Text>}
+            <Text style={styles.text}>Tipo: {ticket.ticketType}</Text>
+          </View>
+        </View>
+        <View style={styles.footer}>
+          <RenderImage src='/branding/logo-ticketi-full.png' style={styles.logoImage} />
+          <Text>ID: {ticket.id}</Text>
+        </View>
+      </Page>
+    </Document>
+  )
+}
+
+function TicketsPDFDocument({ tickets }: { tickets: TicketData[] }) {
+  return (
+    <Document>
+      {tickets.map((ticket) => (
+        <Page size={[300, 600]} style={styles.page} key={ticket.id}>
+          <RenderImage src={ticket.eventImage} style={styles.eventImage} />
+
+          <View style={styles.section}>
+            <RenderImage src={ticket.qrCode} style={styles.qrImage} />
+
+            <View style={styles.infoBox}>
+              <Text style={styles.title}>{ticket.eventName}</Text>
+              <Text style={styles.text}>
+                Fecha: {formatDate(ticket.eventDate)} {ticket.eventTime}
+              </Text>
+              <Text style={styles.text}>{ticket.eventLocation}</Text>
+              {ticket.ticketHolder && <Text style={styles.text}>Titular: {ticket.ticketHolder}</Text>}
+              <Text style={styles.text}>Tipo: {ticket.ticketType}</Text>
+            </View>
+          </View>
+          <View style={styles.footer}>
+            <RenderImage src='/branding/logo-ticketi-full.png' style={styles.logoImage} />
+            <Text>ID: {ticket.id}</Text>
+          </View>
+        </Page>
+      ))}
+    </Document>
+  )
 }
 
 export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProps) {
   const router = useRouter()
   const [tickets, setTickets] = useState<TicketData[]>([])
   const [loading, setLoading] = useState(true)
-  const reduxPaymentIntent = useSelector((state: RootState) => state.checkout.paymentIntentId)
-
-  if (!paymentIntentId) {
-    //Si no se manda como parametro se asume que viene de la compra
-    paymentIntentId = reduxPaymentIntent ?? null
-  }
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -56,16 +173,24 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
         return
       }
 
-      const ticketsWithQR: TicketData[] = await Promise.all(
+      const ticketsWithQR = await Promise.all(
         data.map(async (ticket: any) => {
-          const qrCode = await QRCode.toDataURL(ticket.code)
+          const qrCode = await QRCode.toDataURL(ticket.code) // base64 PNG, ok para ReactPDF
+
+          // Convertir eventImage a base64 PNG si es WebP o URL remota
+          let eventImageBase64 = ticket.image
+          if (ticket.image.endsWith('.webp')) {
+            eventImageBase64 = await loadWebPAsPngBase64(ticket.image)
+          }
+          // Si ya es base64 o JPEG, puedes dejarlo
+
           return {
             id: ticket.ticket_id,
             eventName: ticket.title,
             eventDate: ticket.date,
             eventTime: ticket.time,
             eventLocation: ticket.location,
-            eventImage: ticket.image,
+            eventImage: eventImageBase64,
             ticketType: ticket.ticket_type,
             ticketHolder: ticket.ticket_holder ? ticket.ticket_holder : null,
             qrCode
@@ -80,157 +205,50 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
     fetchTickets()
   }, [paymentIntentId, router])
 
-  const loadWebPAsPngBase64 = async (src: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image()
-      img.crossOrigin = 'anonymous'
-      img.src = src
-
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width
-        canvas.height = img.height
-
-        const ctx = canvas.getContext('2d')
-        ctx?.drawImage(img, 0, 0)
-
-        const pngBase64 = canvas.toDataURL('image/png')
-        resolve(pngBase64)
-      }
-
-      img.onerror = reject
-    })
-  }
-
-  const getImageBase64 = async (src: string): Promise<{ data: string; format: 'PNG' | 'JPEG' }> => {
-    const format = src.endsWith('.webp') ? 'PNG' : src.endsWith('.jpg') || src.endsWith('.jpeg') ? 'JPEG' : 'PNG'
-    if (format === 'PNG' && src.endsWith('.webp')) {
-      const converted = await loadWebPAsPngBase64(src)
-      return { data: converted, format: 'PNG' }
-    } else {
-      return { data: src, format }
-    }
-  }
-
-  const generatePDF = async (ticket: TicketData) => {
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [210, 250] // Tamaño personalizado
-    })
-
-    // Fondo blanco
-    doc.setFillColor(255, 255, 255)
-    doc.rect(0, 0, 210, 250, 'F')
-
-    // Imagen principal del evento
-    console.log(ticket.eventImage)
-    const eventImg = await getImageBase64(ticket.eventImage) // Ruta pública en Next.js
-    doc.addImage(eventImg.data, eventImg.format, 14, 150, 60, 34)
-
-    // QR
-    const qrImg = await getImageBase64(ticket.qrCode)
-    doc.addImage(qrImg.data, qrImg.format, 55, 10, 100, 100)
-
-    // Logo
-    const logoImg = await getImageBase64('/branding/logo-ticketi.webp') // Ruta pública en Next.js
-    doc.addImage(logoImg.data, logoImg.format, 80, 220, 20, 20)
-
-    // Texto
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(0, 0, 0)
-    doc.setFontSize(14)
-    doc.text(ticket.eventName, 90, 142)
-
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(12)
-    doc.text(`Fecha: ${formatDate(ticket.eventDate)}`, 90, 150)
-    doc.text(`Hora: ${ticket.eventTime}`, 90, 157)
-    doc.text(`Lugar: ${ticket.eventLocation}`, 90, 164)
-    if (ticket.ticketHolder) {
-      doc.text(`Titular: ${ticket.ticketHolder}`, 90, 175)
-    }
-    doc.text(`Tipo: ${ticket.ticketType}`, 90, 182)
-
-    doc.setFontSize(10)
-    doc.text(`ID: ${ticket.id}`, 90, 190)
-
-    doc.setFontSize(18)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Ticketi', 111, 232, { align: 'center' })
-
-    // Guardar PDF
-    doc.save(`ticket-${ticket.id}.pdf`)
-  }
-
-  const sendByEmail = (ticket: TicketData) => {
-    // Implementar envío por email (requiere backend)
-    alert('Función de envío por email en desarrollo')
-  }
-
   if (loading) {
-    return (
-      <div className='min-h-screen bg-gray-50 py-12'>
-        <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className='bg-white p-6 rounded-lg shadow-md'>
-            <div className='animate-pulse space-y-4'>
-              <div className='h-8 bg-gray-200 rounded w-1/2'></div>
-              <div className='space-y-3'>
-                <div className='h-4 bg-gray-200 rounded'></div>
-                <div className='h-4 bg-gray-200 rounded'></div>
-                <div className='h-4 bg-gray-200 rounded'></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <Spinner label='Cargando tickets...' />
   }
 
   return (
-    <div className=' bg-gray-50 py-12'>
-      <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8'>
-        <div className='bg-white p-6 rounded-lg shadow-md mb-6'>
-          <div className='flex items-center justify-between mb-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>¡Descarga tus boletos con un click!</h1>
-            <QrCode className='h-8 w-8 text-blue-600' />
+    <div className='py-12 max-w-3xl mx-auto px-4 space-y-6'>
+      {tickets.length > 1 ? (
+        <>
+          <h1 className='text-2xl font-bold '>¡Descarga tus boletos!</h1>
+          <p>Puedes descargar todos los boletos juntos o también por separado si necesitas enviarlos a alguien más.</p>
+          <PDFDownloadLink
+            document={<TicketsPDFDocument tickets={tickets} />}
+            fileName={`boletos-${paymentIntentId}.pdf`}
+            className='inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
+          >
+            {({ loading }) => (loading ? 'Generando PDF...' : 'Descargar todos los boletos')}
+          </PDFDownloadLink>
+        </>
+      ) : (
+        <>
+          <h1 className='text-2xl font-bold '>¡Descarga tu boleto!</h1>
+          <p>Descarga en un click tu acceso al evento.</p>
+        </>
+      )}
+
+      <div className='flex flex-col  gap-6'>
+        {tickets.map((ticket) => (
+          <div key={ticket.id} className='bg-white p-4 rounded-lg shadow-md sm:flex items-center gap-4'>
+            <img src={ticket.eventImage} alt={ticket.eventName} className='sm:w-1/3' />
+            <section>
+              <h2 className='text-xl font-semibold mb-2'>{ticket.eventName}</h2>
+              <p className='mb-2'>Tipo: {ticket.ticketType}</p>
+              {ticket.ticketHolder && <p className='mb-2'>Titular: {ticket.ticketHolder}</p>}
+              {/* Botón para descargar PDF generado con ReactPDF */}
+              <PDFDownloadLink
+                document={<TicketPDF ticket={ticket} />}
+                fileName={`ticket-${ticket.id}.pdf`}
+                className='inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
+              >
+                {({ loading }) => (loading ? 'Generando PDF...' : 'Descargar Boleto')}
+              </PDFDownloadLink>
+            </section>
           </div>
-        </div>
-
-        <div className='space-y-6'>
-          {tickets.map((ticket) => (
-            <div key={ticket.id} className='bg-white p-6 rounded-lg shadow-md'>
-              <div className='flex justify-between items-start'>
-                <div className='flex-1'>
-                  <h2 className='text-xl font-semibold text-gray-900 mb-4'>{ticket.eventName}</h2>
-                  <div className='space-y-2 text-gray-600'>
-                    {ticket.ticketHolder && <p className='font-semibold text-lg'>Titular: {ticket.ticketHolder}</p>}
-                    <p>Tipo: {ticket.ticketType}</p>
-                    <p className='font-mono text-sm'>ID: {ticket.id}</p>
-                  </div>
-                </div>
-                {/* <img src={ticket.qrCode} alt='QR Code' className='w-32 h-32' /> */}
-              </div>
-
-              <div className='mt-6 flex gap-4'>
-                <button
-                  onClick={() => generatePDF(ticket)}
-                  className='flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700'
-                >
-                  <Download className='h-5 w-5 mr-2' />
-                  Descargar PDF
-                </button>
-                {/* <button
-                    onClick={() => sendByEmail(ticket)}
-                    className='flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700'
-                  >
-                    <Mail className='h-5 w-5 mr-2' />
-                    Enviar por email
-                  </button> */}
-              </div>
-            </div>
-          ))}
-        </div>
+        ))}
       </div>
     </div>
   )
