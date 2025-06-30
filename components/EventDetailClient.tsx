@@ -9,9 +9,11 @@ import { formatDate, formatTime } from '@/lib/utils'
 import { applyCoupon, setSelectedQuantity } from '@/store/slices/checkoutSlice'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
+import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react'
 import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Twitter } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useSelector } from 'react-redux'
 interface EventWithQuantity extends Event {
@@ -28,8 +30,9 @@ export default function EventDetailClient({ event }: { event: Event }) {
   const { categories } = useCategories()
   const [validCoupon, setValidCoupon] = useState(false)
   const category = categories.find((cat) => cat.slug === event.category)
-
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
   const checkout = useSelector((state: RootState) => state.checkout)
+  const [purchaseLimit, setPurchaseLimit] = useState(4) // Límite de compra por usuario no registrado
 
   const dispatch = useDispatch()
 
@@ -52,6 +55,21 @@ export default function EventDetailClient({ event }: { event: Event }) {
       setQuantity(quantity - 1)
     }
   }
+
+  useEffect(() => {
+    if (quantity > purchaseLimit) {
+      setQuantity(purchaseLimit)
+    }
+  }, [purchaseLimit])
+
+  useEffect(() => {
+    // Si el usuario está autenticado, actualizar el límite de compra
+    if (isAuthenticated) {
+      setPurchaseLimit(8)
+    } else {
+      setPurchaseLimit(4)
+    }
+  }, [isAuthenticated])
 
   const handleValidateCoupon = () => {
     const result = validateCoupon(couponCode) // Devuelve { code, discount, isPercentage, isApplied }
@@ -245,11 +263,34 @@ export default function EventDetailClient({ event }: { event: Event }) {
                 <span className='text-lg font-medium'>{quantity}</span>
                 <button
                   onClick={incrementQuantity}
-                  disabled={quantity >= event.availableTickets}
+                  disabled={quantity >= event.availableTickets || quantity >= purchaseLimit}
                   className='p-2 rounded-full border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
                   <Plus className='h-4 w-4' />
                 </button>
+                {quantity >= purchaseLimit && (
+                  <Popover showArrow={true}>
+                    <PopoverTrigger>
+                      <span className='text-sm text-red-500'>Límite de {purchaseLimit} boletos </span>
+                    </PopoverTrigger>
+                    <PopoverContent className='max-w-xs'>
+                      <div className='px-1 py-2'>
+                        <div className='text-small font-bold'>¿Necesitas más boletos?</div>
+                        <div className='text-tiny'>
+                          Si quieres aumentar tu límite de compras, debes{' '}
+                          <Link className='text-blue-700 hover:text-bue-200 hover:underline' href='/crear-cuenta' target='_blank'>
+                            crear una cuenta
+                          </Link>{' '}
+                          o{' '}
+                          <Link className='text-blue-700 hover:text-bue-200 hover:underline' href='/login' target='_blank'>
+                            iniciar sesión
+                          </Link>
+                          .
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
             </div>
 
