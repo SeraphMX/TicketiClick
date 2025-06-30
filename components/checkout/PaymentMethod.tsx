@@ -5,6 +5,7 @@ import { setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { RootState } from '@/store/store'
 import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, CreditCard } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useWizard } from 'react-use-wizard'
@@ -72,7 +73,7 @@ const PaymentForm = ({ formData, onSubmit }: PaymentMethodProps) => {
 
     try {
       // Create payment intent
-      const response = await fetch('/api/create-payment-intent', {
+      const response = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -137,7 +138,16 @@ const PaymentForm = ({ formData, onSubmit }: PaymentMethodProps) => {
   }
 
   return (
-    <div className='space-y-6'>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }}
+      className='space-y-4'
+    >
       <div className='flex items-center'>
         <h2 className='text-xl font-bold text-gray-900'>Método de pago</h2>
       </div>
@@ -243,7 +253,7 @@ const PaymentForm = ({ formData, onSubmit }: PaymentMethodProps) => {
           </Button>
         </div>
       </form>
-    </div>
+    </motion.section>
   )
 }
 
