@@ -49,7 +49,15 @@ export const loginUser = createAsyncThunk<AuthUserPayload, { email: string; pass
         role: castRole(profile.role)
       }
     } catch (error: any) {
-      return thunkAPI.rejectWithValue(error.message)
+      // Usa el mensaje específico de Supabase si está disponible
+      const supabaseMessage = error?.message || error?.error_description || 'Error al iniciar sesión'
+
+      let translatedMessage = supabaseMessage
+      if (supabaseMessage === 'Invalid login credentials') {
+        translatedMessage = 'Contraseña incorrecta'
+      }
+
+      return thunkAPI.rejectWithValue(translatedMessage)
     }
   }
 )
@@ -128,6 +136,9 @@ const authSlice = createSlice({
     },
     clearUser: (state) => {
       return initialState
+    },
+    clearAuthError: (state) => {
+      state.error = null
     }
   },
   extraReducers: (builder) => {
@@ -181,5 +192,5 @@ const authSlice = createSlice({
   }
 })
 
-export const { clearUser, setUser } = authSlice.actions
+export const { clearUser, setUser, clearAuthError } = authSlice.actions
 export default authSlice.reducer

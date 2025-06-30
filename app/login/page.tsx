@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 
 import { loginUserForm } from '@/schemas/user.schema'
 import { userService } from '@/services/userService'
-import { loginUser } from '@/store/slices/authSlice'
+import { clearAuthError, loginUser } from '@/store/slices/authSlice'
 import { setEmail } from '@/store/slices/registerSlice'
 import { AppDispatch, RootState } from '@/store/store'
 import { Checkbox, Spinner } from '@heroui/react'
@@ -23,7 +23,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loginAttempts, setLoginAttempts] = useState(0)
   const [userCanLogin, setUserCanLogin] = useState(true)
-  const [loginError, setLoginError] = useState<string | null>(null)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
@@ -48,6 +47,34 @@ export default function LoginPage() {
     }
   })
 
+  useEffect(() => {
+    if (!userCanLogin) {
+      // Si el login está bloqueado, limpiamos el error del campo
+      clearErrors('password')
+    }
+  }, [userCanLogin, clearErrors])
+
+  useEffect(() => {
+    dispatch(clearAuthError())
+    clearErrors() // limpia errores al montar
+    return () => {
+      dispatch(clearAuthError())
+      clearErrors()
+    } // limpia también al desmontar por si acaso
+  }, [])
+
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'email') {
+        setLoginAttempts(0)
+        setUserCanLogin(true)
+        clearErrors()
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [watch, clearErrors])
+
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (user && user.id && !isLoading) {
@@ -57,14 +84,22 @@ export default function LoginPage() {
 
   // Controla los intentos y mensajes según el error global
   useEffect(() => {
-    if (error) {
-      setLoginAttempts((prev) => prev + 1)
-      const maxAttempts = 5
-      const remainingAttempts = maxAttempts - loginAttempts - 1
+    if (!error || !userCanLogin) return
 
-      if (loginAttempts >= maxAttempts - 1) {
-        setUserCanLogin(false)
-      }
+    const maxAttempts = 5
+    const nextAttempts = loginAttempts + 1
+    setLoginAttempts(nextAttempts)
+
+    if (error === 'Contraseña incorrecta') {
+      setError('password', {
+        type: 'manual',
+        message: 'Contraseña incorrecta.'
+      })
+    }
+
+    if (nextAttempts >= maxAttempts) {
+      setUserCanLogin(false)
+      clearErrors('password')
     }
   }, [error])
 
@@ -80,20 +115,22 @@ export default function LoginPage() {
     dispatch(loginUser({ email: data.email, password: data.password }))
   }
 
-  // Puedes mostrar mensajes personalizados según loginAttempts y authError
   const renderErrorMessage = () => {
-    if (!error) return null
-
     const maxAttempts = 5
-    const remainingAttempts = maxAttempts - loginAttempts
+    const remaining = maxAttempts - loginAttempts
 
-    if (loginAttempts >= maxAttempts) {
+    // Si ya no puede intentar más
+    if (!userCanLogin) {
       return 'Has alcanzado el número máximo de intentos. Por favor, inténtalo más tarde o restablece tu contraseña.'
-    } else if (loginAttempts >= 3) {
-      return `Te quedan ${remainingAttempts} ${remainingAttempts > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
-    } else {
-      return error // Mensaje genérico del error
     }
+
+    // Si quedan 2 o menos intentos, mostrar advertencia
+    if (remaining <= 2) {
+      return `Te quedan ${remaining} ${remaining > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
+    }
+
+    // Si aún quedan más de 2 intentos, no mostrar mensaje global
+    return null
   }
 
   const handleUserExists = async (email: string) => {
@@ -143,10 +180,10 @@ export default function LoginPage() {
 
           {/* Formulario */}
           <div className='p-6'>
-            {loginError && (
-              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-star'>
-                <AlertCircle size={50} className='mr-2 text-red-500 ' />
-                <span>{loginError}</span>
+            {renderErrorMessage() && (
+              <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-start'>
+                <AlertCircle size={20} className='mr-2 text-red-500 mt-1' />
+                <span>{renderErrorMessage()}</span>
               </div>
             )}
             <form onSubmit={handleSubmit(handleSignIn)} className='space-y-4'>
@@ -159,6 +196,7 @@ export default function LoginPage() {
                 onBlur={(e) => {
                   handleUserExists(e.target.value)
                 }}
+                autoFocus
               />
 
               <Input
