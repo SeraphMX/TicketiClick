@@ -1,8 +1,12 @@
-// app/events/page.tsx
 // Página de listado de eventos
-
 import EventList from '@/components/EventList'
 import { supabase } from '@/lib/supabase'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Eventos - Ticketi',
+  description: 'Descubre y compra boletos para eventos únicos en Ticketi'
+}
 
 export default async function EventsPage() {
   const { data } = await supabase.from('event_details_view').select('*')
