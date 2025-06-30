@@ -4,11 +4,11 @@
 import CreateAccountMail from '@/emails/CreateAccountMail'
 import PasswordChangedConfirmationMail from '@/emails/PasswordChangedConfirmationMail'
 import PasswordResetMail from '@/emails/PasswordResetMail'
+import PurchaseConfirmationMail from '@/emails/PurchaseConfirmationMail'
 import WelcomeMail from '@/emails/WelcomeMail'
 import { EmailTemplate } from '@/types/email'
 import { render } from '@react-email/render'
 import React from 'react'
-import { PurchaseConfirmation } from './templates/PurchaseConfirmation'
 
 export const renderMail = async (template: EmailTemplate, props: any) => {
   switch (template) {
@@ -17,7 +17,7 @@ export const renderMail = async (template: EmailTemplate, props: any) => {
     case 'welcome':
       return render(React.createElement(WelcomeMail, props))
     case 'purchaseConfirmation':
-      return render(React.createElement(PurchaseConfirmation, props))
+      return render(React.createElement(PurchaseConfirmationMail, props))
     case 'passwordReset':
       return render(React.createElement(PasswordResetMail, props))
     case 'passwordChangedConfirmation':

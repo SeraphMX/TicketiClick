@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import { generateOrderToken } from '@/lib/tokens'
 import { nanoid } from 'nanoid'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
@@ -99,7 +98,7 @@ export async function POST(req: Request) {
 
     const { data: eventData, error: eventError } = await supabase
       .from('event_details_view')
-      .select('date, slug') // Obtén la fecha y el slug
+      .select() // Obtén la fecha y el slug
       .eq('id', event_id)
       .single()
 
@@ -107,9 +106,6 @@ export async function POST(req: Request) {
       console.error('Error fetching event date:', eventError)
       return NextResponse.json({ error: 'Failed to fetch event info' }, { status: 500 })
     }
-
-    const token = generateOrderToken(order.id, new Date(eventData.date))
-    const downloadUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/event/${eventData.slug}/tickets/${token}`
 
     // //Si el modo de desarrollo esta acivado no enviar correo
     // if (process.env.NEXT_PUBLIC_DEVMODE === 'true') {
@@ -120,17 +116,15 @@ export async function POST(req: Request) {
 
     //Llamar internamente al endpoint de correo
     const mailResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/mail/send`, // Usa la URL absoluta
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/mail/send-purchase-confirmation-email`, // Usa la URL absoluta
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: buyer_email,
-          subject: 'Confirmación de compra en Ticketi',
-          template: 'purchaseConfirmation',
-          templateProps: {
-            downloadLink: downloadUrl
-          }
+          email: buyer_email,
+          orderId: order.id,
+          quantity,
+          event: eventData
         })
       }
     )

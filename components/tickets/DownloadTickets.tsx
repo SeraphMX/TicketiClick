@@ -123,7 +123,7 @@ function TicketsPDFDocument({ tickets }: { tickets: TicketData[] }) {
   return (
     <Document>
       {tickets.map((ticket) => (
-        <Page size={[300, 600]} style={styles.page} key={ticket.id}>
+        <Page size='A4' style={styles.page} key={ticket.id}>
           <RenderImage src={ticket.eventImage} style={styles.eventImage} />
 
           <View style={styles.section}>
