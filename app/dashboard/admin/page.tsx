@@ -4,8 +4,10 @@
 
 import { useEvents } from '@/hooks/useEvents'
 import { useTickets } from '@/hooks/useTickets'
+import { RootState } from '@/store/store'
 import { BarChart, CalendarDays, DollarSign, TicketIcon, TrendingUp, UsersRound } from 'lucide-react'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 // Componente de gráfico de barras simulado
 const SimpleBarChart = () => {
