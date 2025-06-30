@@ -1,11 +1,13 @@
+'use client'
 import DownloadTickets from '@/components/tickets/DownloadTickets'
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Confirmación de Compra',
-  description: 'Confirmación de compra de boletos para el evento'
-}
+import { RootState } from '@/store/store'
+import { useSelector } from 'react-redux'
 
 export default function ConfirmationPage() {
-  return <DownloadTickets />
+  const reduxPaymentIntent = useSelector((state: RootState) => state.checkout.paymentIntentId)
+  return (
+    <section className='min-h-screen flex flex-col items-center justify-center p-4 space-y-8'>
+      <DownloadTickets paymentIntentId={reduxPaymentIntent} />
+    </section>
+  )
 }
