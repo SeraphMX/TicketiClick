@@ -23,6 +23,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loginAttempts, setLoginAttempts] = useState(0)
   const [userCanLogin, setUserCanLogin] = useState(true)
+  const [rememberMe, setRememberMe] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
@@ -55,13 +56,22 @@ export default function LoginPage() {
   }, [userCanLogin, clearErrors])
 
   useEffect(() => {
+    // limpia errores al montar y desmontar el componente
     dispatch(clearAuthError())
-    clearErrors() // limpia errores al montar
+    clearErrors()
     return () => {
       dispatch(clearAuthError())
       clearErrors()
-    } // limpia también al desmontar por si acaso
+    }
   }, [])
+
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail')
+    if (rememberedEmail) {
+      setValue('email', rememberedEmail)
+      setRememberMe(true)
+    }
+  }, [setValue])
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -111,6 +121,12 @@ export default function LoginPage() {
 
   const handleSignIn = async (data: SignInFormData): Promise<void> => {
     if (!userCanLogin) return
+
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', data.email)
+    } else {
+      localStorage.removeItem('rememberedEmail')
+    }
 
     dispatch(loginUser({ email: data.email, password: data.password }))
   }
@@ -219,7 +235,7 @@ export default function LoginPage() {
               />
 
               <div className='flex items-center justify-between'>
-                <Checkbox isDisabled={isLoading || !userCanLogin}>
+                <Checkbox isSelected={rememberMe} onValueChange={setRememberMe} isDisabled={isLoading || !userCanLogin}>
                   <span className='text-sm'>Recordarme</span>
                 </Checkbox>
                 <div className='text-sm'>
