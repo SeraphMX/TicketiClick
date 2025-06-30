@@ -4,7 +4,7 @@ import { CSSProperties } from 'react'
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ? `${process.env.NEXT_PUBLIC_BASE_URL}` : 'https://dev-ticketi.netlify.app'
 
-const PurchaseConfirmationMail = ({ downloadLink, event }: { downloadLink: string; event: Event }) => (
+const PurchaseConfirmationMail = ({ downloadLink, event, quantity }: { downloadLink: string; event: Event; quantity: number }) => (
   <Html>
     <Head />
     <Body style={main}>
@@ -26,10 +26,10 @@ const PurchaseConfirmationMail = ({ downloadLink, event }: { downloadLink: strin
           <Section style={upperSection}>
             <Heading style={h1}>Haz hecho una compra en ticketi</Heading>
             <Text style={mainText}>
-              Haz comprado {event.quantity} boletos para {event.title}, que se llevara a cabo el {event.date} a las {event.time} en{' '}
-              {event.location}.
+              Haz comprado {quantity > 1 ? `${quantity} boletos` : 'un boleto'} para {event.title}, que se llevará a cabo el {event.date} a
+              las {event.time} en {event.location}.
             </Text>
-            <Text style={mainText}>Si aún no has descargado tus boletos, puedes descargarlos dando click en el siguiente enlace</Text>
+            <Text style={mainText}>Si aún no has descargado tus boletos, puedes hacerlo dando click en el siguiente enlace</Text>
             <Section style={verificationSection}>
               <Button style={button} href={downloadLink}>
                 Descargar boletos
@@ -67,9 +67,9 @@ PurchaseConfirmationMail.PreviewProps = {
     organizerId: '76150554-65c0-480d-b492-d94df5a231dd',
     availableTickets: 200,
     featured: true,
-    stripe_id: 'acct_1RPSugGu19pvykad',
-    quantity: 4
-  }
+    stripe_id: 'acct_1RPSugGu19pvykad'
+  },
+  quantity: 4
 }
 
 const main = {
