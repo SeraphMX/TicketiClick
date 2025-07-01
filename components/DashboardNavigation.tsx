@@ -3,7 +3,7 @@
 // Navegación para el dashboard actualizada para Supabase
 
 import { RootState } from '@/store/store'
-import { BarChart, CalendarDays, ChevronRight, Eye, LayoutDashboard, Settings, Ticket, Users } from 'lucide-react'
+import { BarChart, CalendarDays, ChevronRight, LayoutDashboard, QrCode, Settings, Ticket, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSelector } from 'react-redux'
@@ -50,7 +50,7 @@ const DashboardNavigation = () => {
         {
           name: 'Check-in',
           href: '/dashboard/check-in',
-          icon: <Eye className='h-5 w-5' />,
+          icon: <QrCode className='h-5 w-5' />,
           exact: false
         }
       ],
