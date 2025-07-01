@@ -5,6 +5,6 @@ export const ticketService = {
     const { data, error } = await supabase.rpc('get_ticket_by_code', { p_code: code })
     if (error) throw new Error(error.message || 'Error al consultar la base de datos.')
 
-    return data
+    return data[0] || null
   }
 }
