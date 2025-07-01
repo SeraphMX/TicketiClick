@@ -1,5 +1,5 @@
 'use client'
-import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner'
+import { IDetectedBarcode, outline, Scanner } from '@yudiel/react-qr-scanner'
 import { useState } from 'react'
 export default function Page() {
   const [qrData, setQrData] = useState<string | null>(null)
@@ -11,6 +11,12 @@ export default function Page() {
           if (result) {
             setQrData(result[0].rawValue)
           }
+        }}
+        sound={true}
+        components={{
+          torch: true,
+          finder: true,
+          tracker: outline
         }}
       />
       <p>Scan a QR code</p>
