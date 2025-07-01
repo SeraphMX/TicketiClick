@@ -49,7 +49,7 @@ const DashboardNavigation = () => {
         },
         {
           name: 'Check-in',
-          href: '/dashboard/check-in',
+          href: '/check-in',
           icon: <QrCode className='h-5 w-5' />,
           exact: false
         }
