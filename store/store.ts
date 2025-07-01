@@ -10,6 +10,7 @@ import eventsReducer from './slices/eventsSlice'
 import otpReducer from './slices/otpSlice'
 import recoverAccountReducer from './slices/recoverAccountSlice'
 import registerReducer from './slices/registerSlice'
+import ticketsReducer from './slices/ticketsSlice'
 
 // Configuración de persistencia
 const persistConfig = {
@@ -29,6 +30,7 @@ export const store = configureStore({
     events: eventsReducer,
     register: registerReducer,
     recoverAccount: recoverAccountReducer,
+    tickets: ticketsReducer,
     otp: otpReducer
   },
   middleware: (getDefaultMiddleware) =>
