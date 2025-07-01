@@ -256,6 +256,15 @@ export const userService = {
     return data
   },
 
+  async getOrdersByMail(email: string) {
+    const { data, error } = await supabase.rpc('get_orders_by_mail', { p_email: email })
+
+    console.log(data)
+
+    if (error) throw new Error('Error al obtener las ordenes del usuario: ' + error.message)
+    return data || []
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
