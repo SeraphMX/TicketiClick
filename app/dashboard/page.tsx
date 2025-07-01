@@ -34,7 +34,7 @@ export default function DashboardPage() {
       case 'customer':
         return [
           {
-            title: 'Mis Boletos',
+            title: 'Mis compras',
             description: 'Ver todos tus boletos comprados',
             icon: <TicketIcon className='h-8 w-8 text-blue-600' />,
             href: '/dashboard/user',
