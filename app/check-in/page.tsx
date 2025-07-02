@@ -84,6 +84,7 @@ export default function Page() {
       </BrowserView>
       <MobileView>
         <Scanner
+          paused={ticketData ? true : false}
           onScan={handleScan}
           sound={true}
           components={{
