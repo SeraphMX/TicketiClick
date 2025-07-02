@@ -82,10 +82,9 @@ export default function Page() {
           </form>
         </section>
       </BrowserView>
-      <MobileView>
+      <MobileView className='bg-blue-300 w-full'>
         <Scanner
-          // styles={{ container: { width: '100%' }, video: { width: '100%' } }}
-          // paused={ticketData ? true : false}
+          paused={ticketData ? true : false}
           onScan={handleScan}
           sound={true}
           components={{
