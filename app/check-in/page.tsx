@@ -84,8 +84,8 @@ export default function Page() {
       </BrowserView>
       <MobileView>
         <Scanner
-          styles={{ container: { width: '100%' }, video: { width: '100%' } }}
-          paused={ticketData ? true : false}
+          // styles={{ container: { width: '100%' }, video: { width: '100%' } }}
+          // paused={ticketData ? true : false}
           onScan={handleScan}
           sound={true}
           components={{
