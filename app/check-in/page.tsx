@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
 export default function Page() {
   const [ticketData, setTicketData] = useState<Ticket | null>(null)
+  const [ticketError, setTicketError] = useState<string | null>(null)
   const { isAuthenticated, user, isLoading } = useSelector((state: RootState) => state.auth)
   const router = useRouter()
   const { isOpen, onOpenChange, onOpen } = useDisclosure()
@@ -26,14 +27,7 @@ export default function Page() {
 
   const handleScan = async (result: IDetectedBarcode[]) => {
     if (result && result.length > 0) {
-      const ticket = await ticketService.getTicketbyCode(result[0].rawValue)
-
-      if (ticket) {
-        console.log('Ticket data:', ticket)
-        setTicketData(ticket)
-      } else {
-        console.error('No se encontró el ticket con el código escaneado.')
-      }
+      getTicket(result[0].rawValue)
     }
   }
 
@@ -41,11 +35,13 @@ export default function Page() {
     try {
       const ticket = await ticketService.getTicketbyCode(code)
       if (ticket) {
+        setTicketError(null)
         setTicketData(ticket)
         console.log('Ticket encontrado:', ticket)
         onOpen() // Abrir el modal al encontrar el ticket
       } else {
         console.error('No se encontró el ticket con el código proporcionado.')
+        setTicketError('Código invalido')
       }
     } catch (error) {
       console.error('Error al buscar el ticket:', error)
@@ -98,10 +94,17 @@ export default function Page() {
         />
       </MobileView>
 
-      {!ticketData && (
+      {!ticketData && !ticketError && (
         <div className='flex items-center justify-center p-6 text-gray-600'>
           <QrCode className='h-5 w-5 mr-2 text-blue-600' />
           <p>Esperando ticket...</p>
+        </div>
+      )}
+
+      {ticketError && (
+        <div className='flex items-center justify-center p-6 text-red-600'>
+          <QrCode className='h-5 w-5 mr-2 ' />
+          <p>{ticketError}</p>
         </div>
       )}
 
