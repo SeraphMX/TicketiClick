@@ -88,7 +88,7 @@ export default function LoginPage() {
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (user && user.id && !isLoading) {
-      router.push('/dashboard')
+      router.push('/')
     }
   }, [user, isLoading, router])
 
