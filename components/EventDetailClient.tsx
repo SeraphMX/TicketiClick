@@ -9,7 +9,7 @@ import { formatDate, formatTime } from '@/lib/utils'
 import { applyCoupon, setSelectedQuantity } from '@/store/slices/checkoutSlice'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
-import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Twitter } from 'lucide-react'
+import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, Lock, MapPin, Minus, Plus, Twitter } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -139,12 +139,14 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   </span>
                   <span className='inline-flex items-center'>
                     <CalendarDays className='h-4 w-4 mr-1' />
-                    {formatDate(event.date)}
+                    {event.date ? formatDate(event.date) : 'Próximamente'}
                   </span>
-                  <span className='inline-flex items-center'>
-                    <Clock className='h-4 w-4 mr-1' />
-                    {formatTime(event.time)}
-                  </span>
+                  {event.date && (
+                    <span className='inline-flex items-center'>
+                      <Clock className='h-4 w-4 mr-1' />
+                      {formatTime(event.time)}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className='flex gap-2 items-center '>
@@ -191,31 +193,41 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Fecha</p>
-                    <p className='text-gray-600'>{formatDate(event.date)}</p>
+                    <p className='text-gray-600'>{event.date ? formatDate(event.date) : 'Próximamente'}</p>
                   </div>
                 </div>
 
-                <div className='flex items-start'>
-                  <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Hora</p>
-                    <p className='text-gray-600'>{formatTime(event.time)}</p>
+                {event.date && (
+                  <div className='flex items-start'>
+                    <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
+                    <div>
+                      <p className='font-medium'>Hora</p>
+                      <p className='text-gray-600'>{formatTime(event.time)}</p>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className='flex items-start'>
-                  <MapPin className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Ubicación</p>
-                    <p className='text-gray-600'>{event.location}</p>
+                {event.date && (
+                  <div className='flex items-start'>
+                    <MapPin className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
+                    <div>
+                      <p className='font-medium'>Ubicación</p>
+                      <p className='text-gray-600'>{event.location}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Comprar boletos */}
-          <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm'>
+          <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm relative'>
+            {!event.date && (
+              <div className='absolute  bg-white/50  h-full  w-full z-50 top-0 right-0 p-2 text-gray-500 hover:text-gray-700 cursor-pointer backdrop-blur-sm flex flex-col items-center justify-center'>
+                <Lock size={40} />
+                Venta de boletos deshabilitada
+              </div>
+            )}
             <h2 className='text-xl font-bold text-gray-800 mb-4'>{event.price === 0 ? 'Obtener' : 'Comprar'} boletos</h2>
 
             <div className='mb-6 gap-2'>
