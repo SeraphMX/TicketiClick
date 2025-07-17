@@ -10,7 +10,7 @@ import { applyCoupon, setSelectedQuantity } from '@/store/slices/checkoutSlice'
 import { setSelectedEvent } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react'
-import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, MapPin, Minus, Plus, Twitter } from 'lucide-react'
+import { CalendarDays, ChevronDown, ChevronUp, Clock, Facebook, Info, Link2, Lock, MapPin, Minus, Plus, Twitter } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -239,7 +239,13 @@ export default function EventDetailClient({ event }: { event: Event }) {
           </div>
 
           {/* Comprar boletos */}
-          <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm'>
+          <div className='bg-blue-50 p-2 md:p-6 rounded-lg shadow-sm relative'>
+            {!event.date && (
+              <div className='absolute  bg-white/50  h-full  w-full z-50 top-0 right-0 p-2 text-gray-500 hover:text-gray-700 cursor-pointer backdrop-blur-sm flex flex-col items-center justify-center'>
+                <Lock size={40} />
+                Venta de boletos deshabilitada
+              </div>
+            )}
             <h2 className='text-xl font-bold text-gray-800 mb-4'>{event.price === 0 ? 'Obtener' : 'Comprar'} boletos</h2>
 
             <div className='mb-6 gap-2'>
