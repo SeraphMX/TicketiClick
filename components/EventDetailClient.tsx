@@ -159,10 +159,12 @@ export default function EventDetailClient({ event }: { event: Event }) {
                     <CalendarDays className='h-4 w-4 mr-1' />
                     {formatDate(event.date)}
                   </span>
-                  <span className='inline-flex items-center'>
-                    <Clock className='h-4 w-4 mr-1' />
-                    {formatTime(event.time)}
-                  </span>
+                  {event.date && (
+                    <span className='inline-flex items-center'>
+                      <Clock className='h-4 w-4 mr-1' />
+                      {formatTime(event.time)}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className='flex gap-2 items-center '>
@@ -213,21 +215,25 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   </div>
                 </div>
 
-                <div className='flex items-start'>
-                  <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Hora</p>
-                    <p className='text-gray-600'>{formatTime(event.time)}</p>
-                  </div>
-                </div>
+                {event.date && (
+                  <>
+                    <div className='flex items-start'>
+                      <Clock className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
+                      <div>
+                        <p className='font-medium'>Hora</p>
+                        <p className='text-gray-600'>{formatTime(event.time)}</p>
+                      </div>
+                    </div>
 
-                <div className='flex items-start'>
-                  <MapPin className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
-                  <div>
-                    <p className='font-medium'>Ubicación</p>
-                    <p className='text-gray-600'>{event.location}</p>
-                  </div>
-                </div>
+                    <div className='flex items-start'>
+                      <MapPin className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
+                      <div>
+                        <p className='font-medium'>Ubicación</p>
+                        <p className='text-gray-600'>{event.location}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

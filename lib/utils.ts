@@ -8,6 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 // Función para formatear fechas a formato español y evitar desfase por zona horaria
 export const formatDate = (dateString: string) => {
   // Tomamos solo la parte de fecha (ignora la hora si existe)
+  if (!dateString) return 'Próximamente'
   const [year, month, day] = dateString.slice(0, 10).split('-').map(Number)
 
   // Creamos la fecha manualmente para evitar desfase por zona horaria

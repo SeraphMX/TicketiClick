@@ -77,15 +77,19 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
             <span>{formatDate(event.date)}</span>
           </div>
 
-          <div className='flex items-center text-gray-600'>
-            <Clock className='h-4 w-4 mr-2 text-blue-600' />
-            <span>{formatTime(event.time)} </span>
-          </div>
+          {event.date && (
+            <>
+              <div className='flex items-center text-gray-600'>
+                <Clock className='h-4 w-4 mr-2 text-blue-600' />
+                <span>{formatTime(event.time)} </span>
+              </div>
 
-          <div className='flex items-center text-gray-600'>
-            <MapPin className='h-4 w-4 mr-2 text-blue-600' />
-            <span className='truncate'>{event.location}</span>
-          </div>
+              <div className='flex items-center text-gray-600'>
+                <MapPin className='h-4 w-4 mr-2 text-blue-600' />
+                <span className='truncate'>{event.location}</span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Precio y botón */}
