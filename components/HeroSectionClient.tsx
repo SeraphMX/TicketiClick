@@ -1,7 +1,6 @@
 'use client'
 
 import { Facebook, Link2, Twitter } from 'lucide-react'
-import Link from 'next/link'
 
 const HeroSectionClient = () => {
   // Imágenes para las categorías
@@ -58,7 +57,7 @@ const HeroSectionClient = () => {
         <div className='md:flex justify-between items-end space-y-3'>
           <div className='w-full text-left px-4 sm:px-6 lg:px-8'>
             <h1 className='text-4xl sm:text-5xl font-extrabold  animate-fade-in mb-1'>Chapul Big Band</h1>
-            <h3 className='text-xl mb-6'>17 de julio de 2024, 8:00 p.m.</h3>
+            <h3 className='text-xl mb-6'>Próximamente</h3>
             <div className='flex flex-col sm:flex-row gap-4'>
               {/* <Link
             href='/events'
@@ -67,12 +66,6 @@ const HeroSectionClient = () => {
             <Search className='h-5 w-5 mr-2' />
             Explorar eventos
           </Link> */}
-              <Link
-                href='/event/chapul-big-band'
-                className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
-              >
-                Comprar entradas
-              </Link>
             </div>
           </div>
           <div className='lg:flex gap-2 items-center lg:w-1/3 '>
