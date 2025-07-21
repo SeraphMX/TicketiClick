@@ -44,7 +44,8 @@ const HeroSectionClient = () => {
       <div
         className='absolute inset-0 '
         style={{
-          backgroundImage: "url('/events/1745434434PQzWhASDd4.webp')",
+          backgroundImage:
+            "url('https://res.cloudinary.com/dbg2l9fw8/image/upload/v1753056019/Ticketi/Imagen_de_WhatsApp_2025-07-19_a_las_20.09.51_5ded9068_lgf4lg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
