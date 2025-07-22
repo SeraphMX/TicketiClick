@@ -45,7 +45,8 @@ const HeroSectionClient = () => {
       <div
         className='absolute inset-0 '
         style={{
-          backgroundImage: "url('/events/1745434434PQzWhASDd4.webp')",
+          backgroundImage:
+            "url('https://res.cloudinary.com/dbg2l9fw8/image/upload/v1753056019/Ticketi/Imagen_de_WhatsApp_2025-07-19_a_las_20.09.51_5ded9068_lgf4lg.jpg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -58,7 +59,7 @@ const HeroSectionClient = () => {
         <div className='md:flex justify-between items-end space-y-3'>
           <div className='w-full text-left px-4 sm:px-6 lg:px-8'>
             <h1 className='text-4xl sm:text-5xl font-extrabold  animate-fade-in mb-1'>Chapul Big Band</h1>
-            <h3 className='text-xl mb-6'>17 de julio de 2024, 8:00 p.m.</h3>
+            <h3 className='text-xl mb-6'>29 de agosto de 2025, 8:00 p.m.</h3>
             <div className='flex flex-col sm:flex-row gap-4'>
               {/* <Link
             href='/events'
@@ -68,7 +69,7 @@ const HeroSectionClient = () => {
             Explorar eventos
           </Link> */}
               <Link
-                href='/event/chapul-big-band'
+                href='/evento/chapul-big-band'
                 className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
               >
                 Comprar entradas
