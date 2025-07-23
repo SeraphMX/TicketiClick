@@ -58,7 +58,7 @@ const HeroSectionClient = () => {
         <div className='md:flex justify-between items-end space-y-3'>
           <div className='w-full text-left px-4 sm:px-6 lg:px-8'>
             <h1 className='text-4xl sm:text-5xl font-extrabold  animate-fade-in mb-1'>Chapul Big Band</h1>
-            <h3 className='text-xl mb-6'>Próximamente</h3>
+            <h3 className='text-xl mb-6'>29 de agosto de 2025, 8:00 p.m.</h3>
             <div className='flex flex-col sm:flex-row gap-4'>
               {/* <Link
             href='/events'
