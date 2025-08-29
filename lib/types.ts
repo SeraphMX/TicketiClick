@@ -2,10 +2,24 @@
 // Interfaces y tipos para la aplicación
 
 import { Ticket, TicketStatus } from '@/data/tickets'
-import { User, UserRole } from '@/data/users'
+import type { DateValue } from '@internationalized/date'
 
-// Re-exportando para facilitar importaciones
-export type { Ticket, TicketStatus, User, UserRole }
+// Re-exportando para facilidad de importaciones
+export type { Ticket, TicketStatus }
+
+// Definición de roles de usuario
+export type UserRole = 'user' | 'organizer' | 'admin'
+
+// Interfaz para usuarios (actualizada para Supabase)
+export interface User {
+  id: string // UUID de Supabase
+  email: string
+  full_name: string
+  phone: string
+  role: UserRole
+  avatar?: string
+  avatar_url?: string
+}
 
 // Interfaz para categorías de eventos
 export interface EventCategory {
@@ -28,7 +42,7 @@ export interface Event {
   image: string
   category: string // Ahora es el slug de la categoría
   category_name?: string // Nombre de la categoría para mostrar
-  organizerId: number
+  organizerId: string
   availableTickets: number
   featured: boolean
   stripe_id: string
@@ -46,13 +60,13 @@ export interface AdminStats {
 export interface EventFormData {
   title: string
   description: string
-  date: string
+  date: DateValue | null | undefined
   time: string
   location: string
-  price: number
   category: string
-  availableTickets: number
-  image?: string
+  price: number
+  ticketsAvailable: number
+  imageUrl?: string
   featured?: boolean
 }
 

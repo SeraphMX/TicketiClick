@@ -6,9 +6,11 @@ import { formatDate, formatTime } from '@/lib/utils'
 import { resetCheckout, resetCoupon, setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { updateSelectedEventDetails } from '@/store/slices/eventsSlice'
 import { RootState } from '@/store/store'
+import { motion } from 'framer-motion'
 import { Calendar, ChevronDown, ChevronUp, CloudDownload, CreditCard, Info, MapPin, Phone, Ticket, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { Button } from '../ui/button'
 
 interface OrderSummaryProps {
   event: Event
@@ -19,7 +21,6 @@ interface OrderSummaryProps {
     paymentMethod: string
   }
   onConfirm: () => void
-  onBack: () => void
 }
 
 // Traductor de métodos de pago
@@ -33,7 +34,7 @@ const translatePaymentMethod = (method: string) => {
   return translations[method] || method
 }
 
-export default function OrderSummary({ event, formData, onConfirm, onBack }: OrderSummaryProps) {
+export default function OrderSummary({ event, formData, onConfirm }: OrderSummaryProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [showFeeDetails, setShowFeeDetails] = useState(false)
   const router = useRouter()
@@ -122,7 +123,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
       // Simular generacion de boletos
       await new Promise((resolve) => setTimeout(resolve, 1000))
       // Redirigir a la página de confirmación
-      router.push(`/event/${event.slug}/tickets`)
+      router.push(`/evento/${event.slug}/tickets`)
     } catch (error) {
       setIsProcessing(false)
       console.error('Error en el proceso de pago:', error)
@@ -140,7 +141,16 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
   }, [])
 
   return (
-    <div className='space-y-6'>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }}
+      className='space-y-4'
+    >
       {event.price > 0 ? (
         <>
           <div className='flex items-center'>
@@ -292,17 +302,7 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
 
       {/* Botón de confirmación */}
       <div className='flex justify-end'>
-        <button
-          onClick={handleConfirm}
-          disabled={isProcessing}
-          className={`
-            inline-flex items-center justify-center px-6 py-3 border border-transparent
-            text-base font-medium rounded-md shadow-sm text-white bg-blue-600
-            hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
-            focus:ring-blue-500 transition-colors duration-200 ${isProcessing ? 'opacity-70 cursor-not-allowed' : ''}
-            min-w-[200px]
-          `}
-        >
+        <Button onPress={handleConfirm} disabled={isProcessing} color='primary' className='flex items-center'>
           {isProcessing ? (
             <>
               <div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3'></div>
@@ -314,8 +314,8 @@ export default function OrderSummary({ event, formData, onConfirm, onBack }: Ord
               Descargar boletos
             </>
           )}
-        </button>
+        </Button>
       </div>
-    </div>
+    </motion.section>
   )
 }

@@ -1,15 +1,16 @@
 'use client'
 // components/DashboardNavigation.tsx
-// Navegación para el dashboard
+// Navegación para el dashboard actualizada para Supabase
 
-import { useAuth } from '@/hooks/useAuth'
-import { BarChart, CalendarDays, ChevronRight, LayoutDashboard, Settings, Ticket, Users } from 'lucide-react'
+import { RootState } from '@/store/store'
+import { BarChart, CalendarDays, ChevronRight, LayoutDashboard, QrCode, Settings, Ticket, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSelector } from 'react-redux'
 
 const DashboardNavigation = () => {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
 
   // Si no hay usuario, no mostramos nada
   if (!user) return null
@@ -31,7 +32,7 @@ const DashboardNavigation = () => {
 
     // Enlaces específicos para cada rol
     const roleSpecificLinks = {
-      user: [
+      customer: [
         {
           name: 'Mis Boletos',
           href: '/dashboard/user',
@@ -42,8 +43,14 @@ const DashboardNavigation = () => {
       organizer: [
         {
           name: 'Mis Eventos',
-          href: '/dashboard/organizer',
+          href: '/dashboard/organizador',
           icon: <CalendarDays className='h-5 w-5' />,
+          exact: false
+        },
+        {
+          name: 'Check-in',
+          href: '/check-in',
+          icon: <QrCode className='h-5 w-5' />,
           exact: false
         }
       ],
@@ -75,13 +82,21 @@ const DashboardNavigation = () => {
 
   const navigation = getNavigation()
 
+  // Función para traducir roles
+  const translateRole = (role: string) => {
+    const translations: Record<string, string> = {
+      customer: 'Usuario',
+      organizer: 'Organizador',
+      admin: 'Administrador'
+    }
+    return translations[role] || role
+  }
+
   return (
     <div className='bg-white rounded-lg shadow-md overflow-hidden'>
       <div className='p-4 bg-blue-700 text-white'>
         <h2 className='text-xl font-semibold'>Dashboard</h2>
-        <p className='text-sm text-blue-200'>
-          Rol: {user.role === 'user' ? 'Usuario' : user.role === 'organizer' ? 'Organizador' : 'Administrador'}
-        </p>
+        <p className='text-sm text-blue-200'>Rol: {translateRole(user.role)}</p>
       </div>
 
       <nav className='p-3'>
@@ -110,7 +125,7 @@ const DashboardNavigation = () => {
 
       <div className='p-4 border-t'>
         <Link
-          href='/settings'
+          href='/dashboard/config'
           className='flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors'
         >
           <Settings className='mr-3 h-5 w-5 text-gray-500' />

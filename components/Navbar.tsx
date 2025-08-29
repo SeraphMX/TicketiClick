@@ -1,23 +1,64 @@
 'use client'
-// components/Navbar.tsx
-// Barra de navegación principal
-
-import { useAuth } from '@/hooks/useAuth'
-import { LogOut, Menu, User, X } from 'lucide-react'
+import { logoutUser } from '@/store/slices/authSlice'
+import { AppDispatch, RootState } from '@/store/store'
+import { User } from '@heroui/react'
+import { CircleUserRound, LogOut, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Button } from './ui/button'
 
 const Navbar = () => {
-  const { user, logout } = useAuth()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
+
+  // Estado para controlar si el navbar se muestra o no
+  const [showNavbar, setShowNavbar] = useState(true)
+
+  // Referencia para guardar la posición previa del scroll
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY < 0) return
+
+      // Si el scroll actual es mayor que el anterior, significa que estás bajando, ocultamos el navbar
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        setShowNavbar(false)
+      } else {
+        // Si haces scroll hacia arriba, mostramos el navbar
+        setShowNavbar(true)
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
 
+  const handleLogout = async () => {
+    dispatch(logoutUser())
+    setIsMenuOpen(false)
+  }
+
   return (
-    <nav className='bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md'>
+    <nav
+      className={`
+      fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-900 to-blue-700 text-white shadow-md
+      transition-transform duration-200 ease-in-out
+      ${showNavbar ? 'translate-y-0' : '-translate-y-full'}
+    `}
+    >
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-14'>
           {/* Logo y Nombre */}
@@ -34,7 +75,7 @@ const Navbar = () => {
               <Link href='/' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
                 Inicio
               </Link>
-              <Link href='/events' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
+              <Link href='/eventos' className='px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors'>
                 Eventos
               </Link>
               {user && (
@@ -49,18 +90,12 @@ const Navbar = () => {
           <div className='hidden md:block'>
             <div className='ml-4 flex items-center md:ml-6'>
               {user ? (
-                <div className='flex items-center'>
-                  <div className='flex items-center mr-4'>
-                    <img className='h-8 w-8 rounded-full border-2 border-white' src={user.avatar} alt={user.name} />
-                    <span className='ml-2'>{user.name}</span>
-                  </div>
-                  <button
-                    onClick={logout}
-                    className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-600 hover:bg-blue-700 transition-colors'
-                  >
+                <div className='flex items-center gap-4'>
+                  <User description='Usuario básico' name={user.full_name} avatarProps={{ size: 'sm' }} />
+                  <Button onPress={handleLogout} color='danger' size='sm'>
                     <LogOut className='h-4 w-4 mr-1' />
                     Salir
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <>
@@ -68,8 +103,8 @@ const Navbar = () => {
                     href='/login'
                     className='flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-900 hover:bg-gray-800 transition-colors'
                   >
-                    <User className='h-4 w-4 mr-1' />
-                    Crear evento
+                    <CircleUserRound className='h-4 w-4 mr-1' />
+                    Iniciar Sesión
                   </Link>
                 </>
               )}
@@ -99,7 +134,7 @@ const Navbar = () => {
             Inicio
           </Link>
           <Link
-            href='/events'
+            href='/eventos'
             className='block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600'
             onClick={() => setIsMenuOpen(false)}
           >
@@ -117,19 +152,17 @@ const Navbar = () => {
           {user ? (
             <>
               <div className='px-3 py-2 flex items-center'>
-                <img className='h-8 w-8 rounded-full border-2 border-white' src={user.avatar} alt={user.name} />
-                <span className='ml-2 text-white'>{user.name}</span>
+                <User description='Usuario básico' name={user.full_name} avatarProps={{ size: 'sm' }} />
               </div>
-              <button
-                onClick={() => {
-                  logout()
-                  setIsMenuOpen(false)
-                }}
+              <Button
+                onPress={handleLogout}
+                color='danger'
+                size='sm'
                 className='w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700'
               >
                 <LogOut className='h-5 w-5 mr-2' />
-                Salir
-              </button>
+                Cerrar sesión
+              </Button>
             </>
           ) : (
             <Link
@@ -137,7 +170,7 @@ const Navbar = () => {
               className='flex items-center px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700'
               onClick={() => setIsMenuOpen(false)}
             >
-              <User className='h-5 w-5 mr-2' />
+              <CircleUserRound className='h-5 w-5 mr-2' />
               Iniciar Sesión
             </Link>
           )}

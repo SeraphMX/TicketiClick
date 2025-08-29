@@ -5,8 +5,11 @@ import { setPaymentIntentId } from '@/store/slices/checkoutSlice'
 import { RootState } from '@/store/store'
 import { CardElement, Elements, useElements, useStripe } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-import { ArrowLeft, ChevronRight, CreditCard } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ChevronLeft, ChevronRight, CreditCard } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useWizard } from 'react-use-wizard'
+import { Button } from '../ui/button'
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
@@ -16,7 +19,6 @@ interface PaymentMethodProps {
     paymentMethod?: string
   }
   onSubmit: (method: string) => void
-  onBack: () => void
 }
 
 const PAYMENT_METHODS = [
@@ -28,7 +30,8 @@ const PAYMENT_METHODS = [
   }
 ]
 
-const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
+const PaymentForm = ({ formData, onSubmit }: PaymentMethodProps) => {
+  const { previousStep, nextStep } = useWizard()
   const stripe = useStripe()
   const elements = useElements()
   const selectedEvent = useSelector((state: RootState) => state.events.selectedEvent)
@@ -49,6 +52,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   useEffect(() => {
     if (selectedMethod !== 'card') {
       setCardComplete(false)
+      nextStep() // Avanza al siguiente paso si se selecciona un método diferente a tarjeta
     }
   }, [selectedMethod])
 
@@ -69,7 +73,7 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
 
     try {
       // Create payment intent
-      const response = await fetch('/api/create-payment-intent', {
+      const response = await fetch('/api/stripe/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -114,6 +118,8 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
       dispatch(setPaymentIntentId(paymentIntentId))
 
       onSubmit(selectedMethod)
+
+      nextStep()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ups... hubo un error al procesar el pago')
       console.error('Payment error:', err)
@@ -132,11 +138,17 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
   }
 
   return (
-    <div className='space-y-6'>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 300,
+        damping: 30
+      }}
+      className='space-y-4'
+    >
       <div className='flex items-center'>
-        <button onClick={onBack} className='mr-4 text-gray-500 hover:text-gray-700'>
-          <ArrowLeft className='h-5 w-5' />
-        </button>
         <h2 className='text-xl font-bold text-gray-900'>Método de pago</h2>
       </div>
 
@@ -205,16 +217,15 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
           })}
         </div>
 
-        <div className='flex justify-end'>
-          <button
+        <div className='flex justify-between items-center'>
+          <Button onPress={previousStep} variant='ghost' className='flex items-center'>
+            <ChevronLeft className='mr-2 h-4 w-4' />
+            Regresar
+          </Button>
+          <Button
             type='submit'
+            color='primary'
             disabled={!stripe || !elements || !selectedMethod || isProcessing || (selectedMethod === 'card' && !cardComplete)}
-            className={`
-              inline-flex items-center justify-center px-4 py-2 border border-transparent 
-              text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 
-              hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 
-              focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed
-            `}
           >
             {isProcessing ? (
               <>
@@ -239,10 +250,10 @@ const PaymentForm = ({ formData, onSubmit, onBack }: PaymentMethodProps) => {
                 <ChevronRight className='ml-2 h-4 w-4' />
               </>
             )}
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </motion.section>
   )
 }
 

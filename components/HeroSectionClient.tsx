@@ -1,6 +1,7 @@
 'use client'
 
 import { Facebook, Link2, Twitter } from 'lucide-react'
+import Link from 'next/link'
 
 const HeroSectionClient = () => {
   // Imágenes para las categorías
@@ -67,6 +68,12 @@ const HeroSectionClient = () => {
             <Search className='h-5 w-5 mr-2' />
             Explorar eventos
           </Link> */}
+              <Link
+                href='/evento/chapul-big-band'
+                className='inline-flex items-center justify-center px-5 py-3 bg-blue-600 text-white font-medium rounded-lg border border-blue-500 hover:bg-blue-700 transition-colors'
+              >
+                Comprar entradas
+              </Link>
             </div>
           </div>
           <div className='lg:flex gap-2 items-center lg:w-1/3 '>

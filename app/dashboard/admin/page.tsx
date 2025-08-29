@@ -2,11 +2,11 @@
 // app/dashboard/admin/page.tsx
 // Panel de administración principal
 
-import { useAuth } from '@/hooks/useAuth'
 import { useEvents } from '@/hooks/useEvents'
-import { useTickets } from '@/hooks/useTickets'
+import { RootState } from '@/store/store'
 import { BarChart, CalendarDays, DollarSign, TicketIcon, TrendingUp, UsersRound } from 'lucide-react'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 // Componente de gráfico de barras simulado
 const SimpleBarChart = () => {
@@ -72,15 +72,15 @@ const SimpleLineChart = () => {
 }
 
 export default function AdminDashboardPage() {
-  const { user } = useAuth()
+  const { isLoading, user } = useSelector((state: RootState) => state.auth)
   const { events } = useEvents()
-  const { tickets } = useTickets()
+  // const { tickets } = useTickets()
 
   // Calcular estadísticas
   const totalEvents = events.length
   const totalUsers = 5 // Número fijo para la demo
-  const totalTickets = tickets.length
-  const totalRevenue = tickets.reduce((sum, ticket) => sum + ticket.totalPrice, 0)
+  // const totalTickets = tickets.length
+  // const totalRevenue = tickets.reduce((sum, ticket) => sum + ticket.totalPrice, 0)
 
   // Tabs para métricas
   const [activeTab, setActiveTab] = useState('events')
@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <p className='text-sm font-medium text-gray-600'>Boletos vendidos</p>
-              <p className='text-2xl font-bold text-gray-900'>{totalTickets}</p>
+              {/* <p className='text-2xl font-bold text-gray-900'>{totalTickets}</p> */}
             </div>
           </div>
           <div className='mt-4 flex items-center text-sm'>
@@ -166,7 +166,7 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <p className='text-sm font-medium text-gray-600'>Ingresos totales</p>
-              <p className='text-2xl font-bold text-gray-900'>{totalRevenue.toFixed(2)} EUR</p>
+              {/* <p className='text-2xl font-bold text-gray-900'>{totalRevenue.toFixed(2)} EUR</p> */}
             </div>
           </div>
           <div className='mt-4 flex items-center text-sm'>

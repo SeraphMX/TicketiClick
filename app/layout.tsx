@@ -1,10 +1,10 @@
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
-import { AuthProvider } from '@/hooks/useAuth'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import { SessionBootstrapper } from './sessionBoostraper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,11 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='es'>
       <body className={`${inter.className} bg-gray-100 min-h-screen flex flex-col`}>
         <Providers>
-          <AuthProvider>
-            <Navbar />
-            <main className='flex-grow '>{children}</main>
-            <Footer />
-          </AuthProvider>
+          <SessionBootstrapper />
+          <Navbar />
+          <main className='flex-grow '>{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

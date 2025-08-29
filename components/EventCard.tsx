@@ -35,7 +35,7 @@ const EventCard = ({ event, featured = false }: EventCardProps) => {
   const handleNavigate = (e: React.MouseEvent) => {
     e.preventDefault()
 
-    const url = `/event/${event.slug}`
+    const url = `/evento/${event.slug}`
 
     if (document.startViewTransition) {
       document.startViewTransition(() => {

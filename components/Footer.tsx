@@ -16,7 +16,7 @@ const Footer = () => {
           <div className='col-span-1 md:col-span-1'>
             <div className='flex items-center mb-4'>
               <Image src='/branding/logo-ticketi.webp' alt='Logo' className='h-8 w-8 mr-2' width={50} height={50} />
-              <span className='font-bold text-xl'>Ticketi Click</span>
+              <span className='font-bold text-xl'>Ticketi</span>
             </div>
             <p className='text-gray-400 mb-4'>Tu acceso a los mejores eventos en un solo click</p>
             <div className='flex space-x-4'>
@@ -37,18 +37,18 @@ const Footer = () => {
             <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Enlaces rápidos</h3>
             <ul className='space-y-2'>
               <li>
-                <Link href='/' className='text-gray-400 hover:text-white transition-colors'>
+                <Link href='/conoce-ticketi' className='text-gray-400 hover:text-white transition-colors'>
                   Conoce Ticketi
                 </Link>
               </li>
               <li>
-                <Link href='/events' className='text-gray-400 hover:text-white transition-colors'>
+                <Link href='/organizadores' className='text-gray-400 hover:text-white transition-colors'>
                   ¿Eres organizador?
                 </Link>
               </li>
               <li>
                 <Link href='/dashboard' className='text-gray-400 hover:text-white transition-colors'>
-                  Mi cuenta
+                  Accede a tu cuenta
                 </Link>
               </li>
             </ul>
@@ -58,17 +58,17 @@ const Footer = () => {
             <h3 className='text-lg font-semibold mb-4 border-b border-gray-700 pb-2'>Páginas útiles</h3>
             <ul className='space-y-2'>
               <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Link href='/preguntas-frecuentes' className='text-gray-400 hover:text-white transition-colors'>
                   Preguntas frecuentes
                 </Link>
               </li>
               <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Link href='aviso-de-privacidad' className='text-gray-400 hover:text-white transition-colors'>
                   Aviso de privacidad
                 </Link>
               </li>
               <li>
-                <Link href='#' className='text-gray-400 hover:text-white transition-colors'>
+                <Link href='terminos-y-condiciones' className='text-gray-400 hover:text-white transition-colors'>
                   Términos y condiciones
                 </Link>
               </li>

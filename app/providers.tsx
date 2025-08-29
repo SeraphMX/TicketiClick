@@ -1,18 +1,22 @@
 // app/providers.tsx
 // Providers de la aplicación
 
-'use client';
+'use client'
 
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '@/store/store';
+import { persistor, store } from '@/store/store'
+import { HeroUIProvider, ToastProvider } from '@heroui/react'
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        {children}
-      </PersistGate>
-    </Provider>
-  );
+    <HeroUIProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          {children}
+        </PersistGate>
+      </Provider>
+      <ToastProvider />
+    </HeroUIProvider>
+  )
 }

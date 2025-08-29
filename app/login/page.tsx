@@ -1,178 +1,276 @@
 'use client'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 // app/login/page.tsx
-// Página de inicio de sesión
+// Página de inicio de sesión actualizada para Supabase
 
-import { useAuth } from '@/hooks/useAuth'
+import { loginUserForm } from '@/schemas/user.schema'
+import { userService } from '@/services/userService'
+import { clearAuthError, loginUser } from '@/store/slices/authSlice'
+import { setEmail } from '@/store/slices/registerSlice'
+import { AppDispatch, RootState } from '@/store/store'
+import { Checkbox, Spinner } from '@heroui/react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { motion } from 'framer-motion'
 import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useDispatch, useSelector } from 'react-redux'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const { login, isLoading } = useAuth()
+  const [loginAttempts, setLoginAttempts] = useState(0)
+  const [userCanLogin, setUserCanLogin] = useState(true)
+  const [rememberMe, setRememberMe] = useState(false)
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const { error, isLoading, user } = useSelector((state: RootState) => state.auth)
 
-    // Validación básica
-    if (!email || !password) {
-      setError('Por favor, completa todos los campos')
-      return
+  const {
+    register,
+    watch,
+    handleSubmit,
+    setError,
+    clearErrors,
+    setValue,
+    trigger,
+
+    formState: { errors }
+  } = useForm({
+    resolver: zodResolver(loginUserForm),
+    mode: 'onSubmit',
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
+
+  useEffect(() => {
+    if (!userCanLogin) {
+      // Si el login está bloqueado, limpiamos el error del campo
+      clearErrors('password')
+    }
+  }, [userCanLogin, clearErrors])
+
+  useEffect(() => {
+    // limpia errores al montar y desmontar el componente
+    dispatch(clearAuthError())
+    clearErrors()
+    return () => {
+      dispatch(clearAuthError())
+      clearErrors()
+    }
+  }, [])
+
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail')
+    if (rememberedEmail) {
+      setValue('email', rememberedEmail)
+      setRememberMe(true)
+    }
+  }, [setValue])
+
+  useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'email') {
+        setLoginAttempts(0)
+        setUserCanLogin(true)
+        clearErrors()
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [watch, clearErrors])
+
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (user && user.id && !isLoading) {
+      router.push('/')
+    }
+  }, [user, isLoading, router])
+
+  // Controla los intentos y mensajes según el error global
+  useEffect(() => {
+    if (!error || !userCanLogin) return
+
+    const maxAttempts = 5
+    const nextAttempts = loginAttempts + 1
+    setLoginAttempts(nextAttempts)
+
+    if (error === 'Contraseña incorrecta') {
+      setError('password', {
+        type: 'manual',
+        message: 'Contraseña incorrecta.'
+      })
     }
 
-    try {
-      const success = await login(email, password)
+    if (nextAttempts >= maxAttempts) {
+      setUserCanLogin(false)
+      clearErrors('password')
+    }
+  }, [error])
 
-      if (success) {
-        // Redirigir al dashboard o a la página principal
-        router.push('/dashboard')
+  // Maneja el submit
+  interface SignInFormData {
+    email: string
+    password: string
+  }
+
+  const handleSignIn = async (data: SignInFormData): Promise<void> => {
+    if (!userCanLogin) return
+
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', data.email)
+    } else {
+      localStorage.removeItem('rememberedEmail')
+    }
+
+    dispatch(loginUser({ email: data.email, password: data.password }))
+  }
+
+  const renderErrorMessage = () => {
+    const maxAttempts = 5
+    const remaining = maxAttempts - loginAttempts
+
+    // Si ya no puede intentar más
+    if (!userCanLogin) {
+      return 'Has alcanzado el número máximo de intentos. Por favor, inténtalo más tarde o restablece tu contraseña.'
+    }
+
+    // Si quedan 2 o menos intentos, mostrar advertencia
+    if (remaining <= 2) {
+      return `Te quedan ${remaining} ${remaining > 1 ? 'intentos' : 'intento'} antes de que se bloquee el inicio de sesión.`
+    }
+
+    // Si aún quedan más de 2 intentos, no mostrar mensaje global
+    return null
+  }
+
+  const handleUserExists = async (email: string) => {
+    const isValid = await trigger('email') // Ejecuta validación solo de email
+    if (isValid) {
+      clearErrors('email')
+      const userExists = await userService.isEmailRegistered(email)
+
+      if (userExists) {
+        setUserCanLogin(true)
       } else {
-        setError('Credenciales inválidas. Intenta de nuevo.')
+        setUserCanLogin(false)
+        setError('email', {
+          type: 'manual',
+          message: 'Este correo electrónico no está registrado.'
+        })
+        dispatch(setEmail({ email })) // Guardar el email en el store
       }
-    } catch (err) {
-      setError('Error al iniciar sesión. Intenta de nuevo más tarde.')
     }
   }
 
-  // Opciones de demo login
-  const demoUsers = [
-    { email: 'juan@ejemplo.com', role: 'Usuario' },
-    { email: 'maria@ejemplo.com', role: 'Organizador' },
-    { email: 'carlos@ejemplo.com', role: 'Administrador' }
-  ]
-
-  const handleDemoLogin = async (demoEmail: string) => {
-    try {
-      // Usar contraseña ficticia para el demo
-      const success = await login(demoEmail, 'password123')
-
-      if (success) {
-        router.push('/dashboard')
-      } else {
-        setError('Error en el acceso demo. Intenta de nuevo.')
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión demo. Intenta de nuevo más tarde.')
-    }
+  // Si ya está autenticado, mostrar loading
+  if (user && !isLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gray-50'>
+        <div className='text-center'>
+          <Spinner color='primary' label='Cargando...' labelColor='primary' size='lg' />
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 py-12'>
-      <div className='max-w-md mx-auto px-4 sm:px-6'>
-        <div className='bg-white rounded-lg shadow-md overflow-hidden'>
+    <div className='min-h-screen flex items-center justify-center '>
+      <motion.div
+        className='px-4 sm:px-6 w-full max-w-md'
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, y: 20, scale: 0.8 }}
+        transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 20 }}
+      >
+        <section className='bg-white rounded-lg shadow-md overflow-hidden'>
           {/* Cabecera */}
-          <div className='px-6 pt-8 pb-6 bg-gradient-to-r from-blue-700 to-zinc-800 text-white'>
+          <div className='px-6 pt-8 '>
             <h1 className='text-2xl font-bold mb-1'>Iniciar Sesión</h1>
-            <p className='text-blue-100'>Accede a tu cuenta para comprar boletos y más</p>
+            <p>Accede a tu cuenta en Ticketi</p>
           </div>
 
           {/* Formulario */}
           <div className='p-6'>
-            {error && (
+            {renderErrorMessage() && (
               <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-start'>
-                <AlertCircle className='h-5 w-5 mr-2 text-red-500 mt-0.5' />
-                <span>{error}</span>
+                <AlertCircle size={20} className='mr-2 text-red-500 mt-1' />
+                <span>{renderErrorMessage()}</span>
               </div>
             )}
+            <form onSubmit={handleSubmit(handleSignIn)} className='space-y-4'>
+              <Input
+                {...register('email')}
+                isInvalid={!!errors.email}
+                errorMessage={errors.email?.message}
+                label='Correo electrónico'
+                isDisabled={isLoading || loginAttempts >= 5}
+                onBlur={(e) => {
+                  handleUserExists(e.target.value)
+                }}
+                autoFocus
+              />
 
-            <form onSubmit={handleSubmit} className='space-y-4'>
-              <div>
-                <label htmlFor='email' className='block text-sm font-medium text-gray-700 mb-1'>
-                  Correo electrónico
-                </label>
-                <input
-                  id='email'
-                  type='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='tu@email.com'
-                />
-              </div>
-
-              <div>
-                <label htmlFor='password' className='block text-sm font-medium text-gray-700 mb-1'>
-                  Contraseña
-                </label>
-                <div className='relative'>
-                  <input
-                    id='password'
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
-                    placeholder='••••••••'
-                  />
+              <Input
+                {...register('password')}
+                label='Contraseña'
+                type={showPassword ? 'text' : 'password'}
+                endContent={
                   <button
                     type='button'
                     onClick={() => setShowPassword(!showPassword)}
                     className='absolute inset-y-0 right-0 pr-3 flex items-center'
+                    tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className='h-5 w-5 text-gray-400' /> : <Eye className='h-5 w-5 text-gray-400' />}
                   </button>
-                </div>
-              </div>
+                }
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message}
+                isDisabled={isLoading || !userCanLogin}
+              />
 
               <div className='flex items-center justify-between'>
-                <div className='flex items-center'>
-                  <input id='remember-me' type='checkbox' className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded' />
-                  <label htmlFor='remember-me' className='ml-2 block text-sm text-gray-700'>
-                    Recordarme
-                  </label>
-                </div>
-
+                <Checkbox isSelected={rememberMe} onValueChange={setRememberMe} isDisabled={isLoading || !userCanLogin}>
+                  <span className='text-sm'>Recordarme</span>
+                </Checkbox>
                 <div className='text-sm'>
-                  <a href='#' className='font-medium text-blue-600 hover:text-blue-500'>
+                  <Link href='/cuenta/reset-password' className='font-medium text-blue-600 hover:text-blue-500'>
                     ¿Olvidaste tu contraseña?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
-              <button
-                type='submit'
-                disabled={isLoading}
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  isLoading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
-              >
+              <Button type='submit' isDisabled={isLoading || !userCanLogin} isLoading={isLoading} fullWidth color='primary'>
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
-              </button>
+              </Button>
             </form>
 
             <div className='mt-6'>
               <p className='text-sm text-gray-600 text-center'>
                 ¿No tienes una cuenta?{' '}
-                <Link href='#' className='font-medium text-blue-600 hover:text-blue-500'>
+                <Link href='/crear-cuenta' className='font-medium text-blue-600 hover:text-blue-500'>
                   Regístrate aquí
                 </Link>
               </p>
             </div>
           </div>
 
-          {/* Demo Users */}
-          <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
-            <h3 className='text-sm font-medium text-gray-700 mb-3'>Accesos para demostración:</h3>
-            <div className='space-y-2'>
-              {demoUsers.map((demo) => (
-                <button
-                  key={demo.email}
-                  onClick={() => handleDemoLogin(demo.email)}
-                  className='w-full text-left text-sm px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center'
-                >
-                  <span>{demo.email}</span>
-                  <span className='bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full'>{demo.role}</span>
-                </button>
-              ))}
+          {/* Información de desarrollo */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className='px-6 py-4 bg-gray-50 border-t border-gray-100'>
+              <p className='text-xs text-gray-500'>
+                <strong>Modo desarrollo:</strong> Si no tienes una cuenta, puedes registrarte o usar las credenciales que hayas creado en
+                Supabase.
+              </p>
             </div>
-            <p className='text-xs text-gray-500 mt-2'>* Haz clic en cualquier usuario demo para iniciar sesión automáticamente</p>
-          </div>
-        </div>
-      </div>
+          )}
+        </section>
+      </motion.div>
     </div>
   )
 }
