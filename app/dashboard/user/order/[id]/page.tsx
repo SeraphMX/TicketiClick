@@ -1,30 +1,15 @@
-// app/event/[slug]/tickets/[token]/page.tsx
 import DownloadTickets from '@/components/tickets/DownloadTickets'
 import { supabase } from '@/lib/supabase'
-import { verifyOrderToken } from '@/lib/tokens'
-import { formatDate } from '@/lib/utils'
 import { OrderData } from '@/types/orders'
-import { notFound } from 'next/navigation'
+import { formatDate } from '@/utils/date'
 
-type Props = Promise<{ slug: string; token: string }>
-
-export default async function TicketPage(props: { params: Props }) {
-  const { token, slug } = await props.params
-
-  let orderId: string
-
-  // Verifica el token JWT
-  try {
-    const payload = verifyOrderToken(token)
-    orderId = payload.orderId
-  } catch (err) {
-    console.error('Token inválido o expirado', err)
-    return notFound()
-  }
+type Props = Promise<{ id: string }>
+export default async function OrderPage(props: { params: Props }) {
+  const { id } = await props.params
 
   const { data: orderData, error } = await supabase
     .rpc('get_order_by_id', {
-      order_id: orderId
+      order_id: id
     })
     .single()
 
@@ -41,13 +26,13 @@ export default async function TicketPage(props: { params: Props }) {
   console.log(order_data)
 
   return (
-    <div className='py-6 min-h-screen mt-20 flex flex-col items-center justify-center gap-5'>
-      <div className='max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 '>
+    <div className='py-6 flex flex-col  gap-5'>
+      <div className=' px-4 sm:px-6 lg:px-8 '>
         <div className='bg-white p-6 rounded-lg'>
           <div className='flex items-center justify-between mb-6'>
             <h1 className='text-2xl font-bold text-gray-900'>Los datos de tu orden</h1>
           </div>
-          <p>Orden: {orderId}</p>
+          <p>Orden: {id}</p>
           <p>Fecha: {formatDate(order_data.created_at)}</p>
           <p>Email: {order_data.email}</p>
           <p>Teléfono: {order_data.phone}</p>

@@ -122,8 +122,8 @@ function TicketPDF({ ticket }: { ticket: TicketData }) {
 function TicketsPDFDocument({ tickets }: { tickets: TicketData[] }) {
   return (
     <Document>
-      {tickets.map((ticket) => (
-        <Page size='A4' style={styles.page} key={ticket.id}>
+      {tickets.map((ticket, index) => (
+        <Page size='A4' style={styles.page} key={`ticket-${ticket.id}-${index}`}>
           <RenderImage src={ticket.eventImage} style={styles.eventImage} />
 
           <View style={styles.section}>
@@ -232,7 +232,7 @@ export default function DownloadTickets({ paymentIntentId }: DownloadTicketsProp
 
       <div className='flex flex-col  gap-6'>
         {tickets.map((ticket) => (
-          <div key={ticket.id} className='bg-white p-4 rounded-lg shadow-md sm:flex items-center gap-4'>
+          <div key={`ticket-${ticket.id}`} className='bg-white p-4 rounded-lg shadow-md sm:flex items-center gap-4'>
             <img src={ticket.eventImage} alt={ticket.eventName} className='sm:w-1/3' />
             <section>
               <h2 className='text-xl font-semibold mb-2'>{ticket.eventName}</h2>

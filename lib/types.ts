@@ -2,6 +2,7 @@
 // Interfaces y tipos para la aplicación
 
 import { Ticket, TicketStatus } from '@/data/tickets'
+import type { DateValue } from '@internationalized/date'
 
 // Re-exportando para facilidad de importaciones
 export type { Ticket, TicketStatus }
@@ -59,13 +60,13 @@ export interface AdminStats {
 export interface EventFormData {
   title: string
   description: string
-  date: string
+  date: DateValue | null | undefined
   time: string
   location: string
-  price: number
   category: string
-  availableTickets: number
-  image?: string
+  price: number
+  ticketsAvailable: number
+  imageUrl?: string
   featured?: boolean
 }
 

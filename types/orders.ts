@@ -31,6 +31,21 @@ export interface Ticket {
   status: keyof typeof statusMap
 }
 
+export interface OrderData {
+  id: string
+  user_id: string
+  email: string
+  phone: string
+  event_id: string
+  discount_code_id: string
+  total_amount: number
+  currency: string
+  payment_status: string
+  payment_method: string
+  stripe_payment_intent_id: string
+  created_at: string
+}
+
 export const statusMap = {
   valid: {
     color: 'text-green-500',

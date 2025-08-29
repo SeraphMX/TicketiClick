@@ -3,8 +3,10 @@
 
 import { formatDate } from '@/lib/utils'
 import { Order } from '@/types/orders'
+import { formatCurrency } from '@/utils/currency'
 
 import { Calendar, QrCode, Ticket as TicketIcon } from 'lucide-react'
+import Link from 'next/link'
 
 interface OrderCardProps {
   order: Order
@@ -47,14 +49,14 @@ const OrderCard = ({ order }: OrderCardProps) => {
       <div className='border-b border-dashed border-gray-300 relative'>
         {/* Cabecera del boleto */}
         <div className='p-4 bg-gradient-to-r from-blue-900 to-blue-700 text-white'>
-          <div className='flex justify-between items-start'>
+          <div className='flex justify-between items-center'>
             <div>
               <h3 className='font-bold text-lg'>{order.event_title}</h3>
               <p className='text-blue-100 text-sm'>{formatDate(order.event_date)}</p>
             </div>
-            {/* <div className={`${getStatusColor(order.status)} px-2 py-1 rounded-full text-xs font-medium`}>
-              {translateStatus(order.status)}
-            </div> */}
+            <div>
+              <Link href={`user/order/${order.order_id}`}>Detalles de la orden </Link>
+            </div>
           </div>
         </div>
 
@@ -94,7 +96,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
         <div className='text-right'>
           <p className='text-sm text-gray-500'>Total pagado:</p>
           <p className='font-bold text-blue-700'>
-            {order.total_amount.toFixed(2)} {order.event_currency}
+            {formatCurrency(order.total_amount)} {order.event_currency}
           </p>
         </div>
       </div>

@@ -137,11 +137,11 @@ export default function OrganizerDashboardPage() {
 
       {/* Búsqueda y filtros */}
       {!showForm && (
-        <div className='mb-6 flex items-center '>
-          <Input label='Buscar en mis eventos...' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <div className='mb-6 flex items-center gap-2 '>
+          <Input label='Buscar en mis eventos...' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} size='sm' />
           <Button color='primary'>
             <PlusCircle size={20} />
-            Crear nuevo evento
+            Buscar
           </Button>
         </div>
       )}
