@@ -157,7 +157,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   </span>
                   <span className='inline-flex items-center'>
                     <CalendarDays className='h-4 w-4 mr-1' />
-                    {formatDate(event.date)}
+                    {event.date ? formatDate(event.date) : 'Próximamente'}
                   </span>
                   {event.date && (
                     <span className='inline-flex items-center'>
@@ -211,7 +211,7 @@ export default function EventDetailClient({ event }: { event: Event }) {
                   <CalendarDays className='h-5 w-5 mr-3 text-blue-600 mt-0.5' />
                   <div>
                     <p className='font-medium'>Fecha</p>
-                    <p className='text-gray-600'>{formatDate(event.date)}</p>
+                    <p className='text-gray-600'>{event.date ? formatDate(event.date) : 'Próximamente'}</p>
                   </div>
                 </div>
 

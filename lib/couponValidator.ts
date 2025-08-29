@@ -1,10 +1,10 @@
 // utils/couponValidator.ts
 export const validateCoupon = (code: string) => {
   const normalized = code.trim().toLowerCase()
-  if (normalized === 'admin90') {
+  if (normalized === 'chapul20') {
     return {
-      code: 'admin90',
-      discount: 90,
+      code: 'chapul20',
+      discount: 20,
       isPercentage: true,
       isApplied: true
     }
