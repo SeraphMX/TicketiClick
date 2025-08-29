@@ -3,7 +3,6 @@
 // Página de dashboard para organizadores - Mis eventos
 
 import EventCard from '@/components/EventCard'
-import EventForm from '@/components/organizer/EventForm'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -120,7 +119,7 @@ export default function OrganizerDashboardPage() {
               </div>
             </div>
           ) : (
-            <EventForm onSubmit={handleCreateEvent} isLoading={formSubmitting} />
+            'NUevo'
           )}
         </div>
       ) : (

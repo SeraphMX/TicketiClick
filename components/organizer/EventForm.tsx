@@ -3,7 +3,7 @@
 // Formulario para crear o editar eventos
 
 import { EventFormData } from '@/schemas/event.schema'
-import { Button, DatePicker, NumberInput, Select, SelectItem, Textarea } from '@heroui/react'
+import { Button, NumberInput, Select, SelectItem, Textarea } from '@heroui/react'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -92,7 +92,7 @@ const EventForm = ({ onSubmit, isLoading = false }: EventFormProps) => {
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <div>
-          <Controller
+          {/* <Controller
             name='date'
             control={control}
             render={({ field: { onChange, value } }) => (
@@ -102,7 +102,7 @@ const EventForm = ({ onSubmit, isLoading = false }: EventFormProps) => {
                 onChange={(date) => onChange(date ? date.toString() : '')}
               />
             )}
-          />
+          /> */}
         </div>
 
         <div>
