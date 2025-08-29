@@ -73,7 +73,7 @@ export const useEvents = (organizerId?: string) => {
             organizerId,
             currency: 'EUR',
             featured: eventData.featured || false,
-            image: eventData.image || 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg',
+            image: eventData.imageUrl || 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg',
             slug: eventData.title.toLowerCase().replace(/\s+/g, '-')
           }
         ])

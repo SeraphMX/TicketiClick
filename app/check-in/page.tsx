@@ -4,7 +4,7 @@ import { ticketService } from '@/services/ticketService'
 import { RootState } from '@/store/store'
 import { statusMap, Ticket } from '@/types/orders'
 import { formatDate } from '@/utils/date'
-import { Button, Card, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from '@heroui/react'
 import { IDetectedBarcode, outline, Scanner } from '@yudiel/react-qr-scanner'
 import { Calendar, CalendarCheck2, QrCode, Search, Ticket as TicketIcon, User } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -109,12 +109,12 @@ export default function Page() {
         </div>
       )}
 
-      <section className='max-w-sm   gap-4 w-full p-4'>
+      {/* <section className='max-w-sm   gap-4 w-full p-4'>
         <Card className='flex flex-col items-center justify-center h-24'>
           <p className='text-3xl'>16/150</p>
           <p className='text-xs'>Escaneados</p>
         </Card>
-      </section>
+      </section> */}
 
       <Modal
         isOpen={isOpen}
