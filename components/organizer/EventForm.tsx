@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 import { Input } from '../ui/input'
 
 interface EventFormProps {
-  onSubmit: (data: EventFormData) => void
+  onSubmit: (data: EventFormData) => void | Promise<void>
   isLoading?: boolean
 }
 
@@ -102,7 +102,7 @@ const EventForm = ({ onSubmit, isLoading = false }: EventFormProps) => {
                 onChange={(date) => onChange(date ? date.toString() : '')}
               />
             )}
-          /> */}
+          />  //TODO:Arreglar */}
         </div>
 
         <div>
